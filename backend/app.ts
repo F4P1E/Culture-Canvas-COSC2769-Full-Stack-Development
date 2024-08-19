@@ -23,7 +23,7 @@ app.use(cors({
 const sessionConfig = {
   secret: process.env.SECRET,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
     secure: false, // set to true in production
     maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
