@@ -1,6 +1,5 @@
 import mongoose, { Model, Document } from "mongoose";
 const bcrypt = require('bcrypt');
-const validator = require('validator');
 
 const Schema = mongoose.Schema;
 

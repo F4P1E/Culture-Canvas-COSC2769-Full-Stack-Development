@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 const cors = require('cors');
+const session = require('express-session');
 
 import userRoute from './routes/user';
 
@@ -17,6 +18,19 @@ app.use(express.json())
 app.use(cors({
   origin: 'http://localhost:5173'
 }));
+
+
+const sessionConfig = {
+  secret: process.env.SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secure: false, // set to true in production
+    maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
+  }
+};
+
+app.use(session(sessionConfig));
 
 mongoose.connect(process.env.MONGO_URI!
 )
