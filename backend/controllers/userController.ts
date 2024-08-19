@@ -6,7 +6,7 @@ const loginUser = async (request: any, response: any) => {
   try {
     const user = await UserModel.login(email, password);
 
-    request.session.userId = user._id;
+    request.session._id = user._id;
     request.session.email = email;
 
       response.status(200).json({ email });
