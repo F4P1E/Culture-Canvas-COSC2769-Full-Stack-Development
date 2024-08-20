@@ -182,3 +182,4 @@ const unFriend = async (request: any, response: any) => {
   }
 }
 
+export { loginUser, signupUser, sendFriendRequest, cancelFriendRequest, acceptRequest, unFriend};
