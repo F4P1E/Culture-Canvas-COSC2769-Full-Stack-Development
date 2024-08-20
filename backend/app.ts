@@ -3,7 +3,10 @@ import mongoose from 'mongoose';
 const cors = require('cors');
 const session = require('express-session');
 
+
 import userRoute from './routes/user';
+import requireAuth from './middleware/requireAuth';
+
 
 require('dotenv').config();
 
@@ -23,7 +26,7 @@ app.use(cors({
 const sessionConfig = {
   secret: process.env.SECRET,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
     secure: false, // set to true in production
     maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
@@ -31,6 +34,14 @@ const sessionConfig = {
 };
 
 app.use(session(sessionConfig));
+
+app.use((request, response, next) => {
+  if (request.path === '/user/login' || request.path === '/user/signup') {
+    return next();
+  }
+
+  requireAuth(request, response, next);
+});
 
 mongoose.connect(process.env.MONGO_URI!
 )

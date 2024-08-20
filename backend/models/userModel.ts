@@ -3,9 +3,12 @@ const bcrypt = require('bcrypt');
 
 const Schema = mongoose.Schema;
 
-interface IUser extends Document {             
+interface IUser extends Document {   
+    username: string;
     email: string;
     password: string;
+    friends: IUser[];
+    requests: string[];
 }
 
 interface IUserModel extends Model<IUser> {        
@@ -14,16 +17,30 @@ interface IUserModel extends Model<IUser> {
 }
 
 const userSchema = new Schema<IUser>({
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    password: {
-        type: String,
-        required: true,
-        unique: true
-    }
+username: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  friends: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    default: []
+  }],
+  requests: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    default: []
+  }]
 }, { timestamps: true });
 
 // Static signup method
@@ -35,7 +52,6 @@ userSchema.statics.signup = async function (email: string, password: string) {
     if (exists) {
         throw new Error('Email already in use');  //for signup only. Only one email account can register
     }
-
 
     //validate
     if (!email || !password) {
