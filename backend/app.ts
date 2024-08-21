@@ -3,9 +3,13 @@ import mongoose from 'mongoose';
 const cors = require('cors');
 const session = require('express-session');
 
+import requireAuth from './middleware/requireAuth';
+
 
 import userRoute from './routes/user';
-import requireAuth from './middleware/requireAuth';
+import postRoute from './routes/post';
+
+
 
 
 require('dotenv').config();
@@ -36,7 +40,7 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 
 app.use((request, response, next) => {
-  if (request.path === '/user/login' || request.path === '/user/signup') {
+  if (request.path === '/login' || request.path === '/signup') {
     return next();
   }
 
@@ -56,4 +60,5 @@ mongoose.connect(process.env.MONGO_URI!
 
 
 //routes
-app.use('/user', userRoute);
+app.use('/', userRoute);
+app.use('/post', postRoute);

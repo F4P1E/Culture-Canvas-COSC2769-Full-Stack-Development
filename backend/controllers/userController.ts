@@ -9,7 +9,7 @@ const loginUser = async (request: any, response: any) => {
   try {
     const user = await UserModel.login(email, password);
 
-    request.session._id = user.id;
+    request.session._id = user._id;
     request.session.email = email;   
 
       response.status(200).json({ email });
@@ -29,7 +29,7 @@ const signupUser = async (request: any, response: any) => {
   try {
     const user = await UserModel.signup(email, password);
 
-    request.session._id = user.id;
+    request.session._id = user._id;
     request.session.email = email;
 
     response.status(200).json({ email });
@@ -44,8 +44,8 @@ const signupUser = async (request: any, response: any) => {
 
 const sendFriendRequest = async (request: any, response: any) => {
   try {
-    if (request.user.id !== request.params.id) {
-      const sender: any = await UserModel.findById(request.user.id);
+    if (request.user._id !== request.params.id) {
+      const sender: any = await UserModel.findById(request.user._id);
       const receiver: any = await UserModel.findById(request.params.id);
       
       if (!sender || !receiver) {
@@ -54,11 +54,11 @@ const sendFriendRequest = async (request: any, response: any) => {
       }
       
       if (
-        !receiver.requests.includes(sender.id) &&
-        !receiver.friends.includes(sender.id)) {
+        !receiver.requests.includes(sender._id) &&
+        !receiver.friends.includes(sender._id)) {
         
         await receiver.updateOne({
-          $push: { requests: sender.id }
+          $push: { requests: sender._id }
         });
         
         response.json({ message: 'Friend request sent successfully' });
@@ -77,8 +77,8 @@ const sendFriendRequest = async (request: any, response: any) => {
 
 const cancelFriendRequest = async (request: any, response: any) => {
   try {
-    if (request.user.id !== request.params.id) {
-      const sender: any = await UserModel.findById(request.user.id);
+    if (request.user._id !== request.params.id) {
+      const sender: any = await UserModel.findById(request.user._id);
       const receiver: any = await UserModel.findById(request.params.id);
       
       if (!sender || !receiver) {
@@ -87,11 +87,11 @@ const cancelFriendRequest = async (request: any, response: any) => {
       }
       
       if (
-        !receiver.requests.includes(sender.id) &&
-        !receiver.friends.includes(sender.id)) {
+        !receiver.requests.includes(sender._id) &&
+        !receiver.friends.includes(sender._id)) {
         
         await receiver.updateOne({
-          $pull: { requests: sender.id }
+          $pull: { requests: sender._id }
         });
         
         response.json({ message: 'Friend request cancel successfully' });
@@ -110,8 +110,8 @@ const cancelFriendRequest = async (request: any, response: any) => {
 
 const acceptRequest = async (request: any, response: any) => {
   try {
-    if (request.user.id !== request.params.id) {
-      const receiver: any = await UserModel.findById(request.user.id);
+    if (request.user._id !== request.params.id) {
+      const receiver: any = await UserModel.findById(request.user._id);
       const sender: any = await UserModel.findById(request.params.id);
       
       if (!sender || !receiver) {
@@ -119,16 +119,16 @@ const acceptRequest = async (request: any, response: any) => {
         return;
       }
       
-      if (receiver.requests.includes(sender.id)) {
+      if (receiver.requests.includes(sender._id)) {
         
         await receiver.update({
-          $push: { friends: sender.id }
+          $push: { friends: sender._id }
         });
         await sender.update({
-          $push: { friends: receiver.id}
+          $push: { friends: receiver._id}
         });
         await receiver.updateOne({
-          $pull: { requests: sender.id }
+          $pull: { requests: sender._id }
         });
         
         response.json({ message: 'Friend request accepted' });
@@ -147,8 +147,8 @@ const acceptRequest = async (request: any, response: any) => {
 
 const unFriend = async (request: any, response: any) => {
   try {
-    if (request.user.id !== request.params.id) {
-      const sender: any = await UserModel.findById(request.user.id);
+    if (request.user._id !== request.params.id) {
+      const sender: any = await UserModel.findById(request.user._id);
       const receiver: any = await UserModel.findById(request.params.id);
       
       if (!sender || !receiver) {
@@ -156,16 +156,16 @@ const unFriend = async (request: any, response: any) => {
         return;
       }
       
-      if (receiver.friends.includes(sender.id) && sender.friends.includes(receiver._id)) {
+      if (receiver.friends.includes(sender._id) && sender.friends.includes(receiver._id)) {
         
         await receiver.update({
-          $pull: { friends: sender.id }
+          $pull: { friends: sender._id }
         });
         await sender.update({
-          $pull: { friends: receiver.id}
+          $pull: { friends: receiver._id}
         });
         await receiver.updateOne({
-          $pull: { requests: sender.id }
+          $pull: { requests: sender._id }
         });
         
         response.json({ message: 'Unfriended' });
