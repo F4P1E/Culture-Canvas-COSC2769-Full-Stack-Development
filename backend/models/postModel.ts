@@ -26,9 +26,13 @@ const postSchema = new Schema({
         type: String,
         default: "public",
     },
+    commentCount: {
+        type: Number,
+        default: 0
+    },
     comments: [{
-        type: String,
-        default: []
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment'
     }]
 }, { timestamps: true });
 

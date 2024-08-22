@@ -1,4 +1,5 @@
 import UserModel from "../models/userModel";
+import postModel from "../models/postModel";
 
 const loginUser = async (request: any, response: any) => {
 
@@ -181,5 +182,7 @@ const unFriend = async (request: any, response: any) => {
     response.status(500).json({ error: 'Internal server error' });
   }
 }
+
+
 
 export { loginUser, signupUser, sendFriendRequest, cancelFriendRequest, acceptRequest, unFriend};

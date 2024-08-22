@@ -1,4 +1,6 @@
 import postModel from "../models/postModel";
+import commentModel from "../models/commentModel";
+
 import mongoose from "mongoose";
 
 // Create new post
@@ -39,7 +41,8 @@ const createPost = async (request: any, response: any) => {
 const getPosts = async (request: any, response: any) => {
   try {
     const posts = await postModel.find({}).exec();
-    for (let i = posts.length - 1; i > 0; i--) {
+    
+    for (let i = posts.length - 1; i >= 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [posts[i], posts[j]] = [posts[j], posts[i]];
     }
@@ -61,9 +64,10 @@ const getPostsFromSpecificUser = async (request: any, response: any) => {
   }
 };
 
+
 // Get a single post
 
-const getSinglePost = async (request: any, response: any) => {
+/* const getSinglePost = async (request: any, response: any) => {
     const { id } = request.params;
 
     if (!mongoose.isValidObjectId(id)) {
@@ -76,7 +80,7 @@ const getSinglePost = async (request: any, response: any) => {
     } else {
         response.status(200).json(post);
     }
-}
+} */
 
 //Delete a post
 
@@ -84,18 +88,28 @@ const deletePost = async (request: any, response: any) => {
     const { id } = request.params;
 
     if (!mongoose.isValidObjectId(id)) {
-        response.status(404).json({ error: "Incorrect ID" });
+        return response.status(404).json({ error: "Incorrect ID" });
     }
 
-    const post = await postModel.findOneAndDelete({ _id: id })
-    
-    if (!post) {
-        return response.status(400).json({ error: "No such post" });
-    }
+    try {
+        // Find the post by ID
+        const post = await postModel.findById(id);
 
-    response.status(200).json(post);
-    
-}
+        if (!post) {
+            return response.status(400).json({ error: "No such post" });
+        }
+
+        // Delete all comments associated with this post
+        await commentModel.deleteMany({ _id: { $in: post.comments } });
+
+        // Delete the post 
+        await postModel.findByIdAndDelete(id);
+
+        response.status(200).json({ message: "Post deleted" });
+    } catch (error) {
+        response.status(500).json({ error: "Internal server error" });
+    }
+};
 
 //Update a post
 const updatePost = async (request: any, response: any) => {
@@ -117,4 +131,72 @@ const updatePost = async (request: any, response: any) => {
     
 }
 
-export { createPost, getPosts, getPostsFromSpecificUser, getSinglePost, deletePost, updatePost };
+//Create new comment
+
+const createComment = async (request: any, response: any) => {
+  const { content, reactions, reactionCount } = request.body;
+  const postId = request.params.id
+  const userId = request.user._id;
+
+  let emptyFields: any[] = [];
+
+  if (!content) {
+    emptyFields.push(content);
+  }
+
+  if (emptyFields.length > 0) {
+    return response.status(400).json({ error: 'Please comment something', emptyFields });
+  }
+
+  try {
+    const comment = await commentModel.create({ postId, userId, content, reactions, reactionCount });
+      const post = await postModel.findByIdAndUpdate(postId, {
+            $push: {
+              comments: comment._id,
+            },
+            $inc: { commentCount: 1 },
+          }, { new: true } 
+        );
+      
+
+    response.status(201).json(comment);
+  } catch (error) {
+    response.status(400).json({ error: "Cannot comment"});
+  }
+};
+
+//deleteComment
+const deleteComment = async (request: any, response: any) => {
+    const { id } = request.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+        return response.status(404).json({ error: "Incorrect ID" });
+    }
+
+    try {
+        const comment = await commentModel.findOneAndDelete({ _id: id });
+
+        if (!comment) {
+            return response.status(400).json({ error: "No such comment" });
+        }
+
+        const post = await postModel.findOneAndUpdate(
+            { comments: id },{
+                $pull: { comments: id },
+                $inc: { commentCount: -1 }
+            },
+            { new: true }
+        );
+
+        if (!post) {
+            return response.status(400).json({ error: "No associated post found for this comment" });
+        }
+
+        response.status(200).json({ message: "Comment deleted successfully"});
+    } catch (error) {
+        response.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
+export { createPost, getPosts, getPostsFromSpecificUser, deletePost, updatePost, createComment, deleteComment};

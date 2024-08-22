@@ -17,31 +17,31 @@ interface IUserModel extends Model<IUser> {
 }
 
 const userSchema = new Schema<IUser>({
-username: {
-    type: String,
-    unique: true,
-    sparse: true
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  friends: [{
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    default: []
-  }],
-  requests: [{
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    default: []
-  }]
-}, { timestamps: true });
+    username: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    friends: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        default: []
+    }],
+    requests: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        default: []
+    }]
+    }, { timestamps: true });
 
 // Static signup method
 userSchema.statics.signup = async function (email: string, password: string) {

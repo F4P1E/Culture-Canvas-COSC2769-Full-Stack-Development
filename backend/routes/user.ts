@@ -5,7 +5,8 @@ const router = express.Router();
 
 //controller function
 
-import{ loginUser, signupUser, sendFriendRequest, cancelFriendRequest, acceptRequest, unFriend } from '../controllers/userController'
+import { loginUser, signupUser, sendFriendRequest, cancelFriendRequest, acceptRequest, unFriend } from '../controllers/userController'
+
 
 //login
 router.post('/login', loginUser);
