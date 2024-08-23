@@ -40,7 +40,7 @@ const createPost = async (request: any, response: any) => {
 
 const getPosts = async (request: any, response: any) => {
   try {
-    const posts = await postModel.find({}).exec();
+    const posts = await postModel.find({}).select('-oldVersions').exec();
     
     for (let i = posts.length - 1; i >= 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -111,24 +111,43 @@ const deletePost = async (request: any, response: any) => {
     }
 };
 
-//Update a post
+// Update a post
 const updatePost = async (request: any, response: any) => {
+  const { id } = request.params;
+
+  if (!mongoose.isValidObjectId(id)) {
+    response.status(404).json({ error: "Incorrect ID" });
+  }
+
+  const post: any = await postModel.findOneAndUpdate({ _id: id }, {
+    $set: { ...request.body },
+    $inc: { __v: 1 }
+  }, { upsert: true, new: true });
+
+  if (!post) {
+    return response.status(400).json({ error: "No such post" });
+  }
+
+  response.status(200).json({ message: "Post updated" });
+}
+
+// Get edit history
+const getEditHistory = async (request: any, response: any) => {
     const { id } = request.params;
 
     if (!mongoose.isValidObjectId(id)) {
-        response.status(404).json({ error: "Incorrect ID" });
+      response.status(404).json({ error: "Incorrect ID" });
     }
 
-    const post = await postModel.findOneAndUpdate({ _id: id }, {
-        ...request.body
-    });
+    const post: any = await postModel.findOne({ _id: id });
     
     if (!post) {
-        return response.status(400).json({ error: "No such post" });
+      return response.status(400).json({ error: "No such post" });
     }
 
-    response.status(200).json(post);
-    
+    const editHistory = post.oldVersions;
+
+    response.status(200).json(editHistory);
 }
 
 //Create new comment
@@ -157,8 +176,6 @@ const createComment = async (request: any, response: any) => {
             $inc: { commentCount: 1 },
           }, { new: true } 
         );
-      
-
     response.status(201).json(comment);
   } catch (error) {
     response.status(400).json({ error: "Cannot comment"});
@@ -199,4 +216,4 @@ const deleteComment = async (request: any, response: any) => {
 };
 
 
-export { createPost, getPosts, getPostsFromSpecificUser, deletePost, updatePost, createComment, deleteComment};
+export { createPost, getPosts, getPostsFromSpecificUser, deletePost, updatePost, getEditHistory, createComment, deleteComment};

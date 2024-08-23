@@ -1,23 +1,22 @@
 import express from 'express';
-import { createPost, getPosts, getPostsFromSpecificUser, deletePost, updatePost, createComment, deleteComment} from '../controllers/postController'
-import { error } from 'console';
-import { create } from 'domain';
-import requireAuth from '../middleware/requireAuth';
+import { createPost, getPosts, getPostsFromSpecificUser, deletePost, updatePost, getEditHistory, createComment, deleteComment} from '../controllers/postController'
 
 
 const router = express.Router();
 
 router.get('/', getPosts);
 
-router.get('/:id', getPostsFromSpecificUser);
-
-router.post('/', createPost)
+router.post('/', createPost);
 
 router.delete('/:id', deletePost);
 
 router.patch('/:id', updatePost)
 
-router.put('/:id', createComment)
+router.get('/:id', getPostsFromSpecificUser);
+
+router.get('/:id/history', getEditHistory);
+
+router.post('/comment/:id', createComment)
 
 router.delete('/comment/:id', deleteComment);
 
