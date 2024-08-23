@@ -182,38 +182,88 @@ const createComment = async (request: any, response: any) => {
   }
 };
 
-//deleteComment
+// Delete comment
 const deleteComment = async (request: any, response: any) => {
-    const { id } = request.params;
+  const postId = request.params.postId;
+  const commentId = request.params.commentId;
 
-    if (!mongoose.isValidObjectId(id)) {
-        return response.status(404).json({ error: "Incorrect ID" });
+  if (!mongoose.isValidObjectId(postId) || !mongoose.isValidObjectId(commentId)) {
+    return response.status(404).json({ error: "Incorrect ID" });
+  }
+
+  try {
+    const comment = await commentModel.findOneAndDelete({ _id: commentId });
+
+    if (!comment) {
+      return response.status(400).json({ error: "No such comment" });
     }
 
-    try {
-        const comment = await commentModel.findOneAndDelete({ _id: id });
+    const post = await postModel.findOneAndUpdate(
+      { _id: postId, comments: commentId },
+      {
+        $pull: { comments: commentId },
+        $inc: { commentCount: -1 }
+      },
+      { new: true }
+    );
 
-        if (!comment) {
-            return response.status(400).json({ error: "No such comment" });
-        }
-
-        const post = await postModel.findOneAndUpdate(
-            { comments: id },{
-                $pull: { comments: id },
-                $inc: { commentCount: -1 }
-            },
-            { new: true }
-        );
-
-        if (!post) {
-            return response.status(400).json({ error: "No associated post found for this comment" });
-        }
-
-        response.status(200).json({ message: "Comment deleted successfully"});
-    } catch (error) {
-        response.status(500).json({ error: "Internal server error" });
+    if (!post) {
+      return response.status(400).json({ error: "No associated post found for this comment" });
     }
+
+    response.status(200).json({ message: "Comment deleted successfully" });
+  } catch (error) {
+    response.status(500).json({ error: "Internal server error" });
+  }
 };
 
+// Update comment
+const updateComment = async (request: any, response: any) => {
+  const postId = request.params.postId;
+  const commentId = request.params.commentId;
 
-export { createPost, getPosts, getPostsFromSpecificUser, deletePost, updatePost, getEditHistory, createComment, deleteComment};
+  if (!mongoose.isValidObjectId(postId) || !mongoose.isValidObjectId(commentId)) {
+    return response.status(404).json({ error: "Incorrect ID" });
+  }
+
+  try {
+    const comment = await commentModel.findOneAndUpdate(
+      { _id: commentId },
+      {
+        $set: { ...request.body },
+        $inc: { __v: 1 }
+      },
+      { new: true }
+    );
+
+    if (!comment) {
+      return response.status(400).json({ error: "No such comment" });
+    }
+
+    response.status(200).json({ message: "Comment updated" });
+  } catch (error) {
+    response.status(500).json({ error: "Internal server error" });
+  }
+};
+
+//View all comment from a post
+
+const getCommentsFromPost = async (request: any, response: any) => {
+  try {
+    const postId = request.params.id;
+    const post = await postModel.findById(postId);
+
+    if (!post) {
+      return response.status(404).json({ error: "Post not found" });
+    }
+
+    const commentIds = post.comments;
+    const comments = await commentModel.find({ _id: { $in: commentIds } });
+
+    response.status(200).json({ status: 'success', data: comments });
+  } catch (error) {
+    response.status(500).json({ status: 'error', message: 'Failed to retrieve comments' });
+  }
+};
+
+export { createPost, getPosts, getPostsFromSpecificUser, deletePost, updatePost, getEditHistory, createComment, deleteComment, updateComment, getCommentsFromPost};
