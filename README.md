@@ -74,17 +74,21 @@ Ensure you have the following installed on your machine:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/culture-canvas.git
+   git clone https://github.com/F4P1E/Group-Assigment-Social-Network.git
    ```
-2. **Install dependencies**:
+   **Clone specific branch**:
+   ```bash
+   git clone -b my-branch git@github.com:user/myproject.git
+   ```
+3. **Install dependencies**:
    ```bash
    cd culture-canvas
    npm install
    ```
-3. **Create a `.env` file**:
+4. **Create a `.env` file**:
    Create a `.env` file in the root of your project and configure your environment variables.
 
-4. **Start the development server**:
+5. **Start the development server**:
    ```bash
    npm start
    ```
