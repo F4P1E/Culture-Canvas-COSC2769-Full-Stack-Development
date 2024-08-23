@@ -258,7 +258,7 @@ const getCommentsFromPost = async (request: any, response: any) => {
     }
 
     const commentIds = post.comments;
-    const comments = await commentModel.find({ _id: { $in: commentIds } });
+    const comments = await commentModel.find({ _id: { $in: commentIds } }).select('-oldVersions').exec();
 
     response.status(200).json({ status: 'success', data: comments });
   } catch (error) {
@@ -266,4 +266,30 @@ const getCommentsFromPost = async (request: any, response: any) => {
   }
 };
 
-export { createPost, getPosts, getPostsFromSpecificUser, deletePost, updatePost, getEditHistory, createComment, deleteComment, updateComment, getCommentsFromPost};
+// Get comment edit history
+const getCommentEditHistory = async (request: any, response: any) => {
+  const postId = request.params.postId;
+  const commentId = request.params.commentId;
+
+  if (!mongoose.isValidObjectId(postId) || !mongoose.isValidObjectId(commentId)) {
+    response.status(404).json({ error: "Incorrect ID" });
+  }
+
+  const post: any = await postModel.findOne({ _id: postId });
+  
+  if (!post) {
+    return response.status(400).json({ error: "No such post" });
+  }
+
+  const comment = await commentModel.findOne({ _id: commentId });
+
+  if (!comment) {
+    return response.status(400).json({ error: "No such comment" });
+  }
+
+  const editHistory = comment.oldVersions;
+
+  response.status(200).json(editHistory);
+};
+
+export { createPost, getPosts, getPostsFromSpecificUser, deletePost, updatePost, getEditHistory, createComment, deleteComment, updateComment, getCommentsFromPost, getCommentEditHistory};

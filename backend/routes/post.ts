@@ -1,5 +1,5 @@
 import express from 'express';
-import { createPost, getPosts, getPostsFromSpecificUser, deletePost, updatePost, getEditHistory, createComment, deleteComment, updateComment, getCommentsFromPost} from '../controllers/postController'
+import { createPost, getPosts, getPostsFromSpecificUser, deletePost, updatePost, getEditHistory, createComment, deleteComment, updateComment, getCommentsFromPost, getCommentEditHistory} from '../controllers/postController'
 
 
 const router = express.Router();
@@ -15,6 +15,8 @@ router.patch('/:id', updatePost)
 router.get('/:id', getPostsFromSpecificUser);
 
 router.get('/:id/history', getEditHistory);
+
+router.get('/:postId/comment/:commentId/history', getCommentEditHistory);
 
 router.post('/comment/:id', createComment) //comment on the post with the route parameter's id
 
