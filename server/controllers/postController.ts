@@ -268,28 +268,127 @@ const getCommentsFromPost = async (request: any, response: any) => {
 
 // Get comment edit history
 const getCommentEditHistory = async (request: any, response: any) => {
-  const postId = request.params.postId;
-  const commentId = request.params.commentId;
+    const commentId = request.params.id;
 
-  if (!mongoose.isValidObjectId(postId) || !mongoose.isValidObjectId(commentId)) {
-    response.status(404).json({ error: "Incorrect ID" });
-  }
+    if (!mongoose.isValidObjectId(commentId)) {
+      response.status(404).json({ error: "Incorrect ID" });
+    }
 
-  const post: any = await postModel.findOne({ _id: postId });
-  
-  if (!post) {
-    return response.status(400).json({ error: "No such post" });
-  }
+    const comment = await commentModel.findOne({ _id: commentId });
 
-  const comment = await commentModel.findOne({ _id: commentId });
+    if (!comment) {
+      return response.status(400).json({ error: "No such comment" });
+    }
 
-  if (!comment) {
-    return response.status(400).json({ error: "No such comment" });
-  }
+    const editHistory = comment.oldVersions;
 
-  const editHistory = comment.oldVersions;
-
-  response.status(200).json(editHistory);
+    response.status(200).json(editHistory);
 };
 
-export { createPost, getPosts, getPostsFromSpecificUser, deletePost, updatePost, getEditHistory, createComment, deleteComment, updateComment, getCommentsFromPost, getCommentEditHistory};
+//React to a post
+const reaction = async (request: any, response: any) => {
+  const postId = request.params.id;
+  const userId = request.user._id;
+  const reactionType = request.body.reactionType;
+
+  let emptyFields: any[] = [];
+
+  if (!reactionType) {
+    emptyFields.push('reactionType');
+  }
+
+  if (emptyFields.length > 0) {
+    return response.status(400).json({ error: 'Please select a reaction', emptyFields });
+  }
+
+  if (!mongoose.isValidObjectId(postId)) {
+    return response.status(404).json({ error: "Incorrect ID" });
+  }
+
+  const allowedReactions = ["Like", "Love", "Care", "Haha", "Wow", "Sad", "Angry"];
+  if (!allowedReactions.includes(reactionType)) {
+    return response.status(400).json({ error: "Invalid reaction type" });
+  }
+
+  try {
+    const post: any = await postModel.findById(postId);
+    if (!post) {
+      return response.status(404).json({ error: "No such post" });
+    }
+
+
+    const existingReactionIndex = post.reactions.findIndex(
+      (reaction: any) => reaction.userId.toString() === userId.toString()
+    );
+
+    if (existingReactionIndex !== -1) {
+
+      post.reactions[existingReactionIndex].reactionType = reactionType;
+    } else {
+
+      post.reactions.push({ userId, reactionType });
+      post.reactionCount++;  
+    }
+
+    await post.save();
+    return response.status(201).json({ message: "Reaction added or updated" });
+  } catch (error) {
+    response.status(500).json({ error: "Cannot react" });
+  }
+};
+
+//React to a comment
+
+const commentReaction = async (request: any, response: any) => {
+  const commentId = request.params.id;
+  const userId = request.user._id;
+  const reactionType = request.body.reactionType;
+
+  let emptyFields: any[] = [];
+
+  if (!reactionType) {
+    emptyFields.push('reactionType');
+  }
+
+  if (emptyFields.length > 0) {
+    return response.status(400).json({ error: 'Please select a reaction', emptyFields });
+  }
+
+  if (!mongoose.isValidObjectId(commentId)) {
+    return response.status(404).json({ error: "Incorrect ID" });
+  }
+
+  const allowedReactions = ["Like", "Love", "Care", "Haha", "Wow", "Sad", "Angry"];
+  if (!allowedReactions.includes(reactionType)) {
+    return response.status(400).json({ error: "Invalid reaction type" });
+  }
+
+  try {
+    const comment: any = await commentModel.findById(commentId);
+    if (!comment) {
+      return response.status(404).json({ error: "No such post" });
+    }
+
+
+    const existingReactionIndex = comment.reactions.findIndex(
+      (reaction: any) => reaction.userId.toString() === userId.toString()
+    );
+
+    if (existingReactionIndex !== -1) {
+
+      comment.reactions[existingReactionIndex].reactionType = reactionType;
+    } else {
+
+      comment.reactions.push({ userId, reactionType });
+      comment.reactionCount++;  
+    }
+
+    await comment.save();
+    return response.status(201).json({ message: "Reaction added or updated" });
+  } catch (error) {
+    response.status(500).json({ error: "Cannot react" });
+  }
+};
+
+
+export { createPost, getPosts, getPostsFromSpecificUser, deletePost, updatePost, getEditHistory, createComment, deleteComment, updateComment, getCommentsFromPost, getCommentEditHistory, reaction, commentReaction};

@@ -1,46 +1,41 @@
-import mongoose, { Document } from "mongoose"; // Ensure to import types correctly
+import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
-const postSchema = new Schema({
-    userId: {
+const commentSchema = new mongoose.Schema({
+    postId:{
         type: String,
-        required: true,
+        require: true
     },
-    username: {
+    userId:{
         type: String,
+        require: true
     },
     content: {
-        type: Schema.Types.Mixed, // Allows String or Buffer
-        required: true,
+        type: String,
+        required: true
     },
-    reactions: {
-        type: Map,
-        of: Boolean,
-    },
+    reactions: [{
+        userId: {
+            type: String,
+            required: true,
+        },
+        reactionType: {
+            type: String,
+            required: true,
+        },
+    }],
     reactionCount: {
         type: Number,
         default: 0,
     },
-    visibility: {
-        type: String,
-        default: "public",
-    },
-    commentCount: {
-        type: Number,
-        default: 0,
-    },
-    comments: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Comment',
-    }],
     oldVersions: [{
         version: Number,
         content: Schema.Types.Mixed
     }],
 }, { timestamps: true });
 
-postSchema.pre(['updateOne', 'findOneAndUpdate'], async function(next) {
+commentSchema.pre(['updateOne', 'findOneAndUpdate'], async function(next) {
     const update: any = this.getUpdate();
     const filter: any = this.getFilter();
     const doc = await this.model.findOne(filter);
@@ -57,4 +52,4 @@ postSchema.pre(['updateOne', 'findOneAndUpdate'], async function(next) {
     next();
 });
 
-export default mongoose.model('Post', postSchema);
+export default mongoose.model('Comment', commentSchema);
