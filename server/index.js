@@ -66,4 +66,4 @@ mongoose
 		// User.insertMany(users);
 		// Post.insertMany(posts);
 	})
-	.catch((error) => console.log(`${error} did not connect`));
+	.catch((error) => console.log(`${error} did not connect`));	// https://youtu.be/K8YELRmUb5o?t=6089
