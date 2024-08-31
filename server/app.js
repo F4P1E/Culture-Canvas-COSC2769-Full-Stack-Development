@@ -39,6 +39,8 @@ const sessionConfig = {
 
 app.use(session(sessionConfig));
 
+app.get("/test", connectionTesting); // Test route
+
 app.use((request, response, next) => {
 	if (request.path === "/login" || request.path === "/signup") {
 		return next();
