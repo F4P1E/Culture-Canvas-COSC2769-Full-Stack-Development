@@ -24,6 +24,7 @@ app.use(express.json());
 app.use(
 	cors({
 		origin: "http://localhost:5173",
+		credentials: true,
 	})
 );
 
@@ -36,6 +37,12 @@ const sessionConfig = {
 		maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
 	},
 };
+
+// Middleware to set Access-Control-Allow-Credentials header
+app.use((req, res, next) => {
+	res.header("Access-Control-Allow-Credentials", "true");
+	next();
+});
 
 app.use(session(sessionConfig));
 
