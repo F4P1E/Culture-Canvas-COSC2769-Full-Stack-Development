@@ -94,7 +94,7 @@ Full-Stack/
      ```
 
 ## Usage
-- Access the frontend of the application via `http://localhost:3000` (default Vite port).
+- Access the frontend of the application via `http://localhost:5173` (default Vite port).
 - The backend API runs on `http://localhost:5000` (or as configured in the `.env` file).
 
 ## Configuration
