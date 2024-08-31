@@ -62,7 +62,7 @@ Full-Stack/
 ### Steps
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/F4P1E/Group-Assigment-Social-Network.git
    cd Full-Stack
    ```
 
