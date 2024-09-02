@@ -7,6 +7,7 @@ const requireAuth = require("./middleware/requireAuth");
 
 const userRoute = require("./routes/user");
 const postRoute = require("./routes/post");
+const groupRoute = require("./routes/group");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -70,3 +71,4 @@ mongoose
 // Routes
 app.use("/", userRoute);
 app.use("/post", postRoute);
+app.use("/group", groupRoute);
