@@ -17,7 +17,7 @@ const GroupList = () => {
     };
 
     fetchGroups(); // Call the fetch function.
-  }); 
+  }, []); 
 
   // Render a list of groups.
   return (

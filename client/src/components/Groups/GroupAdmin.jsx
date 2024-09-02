@@ -32,7 +32,7 @@ const GroupAdmin = () => {
     };
 
     fetchGroups();  // Call the fetch function.
-  }, dispatch);  // Dependency array to run effect when dispatch changes.
+  }, [dispatch]);  // Dependency array to run effect when dispatch changes.
 
   // Function to handle group removal.
   const handleRemoveGroup = async (groupId) => {

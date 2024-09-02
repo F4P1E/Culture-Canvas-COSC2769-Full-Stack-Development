@@ -17,7 +17,7 @@ const GroupRequest = () => {
     };
 
     fetchRequests(); // Call the fetch function.
-  }); // Dependency array with token to refetch when it changes.
+  }, []); // Dependency array to refetch when it changes.
 
   // Render a list of group requests with Approve and Reject buttons.
   return (
