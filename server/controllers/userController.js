@@ -2,7 +2,7 @@ const UserModel = require("../models/userModel");
 const postModel = require("../models/postModel");
 
 const loginUser = async (request, response) => {
-	console.log(request.body);
+	console.log("Login request received:", request.body.email);
 
 	const { email, password } = request.body;
 
@@ -23,7 +23,7 @@ const loginUser = async (request, response) => {
 };
 
 const signupUser = async (request, response) => {
-	console.log(request.body);
+	console.log("Signup request received:", request.body.email);
 
 	const { username, email, password } = request.body;
 
