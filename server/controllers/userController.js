@@ -81,18 +81,15 @@ const sendFriendRequest = async (request, response) => {
 const cancelFriendRequest = async (request, response) => {
 	try {
 		if (request.user._id !== request.params.id) {
-			const sender = await UserModel.findById(request.user._id);
-			const receiver = await UserModel.findById(request.params.id);
+			const sender = await UserModel.findById(request.params.id);
+			const receiver = await UserModel.findById(request.user._id);
 
 			if (!sender || !receiver) {
 				response.status(404).json({ error: "User not found" });
 				return;
 			}
 
-			if (
-				!receiver.requests.includes(sender._id) &&
-				!receiver.friends.includes(sender._id)
-			) {
+			if (receiver.requests.includes(sender._id)) {
 				await receiver.updateOne({
 					$pull: { requests: sender._id },
 				});
@@ -111,7 +108,7 @@ const cancelFriendRequest = async (request, response) => {
 	}
 };
 
-const acceptRequest = async (request, response) => {
+const acceptFriendRequest = async (request, response) => {
 	try {
 		if (request.user._id !== request.params.id) {
 			const receiver = await UserModel.findById(request.user._id);
@@ -123,10 +120,10 @@ const acceptRequest = async (request, response) => {
 			}
 
 			if (receiver.requests.includes(sender._id)) {
-				await receiver.update({
+				await receiver.updateOne({
 					$push: { friends: sender._id },
 				});
-				await sender.update({
+				await sender.updateOne({
 					$push: { friends: receiver._id },
 				});
 				await receiver.updateOne({
@@ -162,19 +159,16 @@ const unFriend = async (request, response) => {
 				receiver.friends.includes(sender._id) &&
 				sender.friends.includes(receiver._id)
 			) {
-				await receiver.update({
+				await receiver.updateOne({
 					$pull: { friends: sender._id },
 				});
-				await sender.update({
+				await sender.updateOne({
 					$pull: { friends: receiver._id },
-				});
-				await receiver.updateOne({
-					$pull: { requests: sender._id },
 				});
 
 				response.json({ message: "Unfriended" });
 			} else {
-				response.status(400).json({ error: "Already made this request" });
+				response.status(400).json({ error: "You are not friends" });
 			}
 		} else {
 			response.status(400).json({ error: "Cannot unfriend yourself" });
@@ -189,6 +183,6 @@ module.exports = {
 	signupUser,
 	sendFriendRequest,
 	cancelFriendRequest,
-	acceptRequest,
+	acceptFriendRequest,
 	unFriend,
 };
