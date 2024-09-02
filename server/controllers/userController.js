@@ -272,4 +272,35 @@ const getCommentEditHistory = async (request, response) => {
     response.status(200).json(editHistory);
 };
 
-module.exports = { loginUser, signupUser, sendFriendRequest, cancelFriendRequest, acceptRequest, unFriend, getPosts, getPostsFromSpecificUser, getEditHistory, getCommentsFromPost, getCommentEditHistory };
+//Suspense user accoungt
+
+const suspendAccount = async (request, response) => {
+  try {
+    const userId = request.params.id;
+    const adminId = request.user._id;
+    const adminRole = (await UserModel.findOne({ _id: adminId })).role;
+
+    if (!mongoose.isValidObjectId(userId)) {
+      return response.status(404).json({ error: "Incorrect ID" });
+    }
+
+    if (!adminId || adminRole !== "Admin") {
+      return response.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = await UserModel.findOne({ _id: userId });
+
+    if (!user) {
+      return response.status(400).json({ error: "No such user" });
+    }
+
+    await UserModel.findOneAndUpdate({ _id: userId }, { $set: { status: "Suspended" } });
+
+    response.status(200).json({ message: "User account suspended" });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { loginUser, signupUser, sendFriendRequest, cancelFriendRequest, acceptRequest, unFriend, getPosts, getPostsFromSpecificUser, getEditHistory, getCommentsFromPost, getCommentEditHistory, suspendAccount };

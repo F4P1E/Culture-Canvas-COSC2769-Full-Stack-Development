@@ -7,36 +7,40 @@ const mongoose = require( "mongoose");
 
 // Create new post
 const createPost = async (request, response) => {
-    const {username, content, reactions, reactionCount, visibility, comments} = request.body;
+  try {
+    const { username, content, reactions, reactionCount, visibility, comments } = request.body;
+    const userId = request.user._id;
+    const user = await UserModel.findOne({ _id: userId });
 
-    let emptyFields = []
+    if (!user) {
+      return response.status(401).json({ error: "Unauthorized" });
+    }
 
-    /* if (!username) {
-        emptyFields.push(username);
-    } */
+    if (user.status === "Suspended") {
+      return response.status(403).json({ error: "Your account is suspended. You cannot post anything." });
+    }
+
+    let emptyFields = [];
+
     if (!content) {
-        emptyFields.push(content);
+      emptyFields.push("content");
     }
 
     if (visibility && visibility !== "public" && visibility !== "friendsOnly") {
-        return response.status(400).json({ error: "Invalid visibility" });
+      return response.status(400).json({ error: "Invalid visibility" });
     }
 
     if (emptyFields.length > 0) {
-        return response.status(400).json({ error: 'Please fill in all the table', emptyFields });
+      return response.status(400).json({ error: 'Please fill in all the required fields', emptyFields });
     }
 
-    try {
-        const userId = request.user._id 
-
-        const post = await postModel.create({ userId, username, content, reactions, reactionCount, visibility, comments });
-        response.status(200).json(post);
-    } catch (error) {
-        if (error instanceof Error) {
-            response.status(400).json({ error: error.message });
-        }
-    }
-}
+    const post = await postModel.create({ userId, username, content, reactions, reactionCount, visibility, comments });
+    response.status(200).json(post);
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: error.message });
+  }
+};
 
 // Get a single post
 
@@ -129,32 +133,41 @@ const updatePost = async (request, response) => {
 //Create new comment
 
 const createComment = async (request, response) => {
-  const { content, reactions, reactionCount } = request.body;
-  const postId = request.params.id
-  const userId = request.user._id;
-
-  let emptyFields = [];
-
-  if (!content) {
-    emptyFields.push(content);
-  }
-
-  if (emptyFields.length > 0) {
-    return response.status(400).json({ error: 'Please comment something', emptyFields });
-  }
-
   try {
+    const { content, reactions, reactionCount } = request.body;
+    const postId = request.params.id;
+    const userId = request.user._id;
+    const user = await UserModel.findOne({ _id: userId });
+
+    if (!user) {
+      return response.status(401).json({ error: "Unauthorized" });
+    }
+
+    if (user.status === "Suspended") {
+      return response.status(403).json({ error: "Your account is suspended. You cannot create a comment." });
+    }
+
+    let emptyFields = [];
+
+    if (!content) {
+      emptyFields.push("content");
+    }
+
+    if (emptyFields.length > 0) {
+      return response.status(400).json({ error: 'Please comment something', emptyFields });
+    }
+
     const comment = await commentModel.create({ postId, userId, content, reactions, reactionCount });
-      const post = await postModel.findByIdAndUpdate(postId, {
-            $push: {
-              comments: comment._id,
-            },
-            $inc: { commentCount: 1 },
-          }, { new: true } 
-        );
+    const post = await postModel.findByIdAndUpdate(postId, {
+      $push: {
+        comments: comment._id,
+      },
+      $inc: { commentCount: 1 },
+    }, { new: true });
     response.status(201).json(comment);
   } catch (error) {
-    response.status(400).json({ error: "Cannot comment"});
+    console.error(error);
+    response.status(500).json({ error: error.message });
   }
 };
 

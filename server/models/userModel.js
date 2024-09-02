@@ -23,6 +23,11 @@ const userSchema = new Schema({
         enum: ["User", "Admin", "Site Admin"],
         default: "User",
     },
+    status: {
+        type: String,
+        enum: ["Suspended", "Normal"],
+        default: "Normal"
+    },
     friends: [{
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -40,7 +45,7 @@ const userSchema = new Schema({
 },
     { timestamps: true });
 
-// Static signup method
+
 // Static signup method
 userSchema.statics.signup = async function (username, email, password){
 
