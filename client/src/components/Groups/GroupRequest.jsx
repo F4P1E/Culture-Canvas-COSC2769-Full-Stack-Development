@@ -4,9 +4,8 @@ import { useSelector } from 'react-redux';
 
 const GroupRequest = () => {
   const [requests, setRequests] = useState([]); // Local state for storing group requests.
-  const token = useSelector((state) => state.auth.token); // Accessing auth token from Redux store.
 
-  // useEffect to fetch group requests when the component mounts or token changes.
+  // useEffect to fetch group requests when the component mounts.
   useEffect(() => {
     const fetchRequests = async () => {
       // Fetch group requests from server.
@@ -18,7 +17,7 @@ const GroupRequest = () => {
     };
 
     fetchRequests(); // Call the fetch function.
-  }, [token]); // Dependency array with token to refetch when it changes.
+  }); // Dependency array with token to refetch when it changes.
 
   // Render a list of group requests with Approve and Reject buttons.
   return (

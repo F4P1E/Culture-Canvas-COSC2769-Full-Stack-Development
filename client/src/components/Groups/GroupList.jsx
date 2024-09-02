@@ -17,7 +17,7 @@ const GroupList = () => {
     };
 
     fetchGroups(); // Call the fetch function.
-  }); // Dependency array with token to refetch when it changes.
+  }); 
 
   // Render a list of groups.
   return (

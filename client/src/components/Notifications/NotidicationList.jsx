@@ -7,8 +7,7 @@ import { setNotifications } from '../../slices/notificationSlice';
 const NotificationList = () => {
   const dispatch = useDispatch();  // Hook to dispatch Redux actions.
   const notifications = useSelector((state) => state.notifications.notifications);  // Selector to access notifications state from Redux store.
-  const token = useSelector((state) => state.auth.token);  // Selector to access auth token from Redux store.
-
+  
   // Fetch notifications from the server when the component mounts.
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -21,7 +20,7 @@ const NotificationList = () => {
     };
 
     fetchNotifications();  // Call the fetch function.
-  }, [dispatch, token]);  // Dependency array to run effect when dispatch or token changes.
+  }, dispatch);  // Dependency array to run effect when dispatch or token changes.
 
   // Render a list of notifications.
   return (

@@ -40,7 +40,7 @@ const PostFeed = () => {
 		};
 
 		fetchPosts(); // Call the fetch function.
-	}, []); // Empty dependency array to fetch once on mount.
+	}); 
 
 	if (loading) {
 		return <div>Loading posts...</div>; // Show loading indicator while fetching.
