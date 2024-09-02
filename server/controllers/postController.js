@@ -59,6 +59,7 @@ const getPosts = async (request, response) => {
 			const j = Math.floor(Math.random() * (i + 1));
 			[posts[i], posts[j]] = [posts[j], posts[i]];
 		}
+
 		response.status(200).json({ status: "success", data: posts });
 	} catch (error) {
 		response
@@ -80,6 +81,28 @@ const getPostsFromSpecificUser = async (request, response) => {
 		response
 			.status(500)
 			.json({ status: "error", message: "Failed to retrieve posts from user" });
+	}
+};
+
+// Get a single post
+const getSpecificPost = async (request, response) => {
+	const { id } = request.params;
+	if (!mongoose.isValidObjectId(id)) {
+		return response.status(404).json({ error: "Incorrect ID" });
+	}
+	try {
+		const post = await postModel
+			.findById(id)
+			.populate("comments")
+			.exec();
+		if (!post) {
+			return response.status(404).json({ error: "Post not found" });
+		}
+		response.status(200).json({ status: "success", data: post });
+	} catch (error) {
+		response
+			.status(500)
+			.json({ status: "error", message: "Failed to retrieve post" });
 	}
 };
 
@@ -276,29 +299,6 @@ const updateComment = async (request, response) => {
 	}
 };
 
-// Get a single post
-/*
-const getSinglePost = async (request, response) => {
-  const { id } = request.params;
-
-  if (!mongoose.isValidObjectId(id)) {
-    return response.status(404).json({ error: "Incorrect ID" });
-  }
-
-  try {
-    const post = await postModel.findById(id);
-
-    if (!post) {
-      return response.status(404).json({ error: "No such post" });
-    }
-
-    response.status(200).json(post);
-  } catch (error) {
-    response.status(500).json({ error: "Failed to retrieve post" });
-  }
-};
-*/
-
 // Get all comments from a post
 const getCommentsFromPost = async (request, response) => {
 	const { id } = request.params;
@@ -445,6 +445,7 @@ module.exports = {
 	createPost,
 	getPosts,
 	getPostsFromSpecificUser,
+	getSpecificPost,
 	deletePost,
 	updatePost,
 	getEditHistory,

@@ -48,7 +48,7 @@ const Post = ({ post }) => {
 			</button>
 			{showDetails && (
 				<div>
-					<h4>Details</h4>
+					<h4>Description</h4>
 					<p>{post.content}</p>
 					<CommentSection postId={post._id} />
 				</div>

@@ -1,30 +1,61 @@
 const mongoose = require("mongoose");
 
-const { Schema } = mongoose;
+const Schema = mongoose.Schema;
 
-const commentSchema = new Schema(
+const postModel = new Schema(
 	{
-		postId: { type: Schema.ObjectId, required: true },
-		userId: { type: Schema.ObjectId, required: true },
-		content: { type: String, required: true },
+		userId: {
+			type: String,
+			required: true,
+		},
+		username: {
+			type: String,
+		},
+		content: {
+			type: Schema.Types.Mixed, // Allows String or Buffer
+			required: true,
+		},
+		reactionCount: {
+			type: Number,
+			default: 0,
+		},
 		reactions: [
 			{
-				userId: { type: Schema.ObjectId, required: true },
-				reactionType: { type: String, required: true },
+				userId: {
+					type: String,
+					required: true,
+				},
+				reactionType: {
+					type: String,
+					required: true,
+				},
 			},
 		],
-		reactionCount: { type: Number, default: 0 },
+		visibility: {
+			type: String,
+			default: "public",
+		},
+		commentCount: {
+			type: Number,
+			default: 0,
+		},
+		comments: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "Comment",
+			},
+		],
 		oldVersions: [
 			{
-				version: { type: Number, required: true },
-				content: { type: Schema.Types.Mixed, required: true },
+				version: Number,
+				content: Schema.Types.Mixed,
 			},
 		],
 	},
 	{ timestamps: true }
 );
 
-commentSchema.pre(["updateOne", "findOneAndUpdate"], async function (next) {
+postModel.pre(["updateOne", "findOneAndUpdate"], async function (next) {
 	const update = this.getUpdate();
 	const filter = this.getFilter();
 	const doc = await this.model.findOne(filter);
@@ -41,4 +72,4 @@ commentSchema.pre(["updateOne", "findOneAndUpdate"], async function (next) {
 	next();
 });
 
-module.exports = mongoose.model("Comment", commentSchema);
+module.exports = mongoose.model("Post", postModel);

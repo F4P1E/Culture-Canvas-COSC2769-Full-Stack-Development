@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updatePost } from '../../slices/postSlice';
 
+import { addComment } from '../../slices/postSlice';
+
 // CommentSection component to manage and display comments on a post.
 const CommentSection = ({ postId }) => {
   const dispatch = useDispatch();  // Hook to dispatch Redux actions.
@@ -13,8 +15,9 @@ const CommentSection = ({ postId }) => {
   // Fetch the post with comments from the server when the component mounts or postId changes.
   useEffect(() => {
     const fetchPost = async () => {
-      const response = await fetch(`http://localhost:8000/post/${post._id}`, {
+      const response = await fetch(`http://localhost:8000/post/${postId}/comment`, {
         method: 'GET',  // HTTP method for the request.
+        credentials: 'include',  // Include credentials (cookies) in the request.
       });
       const data = await response.json();  // Parse the response data.
       dispatch(updatePost({ post: data.post }));  // Dispatch action to update post with comments.
@@ -25,14 +28,16 @@ const CommentSection = ({ postId }) => {
 
   // Function to handle adding a new comment.
   const handleAddComment = async () => {
-    const response = await fetch(`http://localhost:3001/routes/posts/${postId}/comments`, {
+    const response = await fetch(`http://localhost:8000/post/${postId}/comment`, {
       method: 'POST',  // HTTP method for the request.
       headers: { 'Content-Type': 'application/json' },  // Header to indicate JSON body.
       body: JSON.stringify({ comment }),  // Request body with new comment.
+      credentials: 'include',  // Include credentials (cookies) in the request.
     });
 
     if (response.ok) {
       const data = await response.json();  // Parse the response data.
+      dispatch(addComment({ comment: data.comment }));  // Dispatch action to add new comment.
       dispatch(updatePost({ post: data.post }));  // Dispatch action to update post with new comment.
       setComment('');  // Clear the comment input field.
     }

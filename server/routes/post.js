@@ -3,6 +3,7 @@ const {
 	createPost,
 	getPosts,
 	getPostsFromSpecificUser,
+	getSpecificPost,
 	deletePost,
 	updatePost,
 	getEditHistory,
@@ -47,6 +48,8 @@ router.post('/comment/:id/react', commentReaction); // react to comment */
 router.get("/", getPosts);
 
 router.post("/", createPost);
+
+router.get("/:id", getSpecificPost); //:id is post id
 
 router.delete("/:id", deletePost); //:id is post id
 
