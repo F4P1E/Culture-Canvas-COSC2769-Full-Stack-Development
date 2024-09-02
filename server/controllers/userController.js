@@ -294,9 +294,16 @@ const suspendAccount = async (request, response) => {
       return response.status(400).json({ error: "No such user" });
     }
 
-    await UserModel.findOneAndUpdate({ _id: userId }, { $set: { status: "Suspended" } });
-
-    response.status(200).json({ message: "User account suspended" });
+    let newStatus;
+    if (user.status === "Suspended") {
+      newStatus = "Normal";
+      await UserModel.findOneAndUpdate({ _id: userId }, { $set: { status: newStatus } });
+      response.status(200).json({ message: "User account resumed" });
+    } else {
+      newStatus = "Suspended";
+      await UserModel.findOneAndUpdate({ _id: userId }, { $set: { status: newStatus } });
+      response.status(200).json({ message: "User account suspended" });
+    }
   } catch (error) {
     console.error(error);
     response.status(500).json({ error: error.message });
