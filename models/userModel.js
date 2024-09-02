@@ -1,22 +1,9 @@
-import mongoose, { Model, Document } from "mongoose";
+const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const Schema = mongoose.Schema;
 
-interface IUser extends Document {   
-    username: string;
-    email: string;
-    password: string;
-    friends: IUser[];
-    requests: string[];
-}
-
-interface IUserModel extends Model<IUser> {        
-    signup(email: string, password: string): Promise<IUser>;
-    login(email: string, password: string): Promise<IUser>;
-}
-
-const userSchema = new Schema<IUser>({
+const userSchema = new Schema({
     username: {
         type: String,
         unique: true,
@@ -31,6 +18,11 @@ const userSchema = new Schema<IUser>({
         type: String,
         required: true
     },
+    role: {
+        type: String,
+        enum: ["User", "Admin", "Site Admin"],
+        default: "User",
+    },
     friends: [{
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -40,11 +32,17 @@ const userSchema = new Schema<IUser>({
         type: Schema.Types.ObjectId,
         ref: 'User',
         default: []
-    }]
-    }, { timestamps: true });
+    }],
+    location: String,
+	occupation: String,
+	viewedProfile: Number,
+	impressions: Number,
+},
+    { timestamps: true });
 
 // Static signup method
-userSchema.statics.signup = async function (email: string, password: string) {
+// Static signup method
+userSchema.statics.signup = async function (username, email, password){
 
     //check for existing email
     const exists = await this.findOne({ email });
@@ -54,7 +52,7 @@ userSchema.statics.signup = async function (email: string, password: string) {
     }
 
     //validate
-    if (!email || !password) {
+    if (!email || !password || !username) {
         throw Error("All fields must be filled")
     }
     if (email.length < 12) {
@@ -63,6 +61,8 @@ userSchema.statics.signup = async function (email: string, password: string) {
     if (!(email.endsWith("@gmail.com"))) {
         throw new Error("Email must be a Gmail account");
     }
+
+
     if (password.length < 8) {
         throw new Error("Password must be at least 8 characters long");
     }
@@ -78,15 +78,21 @@ userSchema.statics.signup = async function (email: string, password: string) {
     const salt = await bcrypt.genSalt(15);
     const hash = await bcrypt.hash(password, salt);
 
-    const user = await this.create({ email, password: hash });
+    let userData = { email, password: hash, username };
 
+    if (username === "Mark Heisenberg" && email === "MarkHeisenberg@gmail.com") {
+        userData.role = "Admin";
+    }
+
+    const user = await this.create(userData);
+    
     return user;
 }
 
 
 //Static login method
 
-userSchema.statics.login = async function (email: string, password: string) {
+userSchema.statics.login = async function (email, password) {
     if (!email || !password) {
         throw Error("All fields must be filled")
     }
@@ -106,6 +112,6 @@ userSchema.statics.login = async function (email: string, password: string) {
     return user;
 }
 
-const UserModel = mongoose.model<IUser, IUserModel>('User', userSchema);
+const UserModel = mongoose.model('User', userSchema);
 
-export default UserModel;
+module.exports = UserModel;

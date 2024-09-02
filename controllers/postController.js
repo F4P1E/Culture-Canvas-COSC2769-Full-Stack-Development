@@ -1,13 +1,15 @@
-import postModel from "../models/postModel";
-import commentModel from "../models/commentModel";
 
-import mongoose from "mongoose";
+const postModel = require( "../models/postModel");
+const commentModel = require("../models/commentModel");
+const UserModel = require("../models/userModel");
+
+const mongoose = require( "mongoose");
 
 // Create new post
-const createPost = async (request: any, response: any) => {
+const createPost = async (request, response) => {
     const {username, content, reactions, reactionCount, visibility, comments} = request.body;
 
-    let emptyFields: any[] = []
+    let emptyFields = []
 
     /* if (!username) {
         emptyFields.push(username);
@@ -36,38 +38,9 @@ const createPost = async (request: any, response: any) => {
     }
 }
 
-// Get all post
-
-const getPosts = async (request: any, response: any) => {
-  try {
-    const posts = await postModel.find({}).select('-oldVersions').exec();
-    
-    for (let i = posts.length - 1; i >= 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [posts[i], posts[j]] = [posts[j], posts[i]];
-    }
-    response.status(200).json({ status: 'success', data: posts });
-  } catch (error) {
-    response.status(500).json({ status: 'error', message: 'Failed to retrieve posts' });
-  }
-};
-
-// Get all post from a user
-
-const getPostsFromSpecificUser = async (request: any, response: any) => {
-  try {
-    const userId = request.params.id;
-    const posts = await postModel.find({ userId }).sort({ createdAt: -1 }).exec();
-    response.status(200).json({ status: 'success', data: posts });
-  } catch (error) {
-    response.status(500).json({ status: 'error', message: 'Failed to retrieve posts from user' });
-  }
-};
-
-
 // Get a single post
 
-/* const getSinglePost = async (request: any, response: any) => {
+/* const getSinglePost = async (request, response) => {
     const { id } = request.params;
 
     if (!mongoose.isValidObjectId(id)) {
@@ -84,80 +57,83 @@ const getPostsFromSpecificUser = async (request: any, response: any) => {
 
 //Delete a post
 
-const deletePost = async (request: any, response: any) => {
+const deletePost = async (request, response) => {
     const { id } = request.params;
+    const userId = request.user._id; 
+    const userRole = (await UserModel.findOne({_id: userId})).role;
 
     if (!mongoose.isValidObjectId(id)) {
         return response.status(404).json({ error: "Incorrect ID" });
     }
 
     try {
-        // Find the post by ID
         const post = await postModel.findById(id);
 
         if (!post) {
             return response.status(400).json({ error: "No such post" });
         }
 
-        // Delete all comments associated with this post
+        if (userRole !== "Admin" && post.userId.toString() !== userId.toString()) {
+        return response.status(403).json({ error: "You can't delete other person's post" });
+        }
+
         await commentModel.deleteMany({ _id: { $in: post.comments } });
 
-        // Delete the post 
         await postModel.findByIdAndDelete(id);
 
         response.status(200).json({ message: "Post deleted" });
     } catch (error) {
+        console.error(error);
         response.status(500).json({ error: "Internal server error" });
     }
 };
 
 // Update a post
-const updatePost = async (request: any, response: any) => {
-  const { id } = request.params;
-
-  if (!mongoose.isValidObjectId(id)) {
-    response.status(404).json({ error: "Incorrect ID" });
-  }
-
-  const post: any = await postModel.findOneAndUpdate({ _id: id }, {
-    $set: { ...request.body },
-    $inc: { __v: 1 }
-  }, { upsert: true, new: true });
-
-  if (!post) {
-    return response.status(400).json({ error: "No such post" });
-  }
-
-  response.status(200).json({ message: "Post updated" });
-}
-
-// Get edit history
-const getEditHistory = async (request: any, response: any) => {
+const updatePost = async (request, response) => {
+  try {
     const { id } = request.params;
+    const userId = request.user._id;
+    const userRole = (await UserModel.findOne({ _id: userId })).role;
 
     if (!mongoose.isValidObjectId(id)) {
-      response.status(404).json({ error: "Incorrect ID" });
+      return response.status(404).json({ error: "Incorrect ID" });
     }
 
-    const post: any = await postModel.findOne({ _id: id });
-    
+    if (!userId || !userRole) {
+      return response.status(401).json({ error: "Unauthorized" });
+    }
+
+    const post = await postModel.findById(id);
+
     if (!post) {
       return response.status(400).json({ error: "No such post" });
     }
 
-    const editHistory = post.oldVersions;
+    if (post.userId.toString() !== userId.toString()) {
+      return response.status(403).json({ error: "You can't update other person's post" });
+    }
 
-    response.status(200).json(editHistory);
-}
+    const updatedPost = await postModel.findOneAndUpdate({ _id: id }, {
+      $set: { ...request.body },
+      $inc: { __v: 1 }
+    }, { upsert: true, new: true });
+
+    response.status(200).json({ message: "Post updated" });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: error.message });
+  }
+};
+
 
 //Create new comment
 
-const createComment = async (request: any, response: any) => {
+const createComment = async (request, response) => {
   const { content, reactions, reactionCount } = request.body;
   const postId = request.params.id
   const userId = request.user._id;
 
-  let emptyFields: any[] = [];
+  let emptyFields = [];
 
   if (!content) {
     emptyFields.push(content);
@@ -183,20 +159,32 @@ const createComment = async (request: any, response: any) => {
 };
 
 // Delete comment
-const deleteComment = async (request: any, response: any) => {
-  const postId = request.params.postId;
-  const commentId = request.params.commentId;
-
-  if (!mongoose.isValidObjectId(postId) || !mongoose.isValidObjectId(commentId)) {
-    return response.status(404).json({ error: "Incorrect ID" });
-  }
-
+const deleteComment = async (request, response) => {
   try {
-    const comment = await commentModel.findOneAndDelete({ _id: commentId });
+    const postId = request.params.postId;
+    const commentId = request.params.commentId;
+    const userId = request.user._id;
+    const userRole = (await UserModel.findOne({ _id: userId })).role;
+
+    if (!mongoose.isValidObjectId(postId) || !mongoose.isValidObjectId(commentId)) {
+      return response.status(404).json({ error: "Incorrect ID" });
+    }
+
+    if (!userId || !userRole) {
+      return response.status(401).json({ error: "Unauthorized" });
+    }
+
+    const comment = await commentModel.findById(commentId);
 
     if (!comment) {
       return response.status(400).json({ error: "No such comment" });
     }
+
+    if (userRole !== "Admin" && comment.userId.toString() !== userId.toString()) {
+      return response.status(403).json({ error: "You can't delete other person's comment" });
+    }
+
+    await commentModel.findOneAndDelete({ _id: commentId });
 
     const post = await postModel.findOneAndUpdate(
       { _id: postId, comments: commentId },
@@ -207,27 +195,38 @@ const deleteComment = async (request: any, response: any) => {
       { new: true }
     );
 
-    if (!post) {
-      return response.status(400).json({ error: "No associated post found for this comment" });
-    }
-
     response.status(200).json({ message: "Comment deleted successfully" });
   } catch (error) {
-    response.status(500).json({ error: "Internal server error" });
+    console.error(error);
+    response.status(500).json({ error: error.message });
   }
 };
-
 // Update comment
-const updateComment = async (request: any, response: any) => {
-  const postId = request.params.postId;
-  const commentId = request.params.commentId;
-
-  if (!mongoose.isValidObjectId(postId) || !mongoose.isValidObjectId(commentId)) {
-    return response.status(404).json({ error: "Incorrect ID" });
-  }
-
+const updateComment = async (request, response) => {
   try {
-    const comment = await commentModel.findOneAndUpdate(
+    const postId = request.params.postId;
+    const commentId = request.params.commentId;
+    const userId = request.user._id;
+
+    if (!mongoose.isValidObjectId(postId) || !mongoose.isValidObjectId(commentId)) {
+      return response.status(404).json({ error: "Incorrect ID" });
+    }
+
+    if (!userId) {
+      return response.status(401).json({ error: "Unauthorized" });
+    }
+
+    const comment = await commentModel.findById(commentId);
+
+    if (!comment) {
+      return response.status(400).json({ error: "No such comment" });
+    }
+
+    if (comment.userId.toString() !== userId.toString()) {
+      return response.status(403).json({ error: "You can't update other person's comment" });
+    }
+
+    const updatedComment = await commentModel.findOneAndUpdate(
       { _id: commentId },
       {
         $set: { ...request.body },
@@ -236,62 +235,21 @@ const updateComment = async (request: any, response: any) => {
       { new: true }
     );
 
-    if (!comment) {
-      return response.status(400).json({ error: "No such comment" });
-    }
-
     response.status(200).json({ message: "Comment updated" });
   } catch (error) {
-    response.status(500).json({ error: "Internal server error" });
+    console.error(error);
+    response.status(500).json({ error: error.message });
   }
 };
 
-//View all comment from a post
-
-const getCommentsFromPost = async (request: any, response: any) => {
-  try {
-    const postId = request.params.id;
-    const post = await postModel.findById(postId);
-
-    if (!post) {
-      return response.status(404).json({ error: "Post not found" });
-    }
-
-    const commentIds = post.comments;
-    const comments = await commentModel.find({ _id: { $in: commentIds } }).select('-oldVersions').exec();
-
-    response.status(200).json({ status: 'success', data: comments });
-  } catch (error) {
-    response.status(500).json({ status: 'error', message: 'Failed to retrieve comments' });
-  }
-};
-
-// Get comment edit history
-const getCommentEditHistory = async (request: any, response: any) => {
-    const commentId = request.params.id;
-
-    if (!mongoose.isValidObjectId(commentId)) {
-      response.status(404).json({ error: "Incorrect ID" });
-    }
-
-    const comment = await commentModel.findOne({ _id: commentId });
-
-    if (!comment) {
-      return response.status(400).json({ error: "No such comment" });
-    }
-
-    const editHistory = comment.oldVersions;
-
-    response.status(200).json(editHistory);
-};
 
 //React to a post
-const reaction = async (request: any, response: any) => {
+const reaction = async (request, response) => {
   const postId = request.params.id;
   const userId = request.user._id;
   const reactionType = request.body.reactionType;
 
-  let emptyFields: any[] = [];
+  let emptyFields = [];
 
   if (!reactionType) {
     emptyFields.push('reactionType');
@@ -311,14 +269,14 @@ const reaction = async (request: any, response: any) => {
   }
 
   try {
-    const post: any = await postModel.findById(postId);
+    const post = await postModel.findById(postId);
     if (!post) {
       return response.status(404).json({ error: "No such post" });
     }
 
 
     const existingReactionIndex = post.reactions.findIndex(
-      (reaction: any) => reaction.userId.toString() === userId.toString()
+      (reaction) => reaction.userId.toString() === userId.toString()
     );
 
     if (existingReactionIndex !== -1) {
@@ -339,12 +297,12 @@ const reaction = async (request: any, response: any) => {
 
 //React to a comment
 
-const commentReaction = async (request: any, response: any) => {
+const commentReaction = async (request, response) => {
   const commentId = request.params.id;
   const userId = request.user._id;
   const reactionType = request.body.reactionType;
 
-  let emptyFields: any[] = [];
+  let emptyFields = [];
 
   if (!reactionType) {
     emptyFields.push('reactionType');
@@ -364,14 +322,14 @@ const commentReaction = async (request: any, response: any) => {
   }
 
   try {
-    const comment: any = await commentModel.findById(commentId);
+    const comment = await commentModel.findById(commentId);
     if (!comment) {
       return response.status(404).json({ error: "No such post" });
     }
 
 
     const existingReactionIndex = comment.reactions.findIndex(
-      (reaction: any) => reaction.userId.toString() === userId.toString()
+      (reaction) => reaction.userId.toString() === userId.toString()
     );
 
     if (existingReactionIndex !== -1) {
@@ -391,4 +349,4 @@ const commentReaction = async (request: any, response: any) => {
 };
 
 
-export { createPost, getPosts, getPostsFromSpecificUser, deletePost, updatePost, getEditHistory, createComment, deleteComment, updateComment, getCommentsFromPost, getCommentEditHistory, reaction, commentReaction};
+module.exports = { createPost, deletePost, updatePost, createComment, deleteComment, updateComment, reaction, commentReaction};

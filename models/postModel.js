@@ -1,4 +1,4 @@
-import mongoose, { Document } from "mongoose"; // Ensure to import types correctly
+const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
@@ -47,8 +47,8 @@ const postSchema = new Schema({
 }, { timestamps: true });
 
 postSchema.pre(['updateOne', 'findOneAndUpdate'], async function(next) {
-    const update: any = this.getUpdate();
-    const filter: any = this.getFilter();
+    const update = this.getUpdate();
+    const filter = this.getFilter();
     const doc = await this.model.findOne(filter);
 
     if (doc && update.$set && update.$set.content) {
@@ -63,4 +63,4 @@ postSchema.pre(['updateOne', 'findOneAndUpdate'], async function(next) {
     next();
 });
 
-export default mongoose.model('Post', postSchema);
+module.exports = mongoose.model('Post', postSchema);

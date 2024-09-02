@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const commentSchema = new mongoose.Schema({
+const commentSchema = new Schema({
     postId:{
         type: String,
         require: true
@@ -36,8 +36,8 @@ const commentSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 commentSchema.pre(['updateOne', 'findOneAndUpdate'], async function(next) {
-    const update: any = this.getUpdate();
-    const filter: any = this.getFilter();
+    const update = this.getUpdate();
+    const filter = this.getFilter();
     const doc = await this.model.findOne(filter);
 
     if (doc && update.$set && update.$set.content) {
@@ -52,4 +52,4 @@ commentSchema.pre(['updateOne', 'findOneAndUpdate'], async function(next) {
     next();
 });
 
-export default mongoose.model('Comment', commentSchema);
+module.exports =  mongoose.model('Comment', commentSchema);

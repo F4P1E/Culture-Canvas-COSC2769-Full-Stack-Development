@@ -1,6 +1,6 @@
-import UserModel from "../models/userModel";
+const  UserModel = require("../models/userModel");
 
-const requireAuth = async (request: any, response: any, next: any) => {
+const requireAuth = async (request, response, next) => {
   if (!request.session || !request.session._id) {
     return response.status(401).json({ error: 'You must be logged in to access this page' });
   }
@@ -12,4 +12,4 @@ const requireAuth = async (request: any, response: any, next: any) => {
   next();
 };
 
-export default requireAuth;
+module.exports = requireAuth;
