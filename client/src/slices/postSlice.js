@@ -44,11 +44,15 @@ const postSlice = createSlice({
 				state.posts[postIndex].comments.push(action.payload.comment); // Add the new comment to the comments array
 			}
 		},
+		setCommentFailure: (state, action) => {
+			state.isLoading = false;
+			state.error = action.payload;
+		},
 	},
 });
 
 // Exporting the action creators for the post slice.
-export const { setPosts, addPost, updatePost, deletePost, addComment } =
+export const { setPosts, addPost, updatePost, deletePost, addComment, setCommentFailure } =
 	postSlice.actions;
 
 // Exporting the reducer to be used in the store.

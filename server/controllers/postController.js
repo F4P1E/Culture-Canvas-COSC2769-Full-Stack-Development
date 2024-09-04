@@ -186,46 +186,86 @@ const getEditHistory = async (request, response) => {
 };
 
 // Create new comment
+// const createComment = async (request, response) => {
+// 	const { content, reactions, reactionCount } = request.body;
+// 	const postId = request.params.id;
+// 	const userId = request.user._id;
+
+// 	let emptyFields = [];
+
+// 	if (!content) {
+// 		emptyFields.push("content");
+// 	}
+
+// 	if (emptyFields.length > 0) {
+// 		return response
+// 			.status(400)
+// 			.json({ error: "Please comment something", emptyFields });
+// 	}
+
+// 	try {
+// 		const comment = await commentModel.create({
+// 			postId,
+// 			userId,
+// 			content,
+// 			reactions,
+// 			reactionCount,
+// 		});
+
+// 		await postModel.findByIdAndUpdate(
+// 			postId,
+// 			{
+// 				$push: { comments: comment._id },
+// 				$inc: { commentCount: 1 },
+// 			},
+// 			{ new: true }
+// 		);
+
+// 		response.status(201).json(comment);
+// 	} catch (error) {
+// 		response.status(400).json({ error: "Cannot comment" });
+// 	}
+// };
+
 const createComment = async (request, response) => {
-	const { content, reactions, reactionCount } = request.body;
-	const postId = request.params.id;
-	const userId = request.user._id;
+    try {
+        const { content, reactions = [], reactionCount = 0 } = request.body;
+        const postId = request.params.id;
+        const userId = request.user._id;
 
-	let emptyFields = [];
+        // Validate content
+        if (!content) {
+            return response.status(400).json({ error: "Content is required" });
+        }
 
-	if (!content) {
-		emptyFields.push("content");
-	}
+        // Create the comment
+        const comment = await Comment.create({
+            postId,
+            userId,
+            content,
+            reactions, // This can be an empty array, and that's valid.
+            reactionCount,
+        });
 
-	if (emptyFields.length > 0) {
-		return response
-			.status(400)
-			.json({ error: "Please comment something", emptyFields });
-	}
+        // Update the post with the new comment
+        const updatedPost = await postModel.findByIdAndUpdate(
+            postId,
+            {
+                $push: { comments: comment._id },
+                $inc: { commentCount: 1 },
+            },
+            { new: true }
+        );
 
-	try {
-		const comment = await commentModel.create({
-			postId,
-			userId,
-			content,
-			reactions,
-			reactionCount,
-		});
-
-		await postModel.findByIdAndUpdate(
-			postId,
-			{
-				$push: { comments: comment._id },
-				$inc: { commentCount: 1 },
-			},
-			{ new: true }
-		);
-
-		response.status(201).json(comment);
-	} catch (error) {
-		response.status(400).json({ error: "Cannot comment" });
-	}
+        // Send the response with the created comment and updated post
+        response.status(201).json({ comment, post: updatedPost });
+    } catch (error) {
+        console.error("Error creating comment:", error);
+        response.status(400).json({ error: "Cannot create comment", details: error.message });
+    }
 };
+
+
 
 // Delete comment
 const deleteComment = async (request, response) => {

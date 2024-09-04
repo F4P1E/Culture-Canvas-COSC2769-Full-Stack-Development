@@ -1,9 +1,7 @@
 // Importing React hooks, Redux hooks, and action creators.
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updatePost } from '../../slices/postSlice';
-
-import { addComment } from '../../slices/postSlice';
+import { updatePost, deletePost, addComment, setCommentFailure } from '../../slices/postSlice';
 
 // CommentSection component to manage and display comments on a post.
 const CommentSection = ({ postId }) => {
@@ -15,7 +13,7 @@ const CommentSection = ({ postId }) => {
   // Fetch the post with comments from the server when the component mounts or postId changes.
   useEffect(() => {
     const fetchPost = async () => {
-      const response = await fetch(`http://localhost:8000/post/${postId}/comment`, {
+      const response = await fetch(`http://localhost:8000/post/${postId}`, {
         method: 'GET',  // HTTP method for the request.
         credentials: 'include',  // Include credentials (cookies) in the request.
       });
@@ -28,6 +26,8 @@ const CommentSection = ({ postId }) => {
 
   // Function to handle adding a new comment.
   const handleAddComment = async () => {
+    setCommentFailure(null);
+    try {
     const response = await fetch(`http://localhost:8000/post/${postId}/comment`, {
       method: 'POST',  // HTTP method for the request.
       headers: { 'Content-Type': 'application/json' },  // Header to indicate JSON body.
@@ -40,6 +40,9 @@ const CommentSection = ({ postId }) => {
       dispatch(addComment({ comment: data.comment }));  // Dispatch action to add new comment.
       dispatch(updatePost({ post: data.post }));  // Dispatch action to update post with new comment.
       setComment('');  // Clear the comment input field.
+    }
+    } catch (err) {
+      setCommentFailure(err.message);
     }
   };
 
