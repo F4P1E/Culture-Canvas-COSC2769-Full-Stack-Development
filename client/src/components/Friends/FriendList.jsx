@@ -1,24 +1,26 @@
-// src/components/Friends/FriendList.jsx
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { viewFriendList, addFriend, unFriend, acceptFriendRequest, cancelFriendRequest } from '../../slices/friendSlice';;
 
-// Functional component to display a list of friends
 const FriendList = () => {
-  // State to hold the list of friends
-  const [friends, setFriends] = useState([]);
-
-  // Access user ID and authentication token from the Redux store
+  const dispatch = useDispatch();
+  
+  // Access user ID from the Redux store
   const userId = useSelector((state) => state.auth.user?._id);
-  const token = useSelector((state) => state.auth.token);
 
-  // useEffect hook to fetch friends data when the component mounts or dependencies change
+  // Access friends list, loading state, and error state from the Redux store
+  const { friends, loading, error } = useSelector((state) => state.friends);
+
+  // Fetch friends list when the component mounts or when userId changes
+
   useEffect(() => {
     // Function to fetch friends data from the API
     const fetchFriends = async () => {
       try {
         // Fetch friends data from the API with authorization header
-        const response = await fetch(`/api/users/${userId}/friends`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const response = await fetch(`http://localhost:8000/${userId}/friends`, {
+          method: "GET",
+          credentials: "include",
         });
         
         // Check if the response is ok (status in the range 200-299)
@@ -30,7 +32,7 @@ const FriendList = () => {
         const data = await response.json();
         
         // Update the state with the fetched friends data
-        setFriends(data);
+        dispatch(viewFriendList(data));
       } catch (error) {
         // Handle errors (e.g., network issues, invalid responses)
         console.error('Failed to fetch friends:', error);
@@ -41,16 +43,50 @@ const FriendList = () => {
     if (userId) {
       fetchFriends();
     }
-  }, [userId, token]); // Dependencies array: runs the effect if userId or token changes
+  }, [userId]); // Dependencies array: runs the effect if userId changes
+
+  // Function to handle adding a friend
+  const handleAddFriend = (friendId) => {
+    if (userId) {
+      dispatch(addFriend({ userId, friendId }));
+    }
+  };
+
+  // Function to handle unfriending a friend
+  const handleUnFriend = (friendId) => {
+    if (userId) {
+      dispatch(unFriend({ userId, friendId }));
+    }
+  };
+
+  // Function to handle accepting a friend request
+  const handleAcceptFriendRequest = (requestId) => {
+    if (userId) {
+      dispatch(acceptFriendRequest({ userId, requestId }));
+    }
+  };
+
+  // Function to handle canceling a friend request
+  const handleCancelFriendRequest = (requestId) => {
+    if (userId) {
+      dispatch(cancelFriendRequest({ userId, requestId }));
+    }
+  };
 
   return (
     <div>
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <ul>
         {/* Render the list of friends */}
         {friends.map((friend) => (
           <li key={friend._id}>
-            {/* Display friend's first and last names */}
             {friend.firstName} {friend.lastName}
+            {/* Example buttons for adding, unfriending, accepting, and canceling friend requests */}
+            <button onClick={() => handleAddFriend(friend._id)}>Add Friend</button>
+            <button onClick={() => handleUnFriend(friend._id)}>Unfriend</button>
+            <button onClick={() => handleAcceptFriendRequest(friend._id)}>Accept Request</button>
+            <button onClick={() => handleCancelFriendRequest(friend._id)}>Cancel Request</button>
           </li>
         ))}
       </ul>
@@ -58,5 +94,4 @@ const FriendList = () => {
   );
 };
 
-// Export the component for use in other parts of the application
 export default FriendList;

@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 
 // Importing reducers from different slices.
 import authReducer from './slices/authSlice';
+import friendsReducer from './slices/friendSlice';
 import postReducer from './slices/postSlice';
 import groupReducer from './slices/groupSlice';
 import notificationReducer from './slices/notificationSlice';
@@ -11,6 +12,7 @@ import notificationReducer from './slices/notificationSlice';
 const store = configureStore({
   reducer: {
     auth: authReducer,             // Reducer managing authentication state
+    friends: friendsReducer,       // Reducer managing friends state
     posts: postReducer,            // Reducer managing posts state
     groups: groupReducer,          // Reducer managing groups state
     notifications: notificationReducer,  // Reducer managing notifications state

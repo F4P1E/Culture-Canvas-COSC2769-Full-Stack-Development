@@ -43,6 +43,20 @@ const signupUser = async (request, response) => {
 	}
 };
 
+const viewFriendList = async (request, response) => {
+	try {
+		const user = await UserModel.findById(request.params.userId).populate('friends');
+	
+		if (!user) {
+		  return response.status(404).send('User not found');
+		}
+	
+		res.status(200).json(user.friends);
+	  } catch (error) {
+		res.status(500).send('Error fetching friends');
+	  }
+}
+
 const sendFriendRequest = async (request, response) => {
 	try {
 		if (request.user._id !== request.params.id) {
@@ -181,6 +195,7 @@ const unFriend = async (request, response) => {
 module.exports = {
 	loginUser,
 	signupUser,
+	viewFriendList,
 	sendFriendRequest,
 	cancelFriendRequest,
 	acceptFriendRequest,
