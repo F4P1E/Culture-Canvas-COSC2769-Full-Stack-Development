@@ -2,9 +2,9 @@ const UserModel = require("../models/userModel");
 const postModel = require("../models/postModel");
 
 const loginUser = async (request, response) => {
-	console.log(request.body);
-
 	const { email, password } = request.body;
+
+	console.log(`- email: ${email}\n- password: *****\n`);
 
 	try {
 		const user = await UserModel.login(email, password);
@@ -12,7 +12,7 @@ const loginUser = async (request, response) => {
 		request.session._id = user._id;
 		request.session.email = email;
 
-		response.status(200).json({ email });
+		response.status(200).json(`Logged in successfully as ${email}`);
 	} catch (error) {
 		if (error instanceof Error) {
 			response.status(400).json({ error: error.message });
@@ -23,9 +23,9 @@ const loginUser = async (request, response) => {
 };
 
 const signupUser = async (request, response) => {
-	console.log(request.body);
-
 	const { username, email, password } = request.body;
+
+	console.log(`- username: ${username}\n- email: ${email}\n- password: *****\n`);
 
 	try {
 		const user = await UserModel.signup(username, email, password);
@@ -33,7 +33,7 @@ const signupUser = async (request, response) => {
 		request.session._id = user._id;
 		request.session.email = email;
 
-		response.status(200).json({ Email: email, Username: username });
+		response.status(200).json(`Signed up successfully as ${email} with username ${username}`);
 	} catch (error) {
 		if (error instanceof Error) {
 			response.status(400).json({ error: error.message });

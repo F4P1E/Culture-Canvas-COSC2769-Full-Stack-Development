@@ -28,10 +28,6 @@ const userSchema = new Schema(
 
 // Static signup method
 userSchema.statics.signup = async function (username, email, password) {
-	console.log(username);
-	console.log(email);
-	console.log(password);
-
 	// Check for existing email
 	const exists = await this.findOne({ email });
 
