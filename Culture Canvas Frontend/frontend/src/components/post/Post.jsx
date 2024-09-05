@@ -1,9 +1,8 @@
 import "./post.scss";
-import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
-import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
-import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
-import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { FaRegHeart, FaHeart } from "react-icons/fa";
+import { AiOutlineMessage } from "react-icons/ai";
+import { BiShare } from "react-icons/bi";
+import { HiDotsHorizontal } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import Comments from "../comments/Comments";
 import { useState } from "react";
@@ -30,7 +29,7 @@ const Post = ({ post }) => {
               <span className="date">1 min ago</span>
             </div>
           </div>
-          <MoreHorizIcon />
+          <HiDotsHorizontal />
         </div>
         <div className="content">
           <p>{post.desc}</p>
@@ -38,15 +37,15 @@ const Post = ({ post }) => {
         </div>
         <div className="info">
           <div className="item">
-            {liked ? <FavoriteOutlinedIcon /> : <FavoriteBorderOutlinedIcon />}
+            {liked ? <FaRegHeart /> : <FaHeart />}
             12 Likes
           </div>
           <div className="item" onClick={() => setCommentOpen(!commentOpen)}>
-            <TextsmsOutlinedIcon />
+            <AiOutlineMessage />
             12 Comments
           </div>
           <div className="item">
-            <ShareOutlinedIcon />
+            <BiShare />
             Share
           </div>
         </div>
