@@ -1,13 +1,8 @@
 import "./profile.scss";
-import FacebookTwoToneIcon from "@mui/icons-material/FacebookTwoTone";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import PinterestIcon from "@mui/icons-material/Pinterest";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import PlaceIcon from "@mui/icons-material/Place";
-import LanguageIcon from "@mui/icons-material/Language";
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { FaFacebookF, FaInstagram, FaTwitter, FaLinkedinIn, FaPinterestP } from "react-icons/fa"
+import { IoLocationOutline } from "react-icons/io5"
+import { AiOutlineGlobal } from "react-icons/ai";
+import { AiOutlineMail, AiOutlineMore } from "react-icons/ai";
 import Posts from "../../components/posts/Posts"
 
 const Profile = () => {
@@ -29,38 +24,38 @@ const Profile = () => {
         <div className="uInfo">
           <div className="left">
             <a href="http://facebook.com">
-              <FacebookTwoToneIcon fontSize="large" />
+              <FaFacebookF size="2rem" />
             </a>
             <a href="http://facebook.com">
-              <InstagramIcon fontSize="large" />
+              <FaInstagram size="2rem" />
             </a>
             <a href="http://facebook.com">
-              <TwitterIcon fontSize="large" />
+              <FaTwitter size="2rem" />
             </a>
             <a href="http://facebook.com">
-              <LinkedInIcon fontSize="large" />
+              <FaLinkedinIn size="2rem" />
             </a>
             <a href="http://facebook.com">
-              <PinterestIcon fontSize="large" />
+              <FaPinterestP size="2rem" />
             </a>
           </div>
           <div className="center">
             <span>Jane Doe</span>
             <div className="info">
               <div className="item">
-                <PlaceIcon />
+                <IoLocationOutline />
                 <span>USA</span>
               </div>
               <div className="item">
-                <LanguageIcon />
-                <span>lama.dev</span>
+                <AiOutlineGlobal />
+                <span>culturecanvas.dev</span>
               </div>
             </div>
             <button>follow</button>
           </div>
           <div className="right">
-            <EmailOutlinedIcon />
-            <MoreVertIcon />
+            <AiOutlineMail />
+            <AiOutlineMore />
           </div>
         </div>
       <Posts/>
