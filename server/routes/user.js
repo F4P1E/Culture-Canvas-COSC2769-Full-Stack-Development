@@ -21,7 +21,7 @@ router.post("/signup", signupUser);
 
 // See friend list
 
-router.get("/:userId/friends", viewFriendList);
+router.get("/:id/friends", viewFriendList);
 
 // Add Friend
 router.post("/friend/:id", sendFriendRequest);

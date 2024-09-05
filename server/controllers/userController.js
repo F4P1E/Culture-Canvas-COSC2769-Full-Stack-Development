@@ -12,7 +12,10 @@ const loginUser = async (request, response) => {
 		request.session._id = user._id;
 		request.session.email = email;
 
-		response.status(200).json(`Logged in successfully as ${email}`);
+		const userPayload = { ...user._doc, password: undefined };
+		console.log(userPayload);
+
+		response.status(200).json(userPayload);
 	} catch (error) {
 		if (error instanceof Error) {
 			response.status(400).json({ error: error.message });
@@ -45,15 +48,15 @@ const signupUser = async (request, response) => {
 
 const viewFriendList = async (request, response) => {
 	try {
-		const user = await UserModel.findById(request.params.userId).populate('friends');
+		const user = await UserModel.findById(request.params.id).populate('friends');
 	
 		if (!user) {
 		  return response.status(404).send('User not found');
 		}
 	
-		res.status(200).json(user.friends);
+		response.status(200).json(user.friends);
 	  } catch (error) {
-		res.status(500).send('Error fetching friends');
+		response.status(500).send('Error fetching friends');
 	  }
 }
 
