@@ -4,8 +4,8 @@ const router = express.Router();
 
 const {
 	getGroups,
-	getGroup,
-    getUserFromGroup,
+	// getGroup,
+    // getUserFromGroup,
 	createGroup,
     addUserToGroup,
 	deleteGroup,
@@ -15,9 +15,9 @@ const {
 
 router.get("/", getGroups); // Get all groups
 
-router.get("/:id", getGroup);   // Get specific group
+// router.get("/:id", getGroup);   // Get specific group
 
-router.get("/:id/:userId", getUserFromGroup);  // Get user from specific group
+// router.get("/:id/:userId", getUserFromGroup);  // Get user from specific group
 
 router.post("/", createGroup);  // Create new group
 
