@@ -4,12 +4,24 @@ import React from 'react';
 import PostFeed from '../Posts/PostFeed'; // Component to display a feed of posts.
 import FriendList from '../Friends/FriendList'; // Component to display a list of friends.
 import GroupList from '../Groups/GroupList' // Component to display a list of groups.
+import Stories from "../stories/Stories"
+import Share from "../share/Share"
 
 const HomePage = () => {
   return (
     <div>
       {/* Header for the HomePage */}
       <h1>Home Page</h1>
+
+      {/* Stories */}
+      <section>
+        <Stories />
+      </section>
+
+      {/* Share */}
+      <section>
+        <Share />
+      </section>
       
       {/* PostFeed component to display a feed of posts */}
       <section>
