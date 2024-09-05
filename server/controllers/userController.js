@@ -13,7 +13,6 @@ const loginUser = async (request, response) => {
 		request.session.email = email;
 
 		const userPayload = { ...user._doc, password: undefined };
-		console.log(userPayload);
 
 		response.status(200).json(userPayload);
 	} catch (error) {

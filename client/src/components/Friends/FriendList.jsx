@@ -13,11 +13,9 @@ const FriendList = () => {
 
 	// Access user ID from the Redux store
 	const userId = useSelector((state) => state.auth.user?._id);
-	console.log(`User ID: ${userId}`);
 
 	// Access friends list, loading state, and error state from the Redux store
 	const { friends, loading, error } = useSelector((state) => state.friends);
-	console.log(`Friends: ${JSON.stringify(friends)}`);
 
 	// Fetch friends list when the component mounts or when userId changes
 
@@ -33,8 +31,6 @@ const FriendList = () => {
 						credentials: "include",
 					}
 				);
-
-				console.log(`Response: ${response}`);
 
 				// Check if the response is ok (status in the range 200-299)
 				if (!response.ok) {
