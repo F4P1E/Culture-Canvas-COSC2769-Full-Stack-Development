@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setLoginStart, setLoginSuccess, setLoginFailure } from "../../slices/authSlice";
+import "./login.scss";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -37,6 +38,15 @@ const Login = () => {
   };
 
   return (
+    <div className="login">
+    <div className="card">
+      <div className="left">
+        <h1>Culture Canvas</h1>
+        <p>
+          Welcome to our social network.
+          Join us for more information.
+        </p>
+        <span>Don't you have an account?</span>
     <form onSubmit={handleSubmit}>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <input
@@ -61,6 +71,9 @@ const Login = () => {
         {isLoading ? "Logging in..." : "Login"}
       </button>
     </form>
+    </div>
+      </div>
+    </div>
   );
 };
 
