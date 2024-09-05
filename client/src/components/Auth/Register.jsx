@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { setRegisterStart, setRegisterSuccess, setRegisterFailure } from "../../slices/authSlice";
 
 const Register = () => {
+  const [username, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [username, setUserName] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

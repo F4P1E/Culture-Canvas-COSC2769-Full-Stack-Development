@@ -13,7 +13,7 @@ const groupSlice = createSlice({
   initialState,  // Setting the initial state defined above
   reducers: {
     setGroups: (state, action) => {   // Reducer to set multiple groups
-      state.groups = action.payload.groups;  // Set groups from action payload
+      state.groups = action.payload;  // Set groups directly from action payload
     },
     setCurrentGroup: (state, action) => {   // Reducer to set the current group
       state.currentGroupId = action.payload.groupId;  // Set the current group ID

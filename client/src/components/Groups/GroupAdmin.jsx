@@ -37,7 +37,7 @@ const GroupAdmin = () => {
   // Function to handle group removal.
   const handleRemoveGroup = async (groupId) => {
     try {
-      const response = await fetch(`http://localhost:3001/routes/groups/${groupId}`, {
+      const response = await fetch(`http://localhost:8000/group/${groupId}`, {
         method: 'DELETE',  // HTTP method to delete a group.
       });
 
