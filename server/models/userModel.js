@@ -9,6 +9,13 @@ const userSchema = new Schema(
 		admin: { type: Boolean, default: false },
 		email: { type: String, required: true, unique: true },
 		password: { type: String, required: true },
+		groups: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "Group",
+				default: [],
+			},
+		],
 		friends: [
 			{
 				type: Schema.Types.ObjectId,
