@@ -17,6 +17,13 @@ const {
 // Login
 router.post("/login", loginUser);
 
+// Logout
+router.get("/logout", (request, response) => {
+	request.session.destroy();
+	localStorage.removeItem("user", "persist:root");
+	response.redirect("/");
+});
+
 // Signup
 router.post("/signup", signupUser);
 

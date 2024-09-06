@@ -1,23 +1,45 @@
 // Importing configureStore from Redux Toolkit to create a Redux store.
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore } from "@reduxjs/toolkit";
+
+// Importing Redux library for persisting state.
+import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
+import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
+import { combineReducers } from "redux";
 
 // Importing reducers from different slices.
-import authReducer from './slices/authSlice';
-import friendsReducer from './slices/friendSlice';
-import postReducer from './slices/postSlice';
-import groupReducer from './slices/groupSlice';
-import notificationReducer from './slices/notificationSlice';
+import authReducer from "./slices/authSlice";
+import friendsReducer from "./slices/friendSlice";
+import postReducer from "./slices/postSlice";
+import groupReducer from "./slices/groupSlice";
+import notificationReducer from "./slices/notificationSlice";
 
-// Configuring the Redux store with reducers for authentication, posts, groups, and notifications.
-const store = configureStore({
-  reducer: {
-    auth: authReducer,             // Reducer managing authentication state
-    friends: friendsReducer,       // Reducer managing friends state
-    posts: postReducer,            // Reducer managing posts state
-    groups: groupReducer,          // Reducer managing groups state
-    notifications: notificationReducer,  // Reducer managing notifications state
-  },
+// Configuration object for redux-persist
+const persistConfig = {
+	key: "root",
+	storage,
+};
+
+const rootReducer = combineReducers({
+	auth: authReducer,
+	friends: friendsReducer,
+	posts: postReducer,
+	groups: groupReducer,
+	notifications: notificationReducer,
 });
 
-// Exporting the configured Redux store to be used in the application.
-export default store;
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+const store = configureStore({
+	reducer: persistedReducer,
+	middleware: (getDefaultMiddleware) =>
+		getDefaultMiddleware({
+			serializableCheck: {
+				// Ignore actions with these action types
+				ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
+			},
+		}),
+});
+
+const persistor = persistStore(store);
+
+export default { store, persistor };

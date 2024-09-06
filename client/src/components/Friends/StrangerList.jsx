@@ -12,6 +12,7 @@ const StrangerList = () => {
 
 	// Access user ID from the Redux store
 	const userId = useSelector((state) => state.auth.user?._id);
+	console.log(`User ID: ${userId}`);
 
 	// Access strangers list, loading state, and error state from the Redux store
 	const { strangers, loading, error } = useSelector((state) => state.friends);
