@@ -10,6 +10,7 @@ const {
 	sendFriendRequest,
 	cancelFriendRequest,
 	acceptFriendRequest,
+	getStrangers,
 	unFriend,
 } = require("../controllers/userController");
 
@@ -20,7 +21,6 @@ router.post("/login", loginUser);
 router.post("/signup", signupUser);
 
 // See friend list
-
 router.get("/:id/friends", viewFriendList);
 
 // Add Friend
@@ -31,6 +31,9 @@ router.post("/friendRequest/:id", acceptFriendRequest);
 
 // Cancel Friend Request
 router.delete("/friendRequest/:id", cancelFriendRequest);
+
+// Get Strangers
+router.get("/:id/strangers", getStrangers);
 
 // Unfriend
 router.delete("/friend/:id", unFriend);

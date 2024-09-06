@@ -27,7 +27,9 @@ const loginUser = async (request, response) => {
 const signupUser = async (request, response) => {
 	const { username, email, password } = request.body;
 
-	console.log(`- username: ${username}\n- email: ${email}\n- password: *****\n`);
+	console.log(
+		`- username: ${username}\n- email: ${email}\n- password: *****\n`
+	);
 
 	try {
 		const user = await UserModel.signup(username, email, password);
@@ -35,7 +37,9 @@ const signupUser = async (request, response) => {
 		request.session._id = user._id;
 		request.session.email = email;
 
-		response.status(200).json(`Signed up successfully as ${email} with username ${username}`);
+		response
+			.status(200)
+			.json(`Signed up successfully as ${email} with username ${username}`);
 	} catch (error) {
 		if (error instanceof Error) {
 			response.status(400).json({ error: error.message });
@@ -47,17 +51,19 @@ const signupUser = async (request, response) => {
 
 const viewFriendList = async (request, response) => {
 	try {
-		const user = await UserModel.findById(request.params.id).populate('friends');
-	
+		const user = await UserModel.findById(request.params.id).populate(
+			"friends"
+		);
+
 		if (!user) {
-		  return response.status(404).send('User not found');
+			return response.status(404).send("User not found");
 		}
-	
+
 		response.status(200).json(user.friends);
-	  } catch (error) {
-		response.status(500).send('Error fetching friends');
-	  }
-}
+	} catch (error) {
+		response.status(500).send("Error fetching friends");
+	}
+};
 
 const sendFriendRequest = async (request, response) => {
 	try {
@@ -194,6 +200,28 @@ const unFriend = async (request, response) => {
 	}
 };
 
+const getStrangers = async (request, response) => {
+	console.log("Testing");
+	try {
+		const user = await UserModel.findById(request.params.id);
+		if (!user) {
+			response.status(404).json({ error: "User not found" });
+			return;
+		}
+
+		const strangers = await UserModel.find(
+			{
+				_id: { $nin: user.friends },
+			}
+		);
+
+		const strangerUsernames = strangers.map((stranger) => stranger);
+		response.json(strangerUsernames);
+	} catch {
+		response.status(500).json({ error: "Internal server error" });
+	}
+};
+
 module.exports = {
 	loginUser,
 	signupUser,
@@ -201,5 +229,6 @@ module.exports = {
 	sendFriendRequest,
 	cancelFriendRequest,
 	acceptFriendRequest,
+	getStrangers,
 	unFriend,
 };

@@ -21,6 +21,7 @@ import HomePage from "./components/pages/HomePage";
 import NotFound from "./components/pages/NotFound";
 import ProfilePage from "./components/pages/ProfilePage"; // Example ProfilePage import
 import GroupPage from "./components/pages/GroupPage"; // Example GroupPage import
+import PeoplePage from "./components/pages/PeoplePage";
 
 const router = createBrowserRouter([
 	{
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
 	{
 		path: "/groups",
 		element: <GroupPage />,
+	},
+	{
+		path: "/people",
+		element: <PeoplePage />,
 	},
 ]);
 

@@ -1,6 +1,11 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { viewStrangersList, addFriend, acceptFriendRequest, cancelFriendRequest } from "../../slices/friendSlice";
+import {
+	viewStrangersList,
+	addFriend,
+	acceptFriendRequest,
+	cancelFriendRequest,
+} from "../../slices/friendSlice";
 
 const StrangerList = () => {
 	const dispatch = useDispatch();
@@ -11,45 +16,37 @@ const StrangerList = () => {
 	// Access strangers list, loading state, and error state from the Redux store
 	const { strangers, loading, error } = useSelector((state) => state.friends);
 
-    useEffect(() => {
-		// Function to fetch friends data from the API
+	useEffect(() => {
 		const fetchStrangers = async () => {
 			try {
-				// Fetch friends data from the API with authorization header
 				const response = await fetch(
-					`http://localhost:8000/${userId}/friends`,
+					`http://localhost:8000/${userId}/strangers`,
 					{
 						method: "GET",
 						credentials: "include",
 					}
 				);
 
-				// Check if the response is ok (status in the range 200-299)
 				if (!response.ok) {
-					throw new Error("Network response was not ok");
+					throw new Error("Failed to fetch strangers");
 				}
 
-				// Parse the response JSON
 				const data = await response.json();
-
-				// Update the state with the fetched friends data
 				dispatch(viewStrangersList(data));
 			} catch (error) {
-				// Handle errors (e.g., network issues, invalid responses)
-				console.error("Failed to fetch anybody:", error);
+				console.error("Failed to fetch strangers:", error);
 			}
 		};
 
 		if (userId) {
 			fetchStrangers();
 		}
-	}, [userId, dispatch]); // Dependencies array: runs the effect if userId changes
+	}, [userId]); // Added dispatch to the dependencies array
 
-	// Function to handle adding a friend
 	const handleAddFriend = (strangerId) => {
+		
 		const makeFriend = async () => {
 			try {
-				// Send DELETE request to the server to unfriend the user
 				const response = await fetch(
 					`http://localhost:8000/friend/${strangerId}`,
 					{
@@ -58,30 +55,24 @@ const StrangerList = () => {
 					}
 				);
 
-				// Check if the response is ok
 				if (!response.ok) {
-					response.status(400).json("Failed to add friend");
+					throw new Error("Failed to add friend");
 				}
 
-				// Dispatch the unFriend action to update the Redux store
 				dispatch(addFriend(strangerId));
 			} catch (error) {
-				// Handle any errors
-				response.status(400).json("Failed to add friend:", error);
+				console.error("Failed to add friend:", error);
 			}
 		};
 
-		// Only proceed if userId is available
 		if (userId) {
 			makeFriend();
 		}
 	};
 
-	// Function to handle accepting a friend request
 	const handleAcceptFriendRequest = (strangerId) => {
 		const acceptFriend = async () => {
 			try {
-				// Send DELETE request to the server to unfriend the user
 				const response = await fetch(
 					`http://localhost:8000/friendRequest/${strangerId}`,
 					{
@@ -90,30 +81,24 @@ const StrangerList = () => {
 					}
 				);
 
-				// Check if the response is ok
 				if (!response.ok) {
-					throw new Error("Failed to unfriend");
+					throw new Error("Failed to accept friend request");
 				}
 
-				// Dispatch the unFriend action to update the Redux store
 				dispatch(acceptFriendRequest(strangerId));
 			} catch (error) {
-				// Handle any errors
-				console.error("Failed to unfriend:", error);
+				console.error("Failed to accept friend request:", error);
 			}
 		};
 
-		// Only proceed if userId is available
 		if (userId) {
 			acceptFriend();
 		}
 	};
 
-	// Function to handle canceling a friend request
 	const handleCancelFriendRequest = (strangerId) => {
 		const cancelFriend = async () => {
 			try {
-				// Send DELETE request to the server to unfriend the user
 				const response = await fetch(
 					`http://localhost:8000/friendRequest/${strangerId}`,
 					{
@@ -122,20 +107,16 @@ const StrangerList = () => {
 					}
 				);
 
-				// Check if the response is ok
 				if (!response.ok) {
-					throw new Error("Failed to unfriend");
+					throw new Error("Failed to cancel friend request");
 				}
 
-				// Dispatch the unFriend action to update the Redux store
 				dispatch(cancelFriendRequest(strangerId));
 			} catch (error) {
-				// Handle any errors
 				console.error("Failed to cancel friend request:", error);
 			}
 		};
 
-		// Only proceed if userId is available
 		if (userId) {
 			cancelFriend();
 		}
@@ -146,12 +127,13 @@ const StrangerList = () => {
 			{loading && <p>Loading...</p>}
 			{error && <p style={{ color: "red" }}>{error}</p>}
 			<ul>
-				{/* Render the list of strangers */}
 				{strangers.map((stranger) => (
 					<li key={stranger._id}>
 						{stranger.username}
 						<br />
-						<button onClick={() => handleAddFriend(stranger._id)}>Add Friend</button>
+						<button onClick={() => handleAddFriend(stranger._id)}>
+							Add Friend
+						</button>
 						<br />
 						<button onClick={() => handleAcceptFriendRequest(stranger._id)}>
 							Accept Request
