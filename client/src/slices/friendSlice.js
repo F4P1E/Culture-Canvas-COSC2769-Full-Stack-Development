@@ -31,7 +31,7 @@ const friendsSlice = createSlice({
 			state.loading = false;
 		},
 		// Accept a friend request
-		acptFriendRequest: (state, action) => {
+		acceptFriendRequest: (state, action) => {
 			state.friends.push(action.payload);
 			state.loading = false;
 		},

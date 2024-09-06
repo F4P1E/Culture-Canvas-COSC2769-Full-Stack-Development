@@ -27,7 +27,7 @@ import ProtectedRoute from "./context/protectedRoute";
 
 const { store, persistor } = storeConfig;
 
-const HandleRootNavigation = () => {
+const HandleNavigation = () => {
 	if (window.location.pathname === "/") {
 		window.location.href = "/home";
 		return null;
@@ -76,7 +76,7 @@ root.render(
 			<PersistGate loading={null} persistor={persistor}>
 				<AuthProvider>
 					<RouterProvider router={router} />
-					<HandleRootNavigation />
+					<HandleNavigation />
 				</AuthProvider>
 			</PersistGate>
 		</Provider>
