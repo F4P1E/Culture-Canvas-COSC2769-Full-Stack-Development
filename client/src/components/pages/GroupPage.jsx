@@ -39,10 +39,10 @@ const GroupPage = () => {
         isAdmin={group.admin}
         onChangeVisibility={handleVisibilityChange}
       />
-      {group.admin && <GroupAdmin groupId={id} />} // Conditionally render
+      {group.admin && <GroupAdmin groupId={id} />} {/* Conditionally render */}
       GroupAdmin if user is admin.
       <h2>Group Posts</h2>
-      <PostFeed posts={group.posts} /> // Render PostFeed with group's posts.
+      <PostFeed posts={group.posts} />  {/* Render PostFeed with group's posts. */}
     </div>
   );
 };

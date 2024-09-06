@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setRegisterStart, setRegisterSuccess, setRegisterFailure } from "../../slices/authSlice";
+import {
+  setRegisterStart,
+  setRegisterSuccess,
+  setRegisterFailure,
+} from "../../slices/authSlice";
+import '../../styles/Register.scss';
 
 const Register = () => {
   const [username, setUserName] = useState("");
@@ -30,7 +35,7 @@ const Register = () => {
       }
 
       const data = await response.json();
-      dispatch(setRegisterSuccess(data)); 
+      dispatch(setRegisterSuccess(data));
       navigate("/login");
     } catch (error) {
       dispatch(setRegisterFailure(error.message));
@@ -38,39 +43,41 @@ const Register = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUserName(e.target.value)}
-        required
-        disabled={isLoading}
-      />
-      <br />
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-        disabled={isLoading}
-      />
-      <br />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        disabled={isLoading}
-      />
-      <br />
-      <button type="submit" disabled={isLoading}>
-        {isLoading ? "Registering..." : "Register"}
-      </button>
-    </form>
+    <div className="register-form">
+      <form onSubmit={handleSubmit}>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUserName(e.target.value)}
+          required
+          disabled={isLoading}
+        />
+        <br />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          disabled={isLoading}
+        />
+        <br />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          disabled={isLoading}
+        />
+        <br />
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Registering..." : "Register"}
+        </button>
+      </form>
+    </div>
   );
 };
 
