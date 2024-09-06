@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 
 //controller function
-const { loginUser, signupUser, sendFriendRequest, cancelFriendRequest, acceptRequest, unFriend, getPosts, getPostsFromSpecificUser, getEditHistory, getCommentsFromPost, getCommentEditHistory, suspendAccount } = require('../controllers/userController');
+const { loginUser, signupUser, sendFriendRequest, cancelFriendRequest, acceptRequest, unFriend, getFriends, getPosts, getPostsFromSpecificUser, getEditHistory, getCommentsFromPost, getCommentEditHistory, suspendAccount } = require('../controllers/userController');
 
 
 
@@ -37,6 +37,9 @@ router.get('/post/:id/history', getEditHistory); //id is post id
 router.get('/comment/:id/history', getCommentEditHistory); //id is comment id
 
 router.get('/post/:id/comment', getCommentsFromPost);  //id is post id
+
+router.get('/friends', getFriends);
+
 
 router.patch('/user/:id', suspendAccount); //id is user id
 
