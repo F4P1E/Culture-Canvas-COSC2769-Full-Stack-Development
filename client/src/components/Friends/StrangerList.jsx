@@ -53,21 +53,21 @@ const StrangerList = () => {
 				const response = await fetch(
 					`http://localhost:8000/friend/${strangerId}`,
 					{
-						method: "DELETE",
+						method: "POST",
 						credentials: "include",
 					}
 				);
 
 				// Check if the response is ok
 				if (!response.ok) {
-					throw new Error("Failed to addfriend");
+					response.status(400).json("Failed to add friend");
 				}
 
 				// Dispatch the unFriend action to update the Redux store
 				dispatch(addFriend(strangerId));
 			} catch (error) {
 				// Handle any errors
-				console.error("Failed to unfriend:", error);
+				response.status(400).json("Failed to add friend:", error);
 			}
 		};
 
