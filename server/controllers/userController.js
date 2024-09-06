@@ -225,12 +225,28 @@ const getStranger = async (request, response) => {
 
 const getPosts = async (request, response) => {
   try {
-    const posts = await postModel.find({}).select('-oldVersions').exec();
-    
+    const userId = request.user.id; 
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      response.status(404).json({ status: 'error', message: 'User not found' });
+      return;
+    }
+
+    const friendIds = user.friends.map(friend => friend.toString());
+    friendIds.push(userId); 
+
+    const posts = await postModel.find({
+      $or: [
+        { userId: { $in: friendIds } },
+        { visibility: 'public' } 
+      ]
+    }).select('-oldVersions').exec();
+
     for (let i = posts.length - 1; i >= 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [posts[i], posts[j]] = [posts[j], posts[i]];
     }
+
     response.status(200).json({ status: 'success', data: posts });
   } catch (error) {
     response.status(500).json({ status: 'error', message: 'Failed to retrieve posts' });
