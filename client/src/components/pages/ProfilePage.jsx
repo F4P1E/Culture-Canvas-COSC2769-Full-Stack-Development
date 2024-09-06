@@ -43,9 +43,9 @@ const ProfilePage = () => {
       <h1>{profile.firstName} {profile.lastName}</h1>
       <p>Location: {profile.location}</p>
       <p>Occupation: {profile.occupation}</p>
-      <FriendList userId={id} /> // Render FriendList with user ID.
+      <FriendList userId={id} /> {/* Render FriendList with user ID.*/}
       <h2>Posts</h2>
-      <PostFeed posts={posts} /> // Render PostFeed with user's posts.
+      <PostFeed posts={posts} /> {/* Render PostFeed with user's posts.*/}
     </div>
   );
 };

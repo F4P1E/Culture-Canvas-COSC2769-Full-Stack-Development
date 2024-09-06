@@ -4,10 +4,11 @@ import React from 'react';
 import PostFeed from '../Posts/PostFeed'; // Component to display a feed of posts.
 import FriendList from '../Friends/FriendList'; // Component to display a list of friends.
 import GroupList from '../Groups/GroupList' // Component to display a list of groups.
+import '../../styles/HomePage.scss';
 
 const HomePage = () => {
   return (
-    <div>
+    <div className='home-page'>
       {/* Header for the HomePage */}
       <h1>Home Page</h1>
       

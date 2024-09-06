@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setLoginStart, setLoginSuccess, setLoginFailure } from "../../slices/authSlice";
+import '../../styles/Login.scss';
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -37,6 +38,7 @@ const Login = () => {
   };
 
   return (
+    <div className="login-form">
     <form onSubmit={handleSubmit}>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <input
@@ -61,6 +63,7 @@ const Login = () => {
         {isLoading ? "Logging in..." : "Login"}
       </button>
     </form>
+    </div>
   );
 };
 
