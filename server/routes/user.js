@@ -19,9 +19,12 @@ router.post("/login", loginUser);
 
 // Logout
 router.get("/logout", (request, response) => {
-	request.session.destroy();
-	localStorage.removeItem("user", "persist:root");
-	response.redirect("/");
+	request.session.destroy((err) => {
+		if (err) {
+			return response.status(500).send("Failed to destroy session");
+		}
+		response.status(200).send("Logged out successfully");
+	});
 });
 
 // Signup
