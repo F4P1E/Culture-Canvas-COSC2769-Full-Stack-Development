@@ -201,6 +201,26 @@ const getFriends = async (request, response) => {
     response.status(500).json({ error: 'Internal server error' });
   }
 }
+
+const getStranger = async (request, response) => {
+  try {
+    const user = await UserModel.findById(request.user._id);
+    if (!user) {
+      response.status(404).json({ error: 'User not found' });
+      return;
+    }
+    
+    const strangers = await UserModel.find({
+      _id: { $nin: user.friends }
+    }, 'username');
+    
+    const strangerUsernames = strangers.map(stranger => stranger.username);
+    response.json(strangerUsernames);
+    
+  } catch {
+    response.status(500).json({ error: 'Internal server error' });
+  }
+}
 // Get all post
 
 const getPosts = async (request, response) => {
@@ -325,4 +345,4 @@ const suspendAccount = async (request, response) => {
   }
 };
 
-module.exports = { loginUser, signupUser, sendFriendRequest, cancelFriendRequest, acceptRequest, unFriend, getFriends, getPosts, getPostsFromSpecificUser, getEditHistory, getCommentsFromPost, getCommentEditHistory, suspendAccount };
+module.exports = { loginUser, signupUser, sendFriendRequest, cancelFriendRequest, acceptRequest, unFriend, getFriends, getStranger, getPosts, getPostsFromSpecificUser, getEditHistory, getCommentsFromPost, getCommentEditHistory, suspendAccount };
