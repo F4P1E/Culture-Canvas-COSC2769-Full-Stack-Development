@@ -1,9 +1,10 @@
 // Importing React hooks for state and effect, routing hook, and Redux hook for accessing state.
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import FriendList from '../Friends/FriendList'; // Importing FriendList component.
-import PostFeed from '../Posts/PostFeed'; // Importing PostFeed component.
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import FriendList from "../Friends/FriendList"; // Importing FriendList component.
+import PostFeed from "../Posts/PostFeed"; // Importing PostFeed component.
+import "../../styles/ProfilePage.scss";
 
 const ProfilePage = () => {
   const { id } = useParams(); // Getting user ID from route parameters.
@@ -39,13 +40,30 @@ const ProfilePage = () => {
 
   // Render the profile page with user details, friend list, and posts.
   return (
-    <div>
-      <h1>{profile.firstName} {profile.lastName}</h1>
-      <p>Location: {profile.location}</p>
-      <p>Occupation: {profile.occupation}</p>
-      <FriendList userId={id} /> {/* Render FriendList with user ID.*/}
-      <h2>Posts</h2>
-      <PostFeed posts={posts} /> {/* Render PostFeed with user's posts.*/}
+    <div className="profile-page">
+      <div className="profile-header">
+        <h1>
+          {profile.firstName} {profile.lastName}
+        </h1>
+        <p>Location: {profile.location}</p>
+        <p>Occupation: {profile.occupation}</p>
+      </div>
+
+      <div className="profile-info">
+        <div className="profile-details">
+          <p>Location: {profile.location}</p>
+          <p>Occupation: {profile.occupation}</p>
+        </div>
+      </div>
+
+      <div className="friend-list">
+        <FriendList userId={id} /> {/* Render FriendList with user ID.*/}
+      </div>
+
+      <div className="post-feed">
+        <h2>Posts</h2>
+        <PostFeed posts={posts} /> {/* Render PostFeed with user's posts.*/}
+      </div>
     </div>
   );
 };
