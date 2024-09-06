@@ -53,21 +53,19 @@ const Layout = () => {
 
 const ProtectedRoute = ({ children }) => {
 	const { currentUser } = useContext(AuthContext);
-	const location = useLocation();
-	const [redirect, setRedirect] = useState(false);
 
-	useEffect(() => {
-		if (currentUser && location.pathname === "/") {
-			setRedirect(true);
-		}
-	}, [currentUser, location]);
-
-	if (redirect) {
-		return <Navigate to="/home" />;
+	// If not logged in, redirect to login
+	if (
+		!currentUser &&
+		window.location.pathname !== "/login" &&
+		window.location.pathname !== "/register"
+	) {
+		return <Navigate to="/login" />;
 	}
 
-	if (!currentUser && location.pathname !== "/login") {
-		return <Navigate to="/login" />;
+	// If user is logged in and tries to access the root, redirect to home
+	if (currentUser && window.location.pathname === "/") {
+		return <Navigate to="/home" />;
 	}
 
 	return children;
@@ -90,6 +88,10 @@ const router = createBrowserRouter([
 				path: "/profile/:id",
 				element: <ProfilePage />,
 			},
+			{
+				path: "/groups",
+				element: <GroupPage />,
+			},
 		],
 		errorElement: <NotFound />,
 	},
@@ -100,10 +102,6 @@ const router = createBrowserRouter([
 	{
 		path: "/register",
 		element: <Register />,
-	},
-	{
-		path: "/groups",
-		element: <GroupPage />,
 	},
 ]);
 
