@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setRegisterStart, setRegisterSuccess, setRegisterFailure } from "../../slices/authSlice";
-import "./register.scss";
 
 const Register = () => {
   const [username, setUserName] = useState("");
@@ -39,18 +38,6 @@ const Register = () => {
   };
 
   return (
-    <div className="register">
-    <div className="card">
-      <div className="left">
-        <h1>Culture Canvas.</h1>
-        <p>
-          Welcome to our social network.
-          Join us for more information.
-        </p>
-        <span>Do you have an account?</span>
-      </div>
-      <div className="right">
-        <h1>Register</h1>
     <form onSubmit={handleSubmit}>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <input
@@ -84,9 +71,6 @@ const Register = () => {
         {isLoading ? "Registering..." : "Register"}
       </button>
     </form>
-    </div>
-      </div>
-    </div>
   );
 };
 
