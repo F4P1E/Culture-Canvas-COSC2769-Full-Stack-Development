@@ -91,10 +91,7 @@ const getSpecificPost = async (request, response) => {
 		return response.status(404).json({ error: "Incorrect ID" });
 	}
 	try {
-		const post = await postModel
-			.findById(id)
-			.populate("comments")
-			.exec();
+		const post = await postModel.findById(id).populate("comments").exec();
 		if (!post) {
 			return response.status(404).json({ error: "Post not found" });
 		}
@@ -228,44 +225,44 @@ const getEditHistory = async (request, response) => {
 // };
 
 const createComment = async (request, response) => {
-    try {
-        const { content, reactions = [], reactionCount = 0 } = request.body;
-        const postId = request.params.id;
-        const userId = request.user._id;
+	try {
+		const { content, reactions = [], reactionCount = 0 } = request.body;
+		const postId = request.params.id;
+		const userId = request.user._id;
 
-        // Validate content
-        if (!content) {
-            return response.status(400).json({ error: "Content is required" });
-        }
+		// Validate content
+		if (!content) {
+			return response.status(400).json({ error: "Content is required" });
+		}
 
-        // Create the comment
-        const comment = await Comment.create({
-            postId,
-            userId,
-            content,
-            reactions, // This can be an empty array, and that's valid.
-            reactionCount,
-        });
+		// Create the comment
+		const comment = await Comment.create({
+			postId,
+			userId,
+			content,
+			reactions, // This can be an empty array, and that's valid.
+			reactionCount,
+		});
 
-        // Update the post with the new comment
-        const updatedPost = await postModel.findByIdAndUpdate(
-            postId,
-            {
-                $push: { comments: comment._id },
-                $inc: { commentCount: 1 },
-            },
-            { new: true }
-        );
+		// Update the post with the new comment
+		const updatedPost = await postModel.findByIdAndUpdate(
+			postId,
+			{
+				$push: { comments: comment._id },
+				$inc: { commentCount: 1 },
+			},
+			{ new: true }
+		);
 
-        // Send the response with the created comment and updated post
-        response.status(201).json({ comment, post: updatedPost });
-    } catch (error) {
-        console.error("Error creating comment:", error);
-        response.status(400).json({ error: "Cannot create comment", details: error.message });
-    }
+		// Send the response with the created comment and updated post
+		response.status(201).json({ comment, post: updatedPost });
+	} catch (error) {
+		console.error("Error creating comment:", error);
+		response
+			.status(400)
+			.json({ error: "Cannot create comment", details: error.message });
+	}
 };
-
-
 
 // Delete comment
 const deleteComment = async (request, response) => {
