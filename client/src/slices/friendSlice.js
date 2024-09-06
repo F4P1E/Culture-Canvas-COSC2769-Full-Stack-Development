@@ -5,6 +5,7 @@ const friendsSlice = createSlice({
   name: 'friends',
   initialState: {
     friends: [],
+    strangers: [], 
     loading: false,
     error: null,
   },
@@ -17,6 +18,7 @@ const friendsSlice = createSlice({
     // Add a friend
     addFriend: (state, action) => {
       state.friends.push(action.payload);
+      state.strangers = state.strangers.filter(stranger => stranger._id !== action.payload._id); // Remove from strangers
       state.loading = false;
     },
     // Remove a friend
@@ -25,13 +27,18 @@ const friendsSlice = createSlice({
       state.loading = false;
     },
     // Accept a friend request
-    acceptFriendRequest: (state, action) => {
+    acptFriendRequest: (state, action) => {
       state.friends.push(action.payload);
       state.loading = false;
     },
     // Cancel a friend request
     cancelFriendRequest: (state, action) => {
       state.friends = state.friends.filter(friend => friend._id !== action.payload);
+      state.loading = false;
+    },
+    // Set the strangers list (users who are not friends)
+    viewStrangersList: (state, action) => {
+      state.strangers = action.payload;
       state.loading = false;
     },
     // Handle loading state
@@ -52,6 +59,7 @@ export const {
   unFriend, 
   acceptFriendRequest, 
   cancelFriendRequest, 
+  viewStrangersList, 
   setLoading, 
   setError 
 } = friendsSlice.actions;
