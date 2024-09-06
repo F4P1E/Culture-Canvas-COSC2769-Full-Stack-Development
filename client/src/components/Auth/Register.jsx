@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   setRegisterStart,
   setRegisterSuccess,
@@ -77,6 +77,9 @@ const Register = () => {
           {isLoading ? "Registering..." : "Register"}
         </button>
       </form>
+      <div className="login-link">
+        <p>Already have and Account?<Link to="/login"> Login Here </Link></p>
+      </div>
     </div>
   );
 };

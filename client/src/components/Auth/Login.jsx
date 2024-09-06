@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { setLoginStart, setLoginSuccess, setLoginFailure } from "../../slices/authSlice";
 import '../../styles/Login.scss';
 
@@ -63,6 +64,9 @@ const Login = () => {
         {isLoading ? "Logging in..." : "Login"}
       </button>
     </form>
+    <div className="register-link">
+      <p>Need an Account?<Link to="/register"> Register Here </Link></p>
+    </div>
     </div>
   );
 };
