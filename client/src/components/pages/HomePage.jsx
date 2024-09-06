@@ -37,7 +37,7 @@ const HomePage = () => {
 
 			navigate("/home");
 		} catch (e) {
-			console.log("Dell thể logout");
+			console.log("Unable to logout");
 		}
 	};
 
