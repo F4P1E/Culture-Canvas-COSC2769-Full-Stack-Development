@@ -1,0 +1,31 @@
+
+.sidebar{
+    width: 215 px;
+  }
+  .sidebar .list-group-item {
+      border-bottom: 1px solid #dee2e6; 
+      text-align: left; 
+      padding-left: 20px; 
+    }
+    
+    .sidebar .list-group-item:last-child {
+      border-bottom: none; 
+    }
+    
+    .brand-name {
+      padding-left: 30px; 
+    }
+    
+  
+    .list-group button:hover {
+      background-color: blue;
+      color: white;
+      cursor: pointer;
+    }
+    
+    .list-group-item.active {
+      background-color: blue; /* Active item background */
+      color: white; /* Active item text color */
+    }
+  
+  
