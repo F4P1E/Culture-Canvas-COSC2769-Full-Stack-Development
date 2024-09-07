@@ -24,6 +24,8 @@ import GroupPage from "./components/pages/GroupPage"; // Example GroupPage impor
 import PeoplePage from "./components/pages/PeoplePage";
 import AuthProvider from "./context/authContext";
 import ProtectedRoute from "./context/protectedRoute";
+import UnjoinedGroupList from "./components/Groups/UnjoinedGroupList";
+import GroupAdmin from "./components/Groups/GroupAdmin";
 
 const { store, persistor } = storeConfig;
 
@@ -56,6 +58,14 @@ const router = createBrowserRouter([
 				path: "/people",
 				element: <PeoplePage />,
 			},
+			{
+				path: "/moregroups",
+				element: <UnjoinedGroupList />,
+			},
+			{
+				path: "/groupadmin",
+				element: <GroupAdmin />,
+			}
 		],
 		errorElement: <NotFound />,
 	},

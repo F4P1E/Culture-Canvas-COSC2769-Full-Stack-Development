@@ -67,6 +67,13 @@ const viewFriendList = async (request, response) => {
 	}
 };
 
+// Get group requests (for admins)
+const getFriendRequest = async (req, res) => {
+	const userId = req.user._id;
+
+	
+};
+
 const sendFriendRequest = async (request, response) => {
 	try {
 		if (request.user._id !== request.params.id) {

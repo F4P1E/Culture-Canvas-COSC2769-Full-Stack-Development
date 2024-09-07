@@ -3,7 +3,7 @@ const userModel = require("../models/userModel");
 
 const mongoose = require("mongoose");
 
-// Get all groups that has not been joined
+// Get groups that has NOT been joined
 const getGroups = async (req, res) => {
 	const userId = req.user._id;
 
@@ -28,7 +28,7 @@ const getGroups = async (req, res) => {
 	}
 };
 
-// Get all groups that has been joined
+// Get groups that has been joined
 const getUserGroups = async (req, res) => {
 	const userId = req.user._id;
 
@@ -53,30 +53,115 @@ const getUserGroups = async (req, res) => {
 	}
 };
 
+// Get groups that has been joined with admin privilege
+const getAdminGroups = async (req, res) => {
+	const userId = req.user._id;
+
+	try {
+		const user = await userModel.findById(userId).populate("groups").exec();
+		if (user && Array.isArray(user.groups)) {
+			const groupIdWithUserAsAdmin = user.groups
+				.filter((group) => group.admins.includes(userId))
+				.map((group) => group._id);
+			console.log("- groupIdWithUserAsAdmin:", groupIdWithUserAsAdmin);
+
+			const groups = await groupModel.find({
+				_id: { $in: groupIdWithUserAsAdmin },
+			});
+
+			res.status(200).json(groups);
+		} else {
+			console.log([]);
+		}
+	} catch (err) {
+		// handle the error
+		console.error(err);
+		res.status(500).send("Error fetching groups");
+	}
+};
+
+// Get group requests (for admins)
+const getGroupRequests = async (req, res) => {
+	const userId = req.user._id;
+	const groupId = req.params.id;
+
+	// Check if the ID is valid
+	if (!mongoose.isValidObjectId(groupId)) {
+		return res.status(404).json({ error: "Incorrect ID" });
+	}
+
+	try {
+		// Find the group
+		const group = await groupModel.findById(groupId);
+		if (!group) {
+			return res.status(404).json({ error: "Group not found" });
+		}
+
+		// Check if the user is an admin
+		if (!group.admins.includes(userId)) {
+			return res.status(403).json({ error: "Only admins can view requests" });
+		} else {
+			// If the user is an admin, populate requests and return them
+			await group.populate("requests");
+			res.status(200).json(group.requests);
+		}	
+	} catch (error) {
+		res.status(500).json("Cannot get group join request: ", error)
+	}
+};
+
+// Get group members
+const getGroupMembers = async (req, res) => {
+	const groupId = req.params.id;
+
+	// Check if the ID is valid
+	if (!mongoose.isValidObjectId(groupId)) {
+		return res.status(404).json({ error: "Incorrect ID" });
+	}
+
+	try {
+		// Find the group
+		const group = await groupModel.findById(groupId);
+		if (!group) {
+			return res.status(404).json({ error: "Group not found" });
+		}
+
+		// Populate members and return them
+		await group.populate("members")
+		res.status(200).json(group.members);
+	} catch (error) {
+		res.status(500).json("Cannot get group members: ", error)
+	}
+};
+
 // Create a new group
 const createGroup = async (req, res) => {
 	const { name } = req.body;
 	const userId = req.user._id;
 
-	// Check if the name is provided
-	if (!name) {
-		return res.status(400).json({ error: "Name is required" });
+	try {
+		// Check if the name is provided
+		if (!name) {
+			return res.status(400).json({ error: "Name is required" });
+		}
+
+		// Create the group
+		const group = await groupModel.create({ name });
+
+		// Add user to the group member and admin
+		await groupModel.findByIdAndUpdate(group._id, {
+			$push: { members: userId, admins: userId },
+		});
+
+		// Add group to user
+		await userModel.findByIdAndUpdate(userId, {
+			$push: { groups: group._id },
+		});
+
+		res.status(200).json({ message: "Group created successfully", group });
+	} catch (error) {
+		res.status(500).json("Cannot get create group: ", error)
 	}
-
-	// Create the group
-	const group = await groupModel.create({ name });
-
-	// Add user to the group member and admin
-	await groupModel.findByIdAndUpdate(group._id, {
-		$push: { members: userId, admins: userId },
-	});
-
-	// Add group to user
-	await userModel.findByIdAndUpdate(userId, {
-		$push: { groups: group._id },
-	});
-
-	res.status(200).json({ message: "Group created successfully", group });
 };
 
 // Request to join group
@@ -137,35 +222,39 @@ const approveJoinGroup = async (req, res) => {
 		return res.status(404).json({ error: "Incorrect ID" });
 	}
 
-	// Find the group
-	const group = await groupModel.findById(groupId);
-	if (!group) {
-		return res.status(404).json({ error: "Group not found" });
-	}
+	try {
+		// Find the group
+		const group = await groupModel.findById(groupId);
+		if (!group) {
+			return res.status(404).json({ error: "Group not found" });
+		}
 
-	// Find the request
-	const request = group.requests.find(
-		(request) => request.toString() === requestId
-	);
-	if (!request) {
-		return res.status(404).json({ error: "Request not found" });
-	}
+		// Find the request
+		const request = group.requests.find(
+			(request) => request.toString() === requestId
+		);
+		if (!request) {
+			return res.status(404).json({ error: "Request not found" });
+		}
 
-	// Check if approver is an admin
-	if (!group.admins.includes(userId)) {
-		return res.status(403).json({ error: "Only admins can approve requests" });
-	} else {
-		// Approve the request
-		group.members.push(requestId);
-		group.requests.splice(group.requests.indexOf(requestId), 1);
-		await group.save();
+		// Check if approver is an admin
+		if (!group.admins.includes(userId)) {
+			return res.status(403).json({ error: "Only admins can approve requests" });
+		} else {
+			// Approve the request
+			group.members.push(requestId);
+			group.requests.splice(group.requests.indexOf(requestId), 1);
+			await group.save();
 
-		// Add group to user
-		await userModel.findByIdAndUpdate(requestId, {
-			$push: { groups: groupId },
-		});
+			// Add group to user
+			await userModel.findByIdAndUpdate(requestId, {
+				$push: { groups: groupId },
+			});
 
-		res.status(200).json({ message: "Request approved successfully", group });
+			res.status(200).json({ message: "Request approved successfully", group });
+		}
+	} catch (error) {
+		res.status(500).json("Cannot approve join request: ", error)
 	}
 };
 
@@ -216,7 +305,10 @@ const deleteMemberFromGroup = async (req, res) => {
 module.exports = {
 	getGroups,
 	getUserGroups,
+	getGroupRequests,
+	getGroupMembers,
 	createGroup,
+	getAdminGroups,
 	requestJoinGroup,
 	approveJoinGroup,
 	deleteMemberFromGroup,
