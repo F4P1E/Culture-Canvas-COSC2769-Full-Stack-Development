@@ -28,6 +28,26 @@ const getGroups = async (req, res) => {
 	}
 };
 
+const getOneGroup = async (req, res) => {
+	const groupId = req.params.id;
+
+	// Check if the ID is valid
+	if (!mongoose.isValidObjectId(groupId)) {
+		return res.status(404).json({ error: "Incorrect ID" });
+	}
+
+	try {
+		// Get group
+		const group = await groupModel.findById(groupId);
+		if (!group) {
+			return res.status(404).json({ error: "Group not found" });
+		}
+		res.status(200).json(group);
+	} catch (error) {
+		res.status(500).json("Cannot get the group: ", error);
+	}
+}
+
 // Get groups that has been joined
 const getUserGroups = async (req, res) => {
 	const userId = req.user._id;
@@ -304,6 +324,7 @@ const deleteMemberFromGroup = async (req, res) => {
 
 module.exports = {
 	getGroups,
+	getOneGroup,
 	getUserGroups,
 	getGroupRequests,
 	getGroupMembers,

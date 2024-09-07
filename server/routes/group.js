@@ -4,6 +4,7 @@ const router = express.Router();
 
 const {
 	getGroups,
+	getOneGroup,
 	getUserGroups,
 	getGroupRequests,
 	getGroupMembers,
@@ -15,6 +16,8 @@ const {
 } = require("../controllers/groupController");
 
 router.get("/", getGroups); // Get all groups that has not been joined
+
+router.get("/specific/:id", getOneGroup); // Get specific group
 
 router.get("/joined", getUserGroups); // Get groups that has been joined
 

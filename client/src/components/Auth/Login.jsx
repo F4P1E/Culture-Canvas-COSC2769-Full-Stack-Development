@@ -38,7 +38,7 @@ const Login = () => {
 
 			function removePassFromUser(user) {
 				const {password, ...userWithoutPassword} = user
-				console.log(`Data: ${JSON.stringify(userWithoutPassword)}`);
+				console.log(`Login Credentials: ${JSON.stringify(userWithoutPassword)}`);
 
 				return userWithoutPassword;
 			};
