@@ -1,66 +1,59 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setPosts, setError, setLoading } from "../../slices/postSlice";
 import Post from "./Post";
 
 const PostFeed = () => {
-	const [posts, setPosts] = useState([]); // Local state for storing posts.
-	const [error, setError] = useState(null); // Local state for storing error messages.
-	const [loading, setLoading] = useState(true); // Local state for loading status.
+  const dispatch = useDispatch();
+  const { posts, isLoading, error } = useSelector((state) => state.posts); // Accessing posts, loading, and error states from Redux.
 
-	useEffect(() => {
-		const fetchPosts = async () => {
-			try {
-				const response = await fetch("http://localhost:8000/post/", {
-					method: "GET",
-					credentials: "include",
-				});
+  useEffect(() => {
+    const fetchPosts = async () => {
+      dispatch(setLoading({ isLoading: true }));
+      try {
+        const response = await fetch("http://localhost:8000/post/", {
+          method: "GET",
+          credentials: "include",
+        });
 
-				if (!response.ok) {
-					throw new Error("Failed to fetch posts. Please try again later.");
-				}
+        if (!response.ok) {
+          throw new Error("Failed to fetch posts. Please try again later.");
+        }
 
-				const contentType = response.headers.get("Content-Type");
-				if (!contentType || !contentType.includes("application/json")) {
-					throw new Error("Received non-JSON response.");
-				}
+        const data = await response.json();
 
-				const data = await response.json();
+        if (data.status === "success") {
+          dispatch(setPosts({ posts: data.data })); // Dispatch action to set posts in Redux store.
+        } else {
+          throw new Error(data.message || "Failed to fetch posts.");
+        }
+      } catch (err) {
+        dispatch(setError({ error: err.message })); // Dispatch error to Redux store.
+      } finally {
+        dispatch(setLoading({ isLoading: false })); // Turn off loading state.
+      }
+    };
 
-				// Check for the success status
-				if (data.status === "success") {
-					setPosts(data.data); // Update state with the fetched posts.
-				} else {
-					throw new Error(data.message || "Failed to fetch posts.");
-				}
-			} catch (err) {
-				console.error("Failed to fetch posts:", err);
-				setError(err.message);
-			} finally {
-				setLoading(false);
-			}
-		};
+    fetchPosts(); // Call the fetch function on component mount.
+  }, [dispatch]);
 
-		fetchPosts(); // Call the fetch function.
-	}, []); 
+  if (isLoading) {
+    return <div>Loading posts...</div>; // Show loading indicator.
+  }
 
-	if (loading) {
-		return <div>Loading posts...</div>; // Show loading indicator while fetching.
-	}
+  if (error) {
+    return <div>Error: {error}</div>; // Show error message.
+  }
 
-	if (error) {
-		return <div>Error: {error}</div>; // Render error message if there is an error.
-	}
-
-	return (
-		<div>
-			{posts.length ? (
-				posts.map((post) => (
-					<Post key={post._id} post={post} /> // Render each post using the Post component.
-				))
-			) : (
-				<p>No posts available</p> // Message if no posts are found.
-			)}
-		</div>
-	);
+  return (
+    <div>
+      {posts.length ? (
+        posts.map((post) => <Post key={post._id} post={post} />) // Render each post.
+      ) : (
+        <p>No posts available</p> // Message if no posts are found.
+      )}
+    </div>
+  );
 };
 
 export default PostFeed;

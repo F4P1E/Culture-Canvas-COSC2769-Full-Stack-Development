@@ -52,6 +52,11 @@ const Login = () => {
 		}
 	};
 
+	const handleRedirectToRegister = (e) => {
+		e.preventDefault();
+		navigate("/register");
+	}
+
 	return (
 		<form onSubmit={handleSubmit}>
 			{error && <p style={{ color: "red" }}>{error}</p>}
@@ -76,6 +81,9 @@ const Login = () => {
 			<button type="submit" disabled={isLoading}>
 				{isLoading ? "Logging in..." : "Login"}
 			</button>
+
+			<br />
+			<button onClick={handleRedirectToRegister}>Register now!</button>
 		</form>
 	);
 };

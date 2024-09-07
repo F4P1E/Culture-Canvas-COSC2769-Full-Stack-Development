@@ -182,48 +182,6 @@ const getEditHistory = async (request, response) => {
 	}
 };
 
-// Create new comment
-// const createComment = async (request, response) => {
-// 	const { content, reactions, reactionCount } = request.body;
-// 	const postId = request.params.id;
-// 	const userId = request.user._id;
-
-// 	let emptyFields = [];
-
-// 	if (!content) {
-// 		emptyFields.push("content");
-// 	}
-
-// 	if (emptyFields.length > 0) {
-// 		return response
-// 			.status(400)
-// 			.json({ error: "Please comment something", emptyFields });
-// 	}
-
-// 	try {
-// 		const comment = await commentModel.create({
-// 			postId,
-// 			userId,
-// 			content,
-// 			reactions,
-// 			reactionCount,
-// 		});
-
-// 		await postModel.findByIdAndUpdate(
-// 			postId,
-// 			{
-// 				$push: { comments: comment._id },
-// 				$inc: { commentCount: 1 },
-// 			},
-// 			{ new: true }
-// 		);
-
-// 		response.status(201).json(comment);
-// 	} catch (error) {
-// 		response.status(400).json({ error: "Cannot comment" });
-// 	}
-// };
-
 const createComment = async (request, response) => {
 	try {
 		const { content, reactions = [], reactionCount = 0 } = request.body;
