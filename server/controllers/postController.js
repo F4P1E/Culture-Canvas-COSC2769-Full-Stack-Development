@@ -206,10 +206,6 @@ const createComment = async (request, response) => {
 		const postId = request.params.id;
 		const userId = request.user._id;
 
-		console.log(`- User ID: ${userId}`);
-		console.log(`- Post ID: ${postId}`);
-		console.log(`- Content: ${request.body}`);
-
 		// Validate content
 		if (!content) {
 			return response.status(400).json({ error: "Content is required" });
