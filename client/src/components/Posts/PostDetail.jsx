@@ -1,180 +1,218 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  updatePost,
-  addComment,
-  editPost,
-  editComment,
-  recordPostHistory,
-  recordCommentHistory,
-  setCommentFailure,
+	updatePost,
+	getComments,
+	addComment,
+	editPost,
+	editComment,
+	recordPostHistory,
+	recordCommentHistory,
+	setCommentFailure,
 } from "../../slices/postSlice";
 
-const PostDetail = ({ postId }) => {
-  const dispatch = useDispatch();
-  const posts = useSelector((state) => state.posts.posts);
-  const post = posts.find((p) => p._id === postId);
-  const [comment, setComment] = useState("");
-  const [editPostContent, setEditPostContent] = useState(post?.content || ""); // Local state for post editing
-  const [editCommentId, setEditCommentId] = useState(null); // Track the comment being edited
-  const [editCommentContent, setEditCommentContent] = useState(""); // Local state for comment editing
-  const [commentFailure, setCommentFailure] = useState(null);
-  const [isEditingPost, setIsEditingPost] = useState(false); // Toggle editing state for post
+const PostDetail = (postSomething) => {
+	const postId = postSomething;
+	const dispatch = useDispatch();
+	const posts = useSelector((state) => state.posts.posts);
+	const post = posts.find((p) => p._id === postId.postId);
+	const comments = useSelector((state) => state.posts.comments);
+	const [content, setComment] = useState("");
+	const [editPostContent, setEditPostContent] = useState(post?.content || ""); // Local state for post editing
+	const [editCommentId, setEditCommentId] = useState(null); // Track the comment being edited
+	const [editCommentContent, setEditCommentContent] = useState(""); // Local state for comment editing
+	const [commentFailure, setCommentFailure] = useState(null);
+	const [isEditingPost, setIsEditingPost] = useState(false); // Toggle editing state for post
 
-  useEffect(() => {
-    if (postId) {
-      const fetchPost = async () => {
-        const response = await fetch(`http://localhost:8000/post/${postId}`, {
-          method: "GET",
-          credentials: "include",
-        });
-        const data = await response.json();
-        if (data && data.post) {
-          dispatch(updatePost({ post: data.post })); // Update post with comments
-        }
-      };
+	useEffect(() => {
+		if (postId) {
+			const fetchPost = async () => {
+				const response = await fetch(
+					`http://localhost:8000/post/${postId.postId}`,
+					{
+						method: "GET",
+						credentials: "include",
+					}
+				);
+				const data = await response.json();
+				if (data && data.post) {
+					dispatch(updatePost({ post: data.post })); // Update post with comments
+					console.log(`DATA: ${JSON.stringify(data)}`);
+				}
+			};
 
-      fetchPost();
-    }
-  }, [dispatch, postId]);
+			fetchPost();
+		}
+	}, [dispatch, postId]);
 
-  // Function to handle adding a new comment
-  const handleAddComment = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:8000/post/${postId}/comment`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ comment }),
-          credentials: "include",
-        }
-      );
+	useEffect(() => {
+		if (postId.postId) {
+			const fetchComments = async () => {
+				const response = await fetch(
+					`http://localhost:8000/post/${postId.postId}/comments`,
+					{
+						method: "GET",
+						credentials: "include",
+					}
+				);
+				const data = await response.json();
+				dispatch(getComments(data));
+			};
+			fetchComments();
+		}
+	}, [postId.postId, dispatch]);
 
-      if (response.ok) {
-        const data = await response.json();
-        dispatch(addComment({ postId, comment: data.comment }));
-        setComment(""); // Clear the input field
-      }
-    } catch (err) {
-      dispatch(setCommentFailure(err.message));
-    }
-  };
+	// Function to handle adding a new comment
+	const handleAddComment = async () => {
+		try {
+			const response = await fetch(
+				`http://localhost:8000/post/${postId.postId}/comment`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ content }),
+					credentials: "include",
+				}
+			);
 
-  // Function to handle post editing
-  const handlePostEdit = async () => {
-    try {
-      // Record current post content in history
-      dispatch(recordPostHistory({ postId, content: post.content }));
+			if (response.ok) {
+				const data = await response.json();
+				dispatch(addComment({ postId, comment: data.comment }));
+				setComment(""); // Clear the input field
+        window.location.reload();
+			}
+		} catch (err) {
+			dispatch(setCommentFailure(err.message));
+		}
+	};
 
-      const response = await fetch(`http://localhost:8000/post/${postId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: editPostContent }),
-        credentials: "include",
-      });
+	// Function to handle post editing
+	const handlePostEdit = async () => {
+		try {
+			// Record current post content in history
+			dispatch(recordPostHistory({ postId, content: post.content }));
 
-      if (response.ok) {
-        const data = await response.json();
-        dispatch(editPost({ postId, content: data.post.content }));
-        setIsEditingPost(false); // Exit edit mode
-      }
-    } catch (error) {
-      console.error("Failed to update post:", error);
-    }
-  };
+			const response = await fetch(
+				`http://localhost:8000/post/${postId.postId}`,
+				{
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ content: editPostContent }),
+					credentials: "include",
+				}
+			);
 
-  // Function to handle comment editing
-  const handleCommentEdit = async (commentId) => {
-    try {
-      // Record current comment content in history
-      const commentToEdit = post.comments.find((comment) => comment._id === commentId);
-      dispatch(recordCommentHistory({ postId, commentId, content: commentToEdit.text }));
+			if (response.ok) {
+				const data = await response.json();
+				dispatch(editPost({ postId, content: data.post.content }));
+				setIsEditingPost(false); // Exit edit mode
+			}
+		} catch (error) {
+			console.error("Failed to update post:", error);
+		}
+	};
 
-      const response = await fetch(
-        `http://localhost:8000/post/${postId}/comment/${commentId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: editCommentContent }),
-          credentials: "include",
-        }
-      );
+	// Function to handle comment editing
+	const handleCommentEdit = async (commentId) => {
+		try {
+			// Record current comment content in history
+			const commentToEdit = post.comments.find(
+				(comment) => comment._id === commentId
+			);
+			dispatch(
+				recordCommentHistory({ postId, commentId, content: commentToEdit.text })
+			);
 
-      if (response.ok) {
-        const data = await response.json();
-        dispatch(editComment({ postId, commentId, text: data.comment.text }));
-        setEditCommentId(null); // Exit edit mode for comment
-      }
-    } catch (error) {
-      console.error("Failed to update comment:", error);
-    }
-  };
+			const response = await fetch(
+				`http://localhost:8000/post/${postId.postId}/comment/${commentId}`,
+				{
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ text: editCommentContent }),
+					credentials: "include",
+				}
+			);
 
-  return (
-    <div>
-      {post ? (
-        <>
-          {/* Post content */}
-          {isEditingPost ? (
-            <div>
-              <textarea
-                value={editPostContent}
-                onChange={(e) => setEditPostContent(e.target.value)}
-              />
-              <button onClick={handlePostEdit}>Save Post</button>
-              <button onClick={() => setIsEditingPost(false)}>Cancel</button>
-            </div>
-          ) : (
-            <div>
-              <p>{post.content}</p>
-              <button onClick={() => setIsEditingPost(true)}>Edit Post</button>
-            </div>
-          )}
+			if (response.ok) {
+				const data = await response.json();
+				dispatch(editComment({ postId, commentId, text: data.comment.text }));
+				setEditCommentId(null); // Exit edit mode for comment
+			}
+		} catch (error) {
+			console.error("Failed to update comment:", error);
+		}
+	};
 
-          <h3>Comments</h3>
-          <ul>
-            {post.comments.map((comment) => (
-              <li key={comment._id}>
-                {editCommentId === comment._id ? (
-                  <div>
-                    <input
-                      type="text"
-                      value={editCommentContent}
-                      onChange={(e) => setEditCommentContent(e.target.value)}
-                    />
-                    <button onClick={() => handleCommentEdit(comment._id)}>Save</button>
-                    <button onClick={() => setEditCommentId(null)}>Cancel</button>
-                  </div>
-                ) : (
-                  <div>
-                    {comment.text}
-                    <button onClick={() => {
-                      setEditCommentId(comment._id);
-                      setEditCommentContent(comment.text);
-                    }}>
-                      Edit
-                    </button>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
+	return (
+		<div>
+			{post ? (
+				<>
+					{/* Post content */}
+					{isEditingPost ? (
+						<div>
+							<textarea
+								value={editPostContent}
+								onChange={(e) => setEditPostContent(e.target.value)}
+							/>
+							<button onClick={handlePostEdit}>Save Post</button>
+							<button onClick={() => setIsEditingPost(false)}>Cancel</button>
+						</div>
+					) : (
+						<div>
+							<p>{post.content}</p>
+							<button onClick={() => setIsEditingPost(true)}>Edit Post</button>
+						</div>
+					)}
 
-          {/* Add new comment */}
-          <input
-            type="text"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
-          <button onClick={handleAddComment}>Add Comment</button>
-          {commentFailure && <p>Error: {commentFailure}</p>}
-        </>
-      ) : (
-        <p>Loading post details...</p>
-      )}
-    </div>
-  );
+					<h3>Comments</h3>
+					<ul>
+						{comments.map((comment) => (
+							<li key={comment._id}>
+								{editCommentId === comment._id ? (
+									<div>
+										<input
+											type="text"
+											value={editCommentContent}
+											onChange={(e) => setEditCommentContent(e.target.value)}
+										/>
+										<button onClick={() => handleCommentEdit(comment._id)}>
+											Save
+										</button>
+										<button onClick={() => setEditCommentId(null)}>
+											Cancel
+										</button>
+									</div>
+								) : (
+									<div>
+										{comment.content}
+										<button
+											onClick={() => {
+												setEditCommentId(comment._id);
+												setEditCommentContent(comment.content);
+											}}
+										>
+											Edit
+										</button>
+									</div>
+								)}
+							</li>
+						))}
+					</ul>
+
+					{/* Add new comment */}
+					<input
+						type="text"
+						value={content}
+						onChange={(e) => setComment(e.target.value)}
+					/>
+					<button onClick={handleAddComment}>Add Comment</button>
+					{commentFailure && <p>Error: {commentFailure}</p>}
+				</>
+			) : (
+				<p>Loading post details...</p>
+			)}
+		</div>
+	);
 };
 
 export default PostDetail;

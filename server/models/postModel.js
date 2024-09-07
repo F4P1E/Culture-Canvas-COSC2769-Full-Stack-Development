@@ -5,11 +5,13 @@ const Schema = mongoose.Schema;
 const postModel = new Schema(
 	{
 		userId: {
-			type: String,
+			type: Schema.Types.ObjectId,
+			ref: "User",
 			required: true,
 		},
 		username: {
 			type: String,
+			required: true,
 		},
 		content: {
 			type: Schema.Types.Mixed, // Allows String or Buffer
@@ -41,7 +43,7 @@ const postModel = new Schema(
 		},
 		comments: [
 			{
-				type: mongoose.Schema.Types.ObjectId,
+				type: Schema.Types.ObjectId,
 				ref: "Comment",
 			},
 		],

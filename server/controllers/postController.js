@@ -182,11 +182,33 @@ const getEditHistory = async (request, response) => {
 	}
 };
 
+const getPostComments = async (request, response) => {
+	const postId = request.params.id;
+
+	// Check if the ID is valid
+	if (!mongoose.isValidObjectId(postId)) {
+		return response.status(404).json({ error: "Incorrect ID" });
+	}
+
+	try {
+		const post = await postModel.findById(postId).populate("comments");
+		console.log(`Comments: ${post.comments}`);
+
+		response.status(200).json(post.comments);
+	} catch (error) {
+		
+	}
+};
+
 const createComment = async (request, response) => {
 	try {
 		const { content, reactions = [], reactionCount = 0 } = request.body;
 		const postId = request.params.id;
 		const userId = request.user._id;
+
+		console.log(`- User ID: ${userId}`);
+		console.log(`- Post ID: ${postId}`);
+		console.log(`- Content: ${request.body}`);
 
 		// Validate content
 		if (!content) {
@@ -194,7 +216,7 @@ const createComment = async (request, response) => {
 		}
 
 		// Create the comment
-		const comment = await Comment.create({
+		const comment = await commentModel.create({
 			postId,
 			userId,
 			content,
@@ -213,7 +235,7 @@ const createComment = async (request, response) => {
 		);
 
 		// Send the response with the created comment and updated post
-		response.status(201).json({ comment, post: updatedPost });
+		response.status(200).json({ comment, post: updatedPost });
 	} catch (error) {
 		console.error("Error creating comment:", error);
 		response
@@ -444,6 +466,7 @@ module.exports = {
 	deletePost,
 	updatePost,
 	getEditHistory,
+	getPostComments,
 	createComment,
 	deleteComment,
 	updateComment,
