@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import FriendList from "../Friends/FriendList"; // Importing FriendList component.
 import PostFeed from "../Posts/PostFeed"; // Importing PostFeed component.
-import "../../styles/ProfilePage.scss";
+import "../../Styles/ProfilePage.scss";
 
 const ProfilePage = () => {
   const { id } = useParams(); // Getting user ID from route parameters.

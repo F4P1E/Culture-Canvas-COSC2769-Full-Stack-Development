@@ -6,7 +6,7 @@ import {
   setRegisterSuccess,
   setRegisterFailure,
 } from "../../slices/authSlice";
-import '../../styles/Register.scss';
+import '../../Styles/Register.scss';
 
 const Register = () => {
   const [username, setUserName] = useState("");

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { updatePost, addReaction } from "../../slices/postSlice";
+import { FaThumbsUp, FaHeart } from "react-icons/fa";
 import PostDetail from "./PostDetail";
+import "../../Styles/Post.scss";
 
 const Post = ({ post }) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -68,17 +70,28 @@ const Post = ({ post }) => {
   };
 
   return (
-    <div>
+    <div className="post-container">
       <h4>{post?.title}</h4>
       <p>{showDetails ? post?.content : getShortContent(post?.content)}</p>
-      <button onClick={handleToggleDetails}>
+      <button className="toggle-details-btn" onClick={handleToggleDetails}>
         {showDetails ? "Hide Details" : "Show Details"}
       </button>
 
       {/* Handle reactions */}
-      <div>
-        <button onClick={() => handleReaction("like")}>Like</button>
-        <button onClick={() => handleReaction("love")}>Love</button>
+      <div className="reactions">
+        <button
+        className="reaction-icon" 
+        onClick={() => handleReaction("like")}
+          aria-label="Like"
+          >
+            <FaThumbsUp />
+          </button>
+        <button 
+        onClick={() => handleReaction("love")}
+        aria-label="Love"
+        >
+          <FaHeart />
+        </button>
       </div>
 
       {/* Conditionally render the PostDetail component when showDetails is true */}
