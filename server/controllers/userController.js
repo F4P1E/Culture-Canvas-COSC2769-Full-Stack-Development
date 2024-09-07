@@ -1,13 +1,15 @@
-const UserModel = require("../models/userModel");
-const postModel = require("../models/postModel");
+const userModel = require("../models/userModel");
 
 const loginUser = async (request, response) => {
 	const { email, password } = request.body;
 
-	console.log(`- email: ${email}\n- password: *****\n`);
+	const user = await userModel.findOne({ email: email });
+	console.log(
+		`- id: ${user._id}\n- username: ${user.username}\n- email: ${email}\n`
+	);
 
 	try {
-		const user = await UserModel.login(email, password);
+		const user = await userModel.login(email, password);
 
 		request.session._id = user._id;
 		request.session.email = email;
@@ -27,15 +29,19 @@ const loginUser = async (request, response) => {
 const signupUser = async (request, response) => {
 	const { username, email, password } = request.body;
 
-	console.log(`- username: ${username}\n- email: ${email}\n- password: *****\n`);
+	console.log(
+		`- username: ${username}\n- email: ${email}\n- password: *****\n`
+	);
 
 	try {
-		const user = await UserModel.signup(username, email, password);
+		const user = await userModel.signup(username, email, password);
 
 		request.session._id = user._id;
 		request.session.email = email;
 
-		response.status(200).json(`Signed up successfully as ${email} with username ${username}`);
+		response
+			.status(200)
+			.json(`Signed up successfully as ${email} with username ${username}`);
 	} catch (error) {
 		if (error instanceof Error) {
 			response.status(400).json({ error: error.message });
@@ -47,23 +53,32 @@ const signupUser = async (request, response) => {
 
 const viewFriendList = async (request, response) => {
 	try {
-		const user = await UserModel.findById(request.params.id).populate('friends');
-	
+		const user = await userModel
+			.findById(request.params.id)
+			.populate("friends");
+
 		if (!user) {
-		  return response.status(404).send('User not found');
+			return response.status(404).send("User not found");
 		}
-	
+
 		response.status(200).json(user.friends);
-	  } catch (error) {
-		response.status(500).send('Error fetching friends');
-	  }
-}
+	} catch (error) {
+		response.status(500).send("Error fetching friends");
+	}
+};
+
+// Get group requests (for admins)
+const getFriendRequest = async (req, res) => {
+	const userId = req.user._id;
+
+	
+};
 
 const sendFriendRequest = async (request, response) => {
 	try {
 		if (request.user._id !== request.params.id) {
-			const sender = await UserModel.findById(request.user._id);
-			const receiver = await UserModel.findById(request.params.id);
+			const sender = await userModel.findById(request.user._id);
+			const receiver = await userModel.findById(request.params.id);
 
 			if (!sender || !receiver) {
 				response.status(404).json({ error: "User not found" });
@@ -97,8 +112,8 @@ const sendFriendRequest = async (request, response) => {
 const cancelFriendRequest = async (request, response) => {
 	try {
 		if (request.user._id !== request.params.id) {
-			const sender = await UserModel.findById(request.params.id);
-			const receiver = await UserModel.findById(request.user._id);
+			const sender = await userModel.findById(request.params.id);
+			const receiver = await userModel.findById(request.user._id);
 
 			if (!sender || !receiver) {
 				response.status(404).json({ error: "User not found" });
@@ -127,8 +142,8 @@ const cancelFriendRequest = async (request, response) => {
 const acceptFriendRequest = async (request, response) => {
 	try {
 		if (request.user._id !== request.params.id) {
-			const receiver = await UserModel.findById(request.user._id);
-			const sender = await UserModel.findById(request.params.id);
+			const receiver = await userModel.findById(request.user._id);
+			const sender = await userModel.findById(request.params.id);
 
 			if (!sender || !receiver) {
 				response.status(404).json({ error: "User not found" });
@@ -163,8 +178,8 @@ const acceptFriendRequest = async (request, response) => {
 const unFriend = async (request, response) => {
 	try {
 		if (request.user._id !== request.params.id) {
-			const sender = await UserModel.findById(request.user._id);
-			const receiver = await UserModel.findById(request.params.id);
+			const sender = await userModel.findById(request.user._id);
+			const receiver = await userModel.findById(request.params.id);
 
 			if (!sender || !receiver) {
 				response.status(404).json({ error: "User not found" });
@@ -194,6 +209,26 @@ const unFriend = async (request, response) => {
 	}
 };
 
+const getStrangers = async (request, response) => {
+	console.log("Testing");
+	try {
+		const user = await userModel.findById(request.params.id);
+		if (!user) {
+			response.status(404).json({ error: "User not found" });
+			return;
+		}
+
+		const strangers = await userModel.find({
+			_id: { $nin: user.friends },
+		});
+
+		const strangerUsernames = strangers.map((stranger) => stranger);
+		response.json(strangerUsernames);
+	} catch {
+		response.status(500).json({ error: "Internal server error" });
+	}
+};
+
 module.exports = {
 	loginUser,
 	signupUser,
@@ -201,5 +236,6 @@ module.exports = {
 	sendFriendRequest,
 	cancelFriendRequest,
 	acceptFriendRequest,
+	getStrangers,
 	unFriend,
 };

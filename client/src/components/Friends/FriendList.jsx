@@ -2,10 +2,7 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
 	viewFriendList,
-	addFriend,
 	unFriend,
-	acceptFriendRequest,
-	cancelFriendRequest,
 } from "../../slices/friendSlice";
 
 const FriendList = () => {
@@ -54,31 +51,36 @@ const FriendList = () => {
 		}
 	}, [userId]); // Dependencies array: runs the effect if userId changes
 
-	// Function to handle adding a friend
-	const handleAddFriend = (friendId) => {
-		if (userId) {
-			dispatch(addFriend({ userId, friendId }));
-		}
-	};
-
+	// Function to handle unfriending a friend
 	// Function to handle unfriending a friend
 	const handleUnFriend = (friendId) => {
-		if (userId) {
-			dispatch(unFriend({ userId, friendId }));
-		}
-	};
+		const deleteFriend = async () => {
+			try {
+				// Send DELETE request to the server to unfriend the user
+				const response = await fetch(
+					`http://localhost:8000/friend/${friendId}`,
+					{
+						method: "DELETE",
+						credentials: "include",
+					}
+				);
 
-	// Function to handle accepting a friend request
-	const handleAcceptFriendRequest = (requestId) => {
-		if (userId) {
-			dispatch(acceptFriendRequest({ userId, requestId }));
-		}
-	};
+				// Check if the response is ok
+				if (!response.ok) {
+					throw new Error("Failed to unfriend");
+				}
 
-	// Function to handle canceling a friend request
-	const handleCancelFriendRequest = (requestId) => {
+				// Dispatch the unFriend action to update the Redux store
+				dispatch(unFriend(friendId));
+			} catch (error) {
+				// Handle any errors
+				console.error("Failed to unfriend:", error);
+			}
+		};
+
+		// Only proceed if userId is available
 		if (userId) {
-			dispatch(cancelFriendRequest({ userId, requestId }));
+			deleteFriend();
 		}
 	};
 
@@ -93,19 +95,7 @@ const FriendList = () => {
 						{friend.username}
 						<br />
 						{/* Example buttons for adding, unfriending, accepting, and canceling friend requests */}
-						<button onClick={() => handleAddFriend(friend._id)}>
-							Add Friend
-						</button>
-						<br />
 						<button onClick={() => handleUnFriend(friend._id)}>Unfriend</button>
-						<br />
-						<button onClick={() => handleAcceptFriendRequest(friend._id)}>
-							Accept Request
-						</button>
-						<br />
-						<button onClick={() => handleCancelFriendRequest(friend._id)}>
-							Cancel Request
-						</button>
 					</li>
 				))}
 			</ul>
