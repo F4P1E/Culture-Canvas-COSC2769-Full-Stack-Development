@@ -5,11 +5,8 @@ import { useParams } from "react-router-dom";
 
 const CommentHistory = () => {
 	const dispatch = useDispatch();
-	//let commentId = useSelector((state) => state.posts.currentId);
 	const { commentId } = useParams();
-	console.log(`CommentId:${commentId}`);
 	const commentHistory = useSelector((state) => state.posts.commentHistories);
-	console.log(`History:${JSON.stringify(commentHistory)}`);
 
 	useEffect(() => {
 		const fetchCommentHistory = async () => {
@@ -27,7 +24,6 @@ const CommentHistory = () => {
 				}
 
 				const data = await response.json();
-				console.log(`Data: ${JSON.stringify(data)}`);
 				dispatch(setCommentHistory(data));
 			} catch (error) {
 				console.error("Failed to fetch comment history:", error);
@@ -44,7 +40,7 @@ const CommentHistory = () => {
 			<h1>Comment History</h1>
 			<ul>
 				{commentHistory.map((comment) => (
-					<li key={comment.version}>
+					<li key={comment._id}>
 						<p>Version: {comment.version}</p>
 						<p>Comment: {comment.content}</p>
                         <br />

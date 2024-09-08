@@ -13,7 +13,6 @@ const PostDetail = ({ postId }) => {
   const navigate = useNavigate();
   const posts = useSelector((state) => state.posts.posts);
   const post = posts.find((p) => p._id === postId);
-  console.log(`POST: ${JSON.stringify(post)}`);
   const comments = useSelector((state) => state.posts.comments);
   const [content, setComment] = useState("");
   const [editPostContent, setEditPostContent] = useState(post?.content || ""); // Local state for post editing
@@ -133,8 +132,9 @@ const PostDetail = ({ postId }) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(`DATA: ${data.content}`);
-        dispatch(editComment({ postId, commentId, text: data.content }));
+        console.log(`Data: ${JSON.stringify(data)}`)
+        //dispatch(editComment({ postId, commentId, text: data.content }));
+        setEditCommentContent(data);
         setEditCommentId(null); // Exit edit mode for comment
         alert("Comment updated successfully!");
       }
@@ -142,6 +142,10 @@ const PostDetail = ({ postId }) => {
       console.error("Failed to update comment:", error);
     }
   };
+
+  const handleRedirectToPostHistory = (currentId) => {
+    navigate(`/posthistory/${currentId}`);
+  }
 
   const handleRedirectToCommentHistory = (currentId) => {
     navigate(`/commenthistory/${currentId}`);
@@ -167,6 +171,13 @@ const PostDetail = ({ postId }) => {
               <p><strong>By: {post?.username || "Anonymous"}</strong></p>
               <p>{post.content}</p>
               <button onClick={() => setIsEditingPost(true)}>Edit Post</button>
+              <button
+                      onClick={() => {
+                        handleRedirectToPostHistory(postId);
+                      }}
+                    >
+                      View post history!
+                    </button>
             </div>
           )}
 

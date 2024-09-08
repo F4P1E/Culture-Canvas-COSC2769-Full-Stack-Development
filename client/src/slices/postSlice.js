@@ -23,7 +23,6 @@ const postSlice = createSlice({
     	setCommentHistory: (state, action) => {
 			// Reducer to set multiple posts
 			state.commentHistories = action.payload; // Set posts from action payload
-			console.log(`action.payload:${JSON.stringify(action.payload)}`);
 		},
 		setPostHistory: (state, action) => {
 			// Reducer to set multiple posts

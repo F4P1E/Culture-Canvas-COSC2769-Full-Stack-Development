@@ -160,30 +160,6 @@ const updatePost = async (request, response) => {
 	}
 };
 
-// Get edit history
-const getPostHistory = async (request, response) => {
-	const postId = request.params.id;
-
-	// Check if the ID is valid
-	if (!mongoose.isValidObjectId(postId)) {
-		return response.status(404).json({ error: "Incorrect ID" });
-	}
-
-	try {
-		const post = await postModel.findOne({ _id: postId });
-
-		if (!post) {
-			return response.status(400).json({ error: "No such post" });
-		}
-
-		const postHistory = post.oldVersions;
-
-		response.status(200).json(postHistory);
-	} catch (error) {
-		response.status(500).json({ error: "Failed to retrieve post history" });
-	}
-};
-
 const getPostComments = async (request, response) => {
 	const postId = request.params.id;
 
@@ -354,6 +330,30 @@ const getPostComment = async (request, response) => {
 		response.status(200).json({ comments: post.comments });
 	} catch (error) {
 		response.status(500).json({ error: "Failed to retrieve comments" });
+	}
+};
+
+// Get edit history
+const getPostHistory = async (request, response) => {
+	const postId = request.params.id;
+
+	// Check if the ID is valid
+	if (!mongoose.isValidObjectId(postId)) {
+		return response.status(404).json({ error: "Incorrect ID" });
+	}
+
+	try {
+		const post = await postModel.findOne({ _id: postId });
+
+		if (!post) {
+			return response.status(400).json({ error: "No such post" });
+		}
+
+		const postHistory = post.oldVersions;
+
+		response.status(200).json(postHistory);
+	} catch (error) {
+		response.status(500).json({ error: "Failed to retrieve post history" });
 	}
 };
 
