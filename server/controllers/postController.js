@@ -1,5 +1,6 @@
 const postModel = require("../models/postModel");
 const commentModel = require("../models/commentModel");
+const userModel = require("../models/userModel");
 const mongoose = require("mongoose");
 
 // Create new post
@@ -160,56 +161,57 @@ const updatePost = async (request, response) => {
 };
 
 // Get edit history
-const getEditHistory = async (request, response) => {
-	const { id } = request.params;
+const getPostHistory = async (request, response) => {
+	const postId = request.params.id;
 
-	if (!mongoose.isValidObjectId(id)) {
+	// Check if the ID is valid
+	if (!mongoose.isValidObjectId(postId)) {
 		return response.status(404).json({ error: "Incorrect ID" });
 	}
 
 	try {
-		const post = await postModel.findOne({ _id: id });
+		const post = await postModel.findOne({ _id: postId });
 
 		if (!post) {
 			return response.status(400).json({ error: "No such post" });
 		}
 
-		const editHistory = post.oldVersions;
+		const postHistory = post.oldVersions;
 
-		response.status(200).json(editHistory);
+		response.status(200).json(postHistory);
 	} catch (error) {
-		response.status(500).json({ error: "Internal server error" });
+		response.status(500).json({ error: "Failed to retrieve post history" });
 	}
 };
 
 const getPostComments = async (request, response) => {
-    const postId = request.params.id;
+	const postId = request.params.id;
 
-    // Check if the ID is valid
-    if (!mongoose.isValidObjectId(postId)) {
-        return response.status(404).json({ error: "Incorrect ID" });
-    }
+	// Check if the ID is valid
+	if (!mongoose.isValidObjectId(postId)) {
+		return response.status(404).json({ error: "Incorrect ID" });
+	}
 
-    try {
-        // Get the post and populate the comments
-        const post = await postModel.findById(postId).populate("comments");
+	try {
+		// Get the post and populate the comments
+		const post = await postModel.findById(postId).populate("comments");
 
-        // Collect updated comments
-        const commentsWithUsernames = await Promise.all(
-            post.comments.map(async (comment) => {                
-                const commentUser = await userModel.findById(comment.userId);	// Get the user name from the comment
-                commentLocal = comment.toObject();	 // Convert Mongo docs into JS objects
-	            commentLocal.username = commentUser.username;	// Update the local comment object with the username
+		// Collect updated comments
+		const commentsWithUsernames = await Promise.all(
+			post.comments.map(async (comment) => {
+				const commentUser = await userModel.findById(comment.userId); // Get the user name from the comment
+				commentLocal = comment.toObject(); // Convert Mongo docs into JS objects
+				commentLocal.username = commentUser.username; // Update the local comment object with the username
 
-                return commentLocal;
-            })
-        );
+				return commentLocal;
+			})
+		);
 
-        // Send the response with the updated comments
-        response.status(200).json(commentsWithUsernames);
-    } catch (error) {
-        response.status(500).json({ error: "Failed to retrieve comments" });
-    }
+		// Send the response with the updated comments
+		response.status(200).json(commentsWithUsernames);
+	} catch (error) {
+		response.status(500).json({ error: "Failed to retrieve comments" });
+	}
 };
 
 const createComment = async (request, response) => {
@@ -294,8 +296,10 @@ const deleteComment = async (request, response) => {
 
 // Update comment
 const updateComment = async (request, response) => {
-	const postId = request.params.postId;
+	const userId = request.user._id;
+	const postId = request.params.id;
 	const commentId = request.params.commentId;
+	const content = request.body.content;
 
 	if (
 		!mongoose.isValidObjectId(postId) ||
@@ -308,7 +312,7 @@ const updateComment = async (request, response) => {
 		const comment = await commentModel.findOneAndUpdate(
 			{ _id: commentId },
 			{
-				$set: { ...request.body },
+				$set: { content },
 				$inc: { __v: 1 },
 			},
 			{ new: true }
@@ -318,14 +322,22 @@ const updateComment = async (request, response) => {
 			return response.status(400).json({ error: "No such comment" });
 		}
 
-		response.status(200).json({ message: "Comment updated" });
+		// Check if the user is the author
+		console.log(`userId: ${userId}, comment.userId: ${comment.userId}`);
+		if (JSON.stringify(userId) !== JSON.stringify(comment.userId)) {
+			return response
+				.status(400)
+				.json({ error: "You are not the author of this comment" });
+		}
+
+		response.status(200).json(comment);
 	} catch (error) {
 		response.status(500).json({ error: "Internal server error" });
 	}
 };
 
 // Get all comments from a post
-const getCommentsFromPost = async (request, response) => {
+const getPostComment = async (request, response) => {
 	const { id } = request.params;
 
 	if (!mongoose.isValidObjectId(id)) {
@@ -346,27 +358,27 @@ const getCommentsFromPost = async (request, response) => {
 };
 
 // Get comment edit history
-const getCommentEditHistory = async (request, response) => {
-	const { id } = request.params;
+const getCommentHistory = async (request, response) => {
+	const commentId = request.params.id;
 
-	if (!mongoose.isValidObjectId(id)) {
+	if (!mongoose.isValidObjectId(commentId)) {
 		return response.status(404).json({ error: "Incorrect ID" });
 	}
 
 	try {
-		const comment = await commentModel.findById(id);
+		const comment = await commentModel.findById(commentId);
 
 		if (!comment) {
 			return response.status(404).json({ error: "No such comment" });
 		}
 
-		const editHistory = comment.oldVersions;
+		const commentHistory = comment.oldVersions;
 
-		response.status(200).json(editHistory);
-	} catch (error) {
 		response
-			.status(500)
-			.json({ error: "Failed to retrieve comment edit history" });
+			.status(200)
+			.json({ currentCommentId: commentId, history: commentHistory });
+	} catch (error) {
+		response.status(500).json({ error: "Failed to retrieve comment history" });
 	}
 };
 
@@ -473,13 +485,13 @@ module.exports = {
 	getSpecificPost,
 	deletePost,
 	updatePost,
-	getEditHistory,
+	getPostHistory,
 	getPostComments,
 	createComment,
 	deleteComment,
 	updateComment,
-	getCommentsFromPost,
-	getCommentEditHistory,
+	getPostComment,
+	getCommentHistory,
 	reaction,
 	commentReaction,
 };

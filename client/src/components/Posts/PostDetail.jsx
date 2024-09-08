@@ -4,10 +4,6 @@ import {
   updatePost,
   getComments,
   addComment,
-  editPost,
-  editComment,
-  recordPostHistory,
-  recordCommentHistory,
   setCommentFailure,
 } from "../../slices/postSlice";
 
@@ -15,6 +11,7 @@ const PostDetail = ({ postId }) => {
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts.posts);
   const post = posts.find((p) => p._id === postId);
+  console.log(`POST: ${JSON.stringify(post)}`);
   const comments = useSelector((state) => state.posts.comments);
   const [content, setComment] = useState("");
   const [editPostContent, setEditPostContent] = useState(post?.content || ""); // Local state for post editing
@@ -92,7 +89,7 @@ const PostDetail = ({ postId }) => {
       const response = await fetch(
         `http://localhost:8000/post/${postId}`,
         {
-          method: "PUT",
+          method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ content: editPostContent }),
           credentials: "include",
@@ -103,6 +100,7 @@ const PostDetail = ({ postId }) => {
         const data = await response.json();
         dispatch(editPost({ postId, content: data.post.content }));
         setIsEditingPost(false); // Exit edit mode
+        window.location.reload();
       }
     } catch (error) {
       console.error("Failed to update post:", error);
@@ -113,27 +111,30 @@ const PostDetail = ({ postId }) => {
   const handleCommentEdit = async (commentId) => {
     try {
       // Record current comment content in history
-      const commentToEdit = post.comments.find(
-        (comment) => comment._id === commentId
-      );
-      dispatch(
-        recordCommentHistory({ postId, commentId, content: commentToEdit.text })
-      );
+      // const commentToEdit = post.comments.find(
+      //   (comment) => comment._id === commentId
+      // );
+      // console.log(`COMMENT: ${JSON.stringify(commentToEdit)}`);
+      // dispatch(
+      //   recordCommentHistory({ postId, commentId, content: commentToEdit.content })
+      // );
 
       const response = await fetch(
         `http://localhost:8000/post/${postId}/comment/${commentId}`,
         {
-          method: "PUT",
+          method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: editCommentContent }),
+          body: JSON.stringify({ content: editCommentContent }),
           credentials: "include",
         }
       );
 
       if (response.ok) {
         const data = await response.json();
-        dispatch(editComment({ postId, commentId, text: data.comment.text }));
+        console.log(`DATA: ${data.content}`);
+        dispatch(editComment({ postId, commentId, text: data.content }));
         setEditCommentId(null); // Exit edit mode for comment
+        alert("Comment updated successfully!");
       }
     } catch (error) {
       console.error("Failed to update comment:", error);
@@ -169,6 +170,7 @@ const PostDetail = ({ postId }) => {
               <li key={comment._id}>
                 {editCommentId === comment._id ? (
                   <div>
+                    <p><strong>{comment?.username || "Anonymous"}</strong></p>
                     <input
                       type="text"
                       value={editCommentContent}

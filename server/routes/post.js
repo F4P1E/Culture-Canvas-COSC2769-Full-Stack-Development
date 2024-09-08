@@ -6,13 +6,13 @@ const {
 	getSpecificPost,
 	deletePost,
 	updatePost,
-	getEditHistory,
+	getPostHistory,
 	getPostComments,
 	createComment,
 	deleteComment,
 	updateComment,
-	getCommentsFromPost,
-	getCommentEditHistory,
+	getPostComment,
+	getCommentHistory,
 	reaction,
 	commentReaction,
 } = require("../controllers/postController");
@@ -31,9 +31,9 @@ router.patch("/:id", updatePost); //:id is post id
 
 router.get("/user/:id", getPostsFromSpecificUser); //:id is user id
 
-router.get("/:id/history", getEditHistory); //id is post id
+router.get("/:id/history", getPostHistory); //id is post id
 
-router.get("/comment/:id/history", getCommentEditHistory); //id is comment id
+router.get("/comment/:id/history", getCommentHistory); //id is comment id
 
 router.get("/:id/comments", getPostComments); //id is post id
 
@@ -43,7 +43,7 @@ router.delete("/:id/comment/:commentId", deleteComment); //comment on the post w
 
 router.patch("/:id/comment/:commentId", updateComment); //     post/postID/comment/commentID
 
-router.get("/:id/comment", getCommentsFromPost);
+router.get("/:id/comment", getPostComment);
 
 router.post("/:id/react", reaction); //react to post
 
