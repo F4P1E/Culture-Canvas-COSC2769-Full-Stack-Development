@@ -106,6 +106,18 @@ const updatePost = async (request, response) => {
 	}
 };
 
+//GET TOTAL POST
+const getPostCount = async (req, res) => {
+	try {
+	  const count = await postModel.countDocuments();
+	  res.status(200).json({ totalPosts: count });
+	} catch (error) {
+	  console.error('Error fetching post count:', error);
+	  res.status(500).json({ error: 'Internal server error' });
+	}
+  };
+  
+
 const createComment = async (request, response) => {
 	try {
 		const { content, reactions = [], reactionCount = 0 } = request.body;

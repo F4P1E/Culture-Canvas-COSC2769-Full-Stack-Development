@@ -28,6 +28,18 @@ const getGroups = async (req, res) => {
 	}
 };
 
+//GET TOTAL GROUP
+const getGroupCount = async (req, res) => {
+	try {
+	  const count = await groupModel.countDocuments();
+	  res.status(200).json({ totalGroups: count });
+	} catch (error) {
+	  console.error('Error fetching group count:', error);
+	  res.status(500).json({ error: 'Internal server error' });
+	}
+  };
+  
+
 const getOneGroup = async (req, res) => {
 	const groupId = req.params.id;
 

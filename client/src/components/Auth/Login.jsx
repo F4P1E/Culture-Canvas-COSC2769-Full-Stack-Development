@@ -47,7 +47,7 @@ const Login = () => {
     
             // Check email domain to redirect
             if (email.endsWith("@gmail.com")) {
-                navigate("/home");
+                navigate("/admin");
             } else if (email.endsWith("@admin")) {
                 navigate("/admin");
             } else {
