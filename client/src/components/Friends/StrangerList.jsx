@@ -3,8 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import {
 	viewStrangersList,
 	addFriend,
-	acceptFriendRequest,
-	cancelFriendRequest,
 } from "../../slices/friendSlice";
 
 const StrangerList = () => {
@@ -71,58 +69,6 @@ const StrangerList = () => {
 		}
 	};
 
-	const handleAcceptFriendRequest = (strangerId) => {
-		const acceptFriend = async () => {
-			try {
-				const response = await fetch(
-					`http://localhost:8000/friendRequest/${strangerId}`,
-					{
-						method: "POST",
-						credentials: "include",
-					}
-				);
-
-				if (!response.ok) {
-					throw new Error("Failed to accept friend request");
-				}
-
-				dispatch(acceptFriendRequest(strangerId));
-			} catch (error) {
-				console.error("Failed to accept friend request:", error);
-			}
-		};
-
-		if (userId) {
-			acceptFriend();
-		}
-	};
-
-	const handleCancelFriendRequest = (strangerId) => {
-		const cancelFriend = async () => {
-			try {
-				const response = await fetch(
-					`http://localhost:8000/friendRequest/${strangerId}`,
-					{
-						method: "DELETE",
-						credentials: "include",
-					}
-				);
-
-				if (!response.ok) {
-					throw new Error("Failed to cancel friend request");
-				}
-
-				dispatch(cancelFriendRequest(strangerId));
-			} catch (error) {
-				console.error("Failed to cancel friend request:", error);
-			}
-		};
-
-		if (userId) {
-			cancelFriend();
-		}
-	};
-
 	return (
 		<div>
 			{loading && <p>Loading...</p>}
@@ -134,14 +80,6 @@ const StrangerList = () => {
 						<br />
 						<button onClick={() => handleAddFriend(stranger._id)}>
 							Add Friend
-						</button>
-						<br />
-						<button onClick={() => handleAcceptFriendRequest(stranger._id)}>
-							Accept Request
-						</button>
-						<br />
-						<button onClick={() => handleCancelFriendRequest(stranger._id)}>
-							Cancel Request
 						</button>
 					</li>
 				))}

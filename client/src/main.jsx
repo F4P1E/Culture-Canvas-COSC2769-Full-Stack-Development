@@ -26,6 +26,7 @@ import AuthProvider from "./context/authContext";
 import ProtectedRoute from "./context/protectedRoute";
 import UnjoinedGroupList from "./components/Groups/UnjoinedGroupList";
 import GroupAdmin from "./components/Groups/GroupAdmin";
+import FriendRequest from "./components/Friends/FriendRequest";
 
 const { store, persistor } = storeConfig;
 
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
 			{
 				path: "/people",
 				element: <PeoplePage />,
+			},
+			{
+				path: "/friendRequest",
+				element: <FriendRequest />,
 			},
 			{
 				path: "/moregroups",

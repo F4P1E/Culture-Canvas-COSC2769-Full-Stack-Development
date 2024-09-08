@@ -183,21 +183,33 @@ const getEditHistory = async (request, response) => {
 };
 
 const getPostComments = async (request, response) => {
-	const postId = request.params.id;
+    const postId = request.params.id;
 
-	// Check if the ID is valid
-	if (!mongoose.isValidObjectId(postId)) {
-		return response.status(404).json({ error: "Incorrect ID" });
-	}
+    // Check if the ID is valid
+    if (!mongoose.isValidObjectId(postId)) {
+        return response.status(404).json({ error: "Incorrect ID" });
+    }
 
-	try {
-		const post = await postModel.findById(postId).populate("comments");
-		console.log(`Comments: ${post.comments}`);
+    try {
+        // Get the post and populate the comments
+        const post = await postModel.findById(postId).populate("comments");
 
-		response.status(200).json(post.comments);
-	} catch (error) {
-		
-	}
+        // Collect updated comments
+        const commentsWithUsernames = await Promise.all(
+            post.comments.map(async (comment) => {                
+                const commentUser = await userModel.findById(comment.userId);	// Get the user name from the comment
+                commentLocal = comment.toObject();	 // Convert Mongo docs into JS objects
+	            commentLocal.username = commentUser.username;	// Update the local comment object with the username
+
+                return commentLocal;
+            })
+        );
+
+        // Send the response with the updated comments
+        response.status(200).json(commentsWithUsernames);
+    } catch (error) {
+        response.status(500).json({ error: "Failed to retrieve comments" });
+    }
 };
 
 const createComment = async (request, response) => {

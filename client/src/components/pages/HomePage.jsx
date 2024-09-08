@@ -1,8 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom"; // Correct import for useNavigate
 import { useDispatch } from "react-redux";
+import CreatePost from "../Posts/CreatePost";
 import PostFeed from "../Posts/PostFeed";
 import FriendList from "../Friends/FriendList";
+import FriendRequest from "../Friends/FriendRequest";
 import GroupList from "../Groups/JoinedGroupList";
 import JoinedGroupList from "../Groups/JoinedGroupList";
 import UnjoinedGroupList from "../Groups/UnjoinedGroupList";
@@ -19,6 +21,11 @@ const HomePage = () => {
 	const handleRedirect = (e) => {
 		e.preventDefault();
 		navigate("/people");
+	};
+
+	const handleRedirectToFriendRequests = (e) => {
+		e.preventDefault();
+		navigate("/friendRequest");
 	};
 
 	const handleRedirectToMoreGroups = (e) => {
@@ -57,7 +64,10 @@ const HomePage = () => {
 		<div>
 			<h1>Home Page</h1>
 
-			<button onClick={handleRedirect}>See more people</button>
+			<section>
+				<h2>Post something ...</h2>
+				<CreatePost /> {/* Add the CreatePost component here */}
+			</section>
 
 			<section>
 				<h2>Latest Posts</h2>
@@ -67,6 +77,15 @@ const HomePage = () => {
 			<section>
 				<h2>Your Friends:</h2>
 				<FriendList />
+			</section>
+
+			<section>
+			<button onClick={handleRedirect}>See more people</button>
+				<FriendRequest />
+			</section>
+
+			<section>
+			<button onClick={handleRedirectToFriendRequests}>View Friend Request</button>
 			</section>
 
 			<section>
