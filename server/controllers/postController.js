@@ -374,9 +374,7 @@ const getCommentHistory = async (request, response) => {
 
 		const commentHistory = comment.oldVersions;
 
-		response
-			.status(200)
-			.json({ currentCommentId: commentId, history: commentHistory });
+		response.status(200).json(commentHistory);
 	} catch (error) {
 		response.status(500).json({ error: "Failed to retrieve comment history" });
 	}

@@ -6,7 +6,6 @@ const initialState = {
 	posts: [], // Array to store all posts
 	postHistories: [],
 	commentHistories: [],
-	currentId: null,
 	comments: [],
 	isLoading: false, // Track loading state
 	error: null, // Track errors
@@ -23,8 +22,7 @@ const postSlice = createSlice({
 		},
     	setCommentHistory: (state, action) => {
 			// Reducer to set multiple posts
-			state.commentHistories = action.payload.commentHistory; // Set posts from action payload
-			state.currentId = action.payload.commentId;
+			state.commentHistories = action.payload; // Set posts from action payload
 			console.log(`action.payload:${JSON.stringify(action.payload)}`);
 		},
 		setPostHistory: (state, action) => {
