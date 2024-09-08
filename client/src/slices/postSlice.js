@@ -6,6 +6,7 @@ const initialState = {
 	posts: [], // Array to store all posts
 	postHistories: [],
 	commentHistories: [],
+	currentId: null,
 	comments: [],
 	isLoading: false, // Track loading state
 	error: null, // Track errors
@@ -20,14 +21,16 @@ const postSlice = createSlice({
 			// Reducer to set multiple posts
 			state.posts = action.payload.posts; // Set posts from action payload
 		},
-    setCommentHistory: (state, action) => {
+    	setCommentHistory: (state, action) => {
 			// Reducer to set multiple posts
-			state.commentHistories = action.payload; // Set posts from action payload
+			state.commentHistories = action.payload.commentHistory; // Set posts from action payload
+			state.currentId = action.payload.commentId;
+			console.log(`action.payload:${JSON.stringify(action.payload)}`);
 		},
-    setPostHistory: (state, action) => {
-      // Reducer to set multiple posts
-      state.postHistories = action.payload; // Set posts from action payload
-    },
+		setPostHistory: (state, action) => {
+			// Reducer to set multiple posts
+			state.postHistories = action.payload; // Set posts from action payload
+		},
 		addPost: (state, action) => {
 			// Reducer to add a new post
 			state.posts.push(action.payload.post); // Add new post to the posts array
@@ -90,15 +93,6 @@ const postSlice = createSlice({
 						action.payload.comment; // Update the comment
 				}
 			}
-		},
-		setEditHistory: (state, action) => {
-			// Reducer to store post edit history
-			state.editHistory[action.payload.postId] = action.payload.history;
-		},
-		setCommentEditHistory: (state, action) => {
-			// Reducer to store comment edit history
-			state.commentEditHistory[action.payload.commentId] =
-				action.payload.history;
 		},
 		addReaction: (state, action) => {
 			// Reducer to add or update a reaction to a post
@@ -172,10 +166,10 @@ export const {
 	deletePost,
 	getComments,
 	addComment,
+	setPostHistory,
+	setCommentHistory,
 	deleteComment,
 	updateComment,
-	setEditHistory,
-	setCommentEditHistory,
 	addReaction,
 	addCommentReaction,
 	setError,

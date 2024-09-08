@@ -27,6 +27,7 @@ import ProtectedRoute from "./context/protectedRoute";
 import UnjoinedGroupList from "./components/Groups/UnjoinedGroupList";
 import GroupAdmin from "./components/Groups/GroupAdmin";
 import FriendRequest from "./components/Friends/FriendRequest";
+import CommentHistory from "./components/Posts/CommentHistory";
 
 const { store, persistor } = storeConfig;
 
@@ -70,7 +71,11 @@ const router = createBrowserRouter([
 			{
 				path: "/groupadmin",
 				element: <GroupAdmin />,
-			}
+			},
+			{
+				path: "/commenthistory/:commentId",
+				element: <CommentHistory/>,
+			},
 		],
 		errorElement: <NotFound />,
 	},

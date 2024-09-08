@@ -1,47 +1,47 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { setCommentHistory } from "../../slices/postSlice";
-import { useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useParams } from "react-router-dom";
 
 const CommentHistory = () => {
-	const dispatch = useDispatch();
-    const commentId = useSelector((state) => state.posts.commentHistory.currentCommentId);
-    console.log(`Current Comment ID: ${commentId}`);
-    const commentHistory = useSelector((state) => state.posts.commentHistory.history);
-    console.log(`Comment History: ${commentHistory}`);
+    const dispatch = useDispatch();
+    //let commentId = useSelector((state) => state.posts.currentId);
+	const { commentId } = useParams();
+	console.log(`CommentId:${commentId}`);
+    const commentHistory = useSelector((state) => state.posts.commentHistories);
+	console.log(`History:${commentHistory}`);
 
-	useEffect(() => {
-		const fetchCommentHistory = async () => {
-			try {
-				const response = await fetch(
-					`http://localhost:8000/post/comment/${commentId}/history`,
-					{
-						method: "GET",
-						credentials: "include",
-					}
-				);
+    useEffect(() => {
+        const fetchCommentHistory = async () => {
+            try {
+                const response = await fetch(
+                    `http://localhost:8000/post/comment/${commentId}/history`,
+                    {
+                        method: "GET",
+                        credentials: "include",
+                    }
+                );
 
-				if (!response.ok) {
-					throw new Error("Network response was not ok");
-				}
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
 
-				const data = await response.json();
-				dispatch(setCommentHistory(data));
-			} catch (error) {
-				console.error("Failed to fetch comment history:", error);
-			}
-		};
+                const data = await response.json();
+                dispatch(setCommentHistory(  data ));
+            } catch (error) {
+                console.error("Failed to fetch comment history:", error);
+            }
+        };
 
         if (commentId) {
             fetchCommentHistory();
         }
-	}, [dispatch, commentId]);
+    }, [dispatch, commentId]);
 
     return (
         <div>
-            {commentHistory.map((comment) => (
-                <p key={comment._id} value={comment} />
+            {commentHistory?.map((comment, index) => (
+                <p key={index}>{comment}</p>
             ))}
         </div>
     );

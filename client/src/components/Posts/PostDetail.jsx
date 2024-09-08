@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   updatePost,
   getComments,
@@ -9,6 +10,7 @@ import {
 
 const PostDetail = ({ postId }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const posts = useSelector((state) => state.posts.posts);
   const post = posts.find((p) => p._id === postId);
   console.log(`POST: ${JSON.stringify(post)}`);
@@ -141,6 +143,10 @@ const PostDetail = ({ postId }) => {
     }
   };
 
+  const handleRedirectToCommentHistory = (currentId) => {
+    navigate(`/commenthistory/${currentId}`);
+  }
+
   return (
     <div>
       {post ? (
@@ -196,6 +202,14 @@ const PostDetail = ({ postId }) => {
                       }}
                     >
                       Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditCommentId(comment._id);
+                        handleRedirectToCommentHistory(comment._id);
+                      }}
+                    >
+                      View comment history!
                     </button>
                   </div>
                 )}
