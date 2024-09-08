@@ -41,7 +41,7 @@ router.post("/friend/:id", sendFriendRequest);
 router.get("/friendRequest", viewFriendRequest); //id is user id
 
 // Accept Request
-router.post("/friendRequest/:id", acceptFriendRequest); 
+router.post("/friendRequest/:id", acceptFriendRequest);
 
 // Cancel Friend Request
 router.delete("/friendRequest/:id", cancelFriendRequest);

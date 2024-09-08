@@ -30,6 +30,7 @@ const getGroups = async (req, res) => {
 
 const getOneGroup = async (req, res) => {
 	const groupId = req.params.id;
+	const PopulateMember = req.header("Populate-Member");
 
 	// Check if the ID is valid
 	if (!mongoose.isValidObjectId(groupId)) {
@@ -37,16 +38,28 @@ const getOneGroup = async (req, res) => {
 	}
 
 	try {
-		// Get group
-		const group = await groupModel.findById(groupId);
-		if (!group) {
-			return res.status(404).json({ error: "Group not found" });
+		if (PopulateMember == "true") {
+			// Get group with populating member
+			const group = await groupModel
+				.findById(groupId)
+				.populate("members")
+				.exec();
+			if (!group) {
+				return res.status(404).json({ error: "Group not found" });
+			}
+			res.status(200).json(group);
+		} else {
+			// Get group without populating member
+			const group = await groupModel.findById(groupId);
+			if (!group) {
+				return res.status(404).json({ error: "Group not found" });
+			}
+			res.status(200).json(group);
 		}
-		res.status(200).json(group);
 	} catch (error) {
 		res.status(500).json("Cannot get the group: ", error);
 	}
-}
+};
 
 // Get groups that has been joined
 const getUserGroups = async (req, res) => {
@@ -124,9 +137,9 @@ const getGroupRequests = async (req, res) => {
 			// If the user is an admin, populate requests and return them
 			await group.populate("requests");
 			res.status(200).json(group.requests);
-		}	
+		}
 	} catch (error) {
-		res.status(500).json("Cannot get group join request: ", error)
+		res.status(500).json("Cannot get group join request: ", error);
 	}
 };
 
@@ -147,10 +160,10 @@ const getGroupMembers = async (req, res) => {
 		}
 
 		// Populate members and return them
-		await group.populate("members")
+		await group.populate("members");
 		res.status(200).json(group.members);
 	} catch (error) {
-		res.status(500).json("Cannot get group members: ", error)
+		res.status(500).json("Cannot get group members: ", error);
 	}
 };
 
@@ -180,7 +193,7 @@ const createGroup = async (req, res) => {
 
 		res.status(200).json({ message: "Group created successfully", group });
 	} catch (error) {
-		res.status(500).json("Cannot get create group: ", error)
+		res.status(500).json("Cannot get create group: ", error);
 	}
 };
 
@@ -259,7 +272,9 @@ const approveJoinGroup = async (req, res) => {
 
 		// Check if approver is an admin
 		if (!group.admins.includes(userId)) {
-			return res.status(403).json({ error: "Only admins can approve requests" });
+			return res
+				.status(403)
+				.json({ error: "Only admins can approve requests" });
 		} else {
 			// Approve the request
 			group.members.push(requestId);
@@ -274,7 +289,7 @@ const approveJoinGroup = async (req, res) => {
 			res.status(200).json({ message: "Request approved successfully", group });
 		}
 	} catch (error) {
-		res.status(500).json("Cannot approve join request: ", error)
+		res.status(500).json("Cannot approve join request: ", error);
 	}
 };
 

@@ -86,7 +86,7 @@ const HomePage = () => {
 			<section>
 			<button onClick={handleRedirect}>See more people</button>
 			</section>
-
+			<br />
 			<section>
 			<button onClick={handleRedirectToFriendRequests}>View Friend Request</button>
 			</section>
@@ -99,10 +99,12 @@ const HomePage = () => {
 			<button onClick={handleRedirectToMoreGroups}>See new groups</button>
 
 			<br />
+			<br />
 			<button onClick={handleRedirectToGroupsAdmin}>See your groups</button>
 
 			<br />
-			<button onClick={handleLogout}>Logout</button>
+			<br />
+			<button style={{ height: "50px", width: "100px", fontSize: "15px", backgroundColor: "red", color: "white", fontWeight: "1000"}} onClick={handleLogout}>Logout</button>
 		</div>
 	);
 };

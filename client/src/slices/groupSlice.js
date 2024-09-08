@@ -4,9 +4,10 @@ import { createSlice } from "@reduxjs/toolkit";
 // Initial state for the group slice.
 const initialState = {
 	groups: [], // Array to store all groups
-	currentGroupId: null, // Stores the currently selected group ID
+	currentGroup: [], // Stores the currently selected group
 	requests: [], // Array to store pending join requests
 	groupInfo: {}, // New field to store detailed group information
+	memberInfo: [], // New field to store detailed member information
 	members: [], // Array to store members of the current group, excluding the current user
 };
 
@@ -19,8 +20,16 @@ const groupSlice = createSlice({
 			// Reducer to set multiple groups
 			state.groups = action.payload; // Set groups directly from action payload
 		},
+		setCurrentGroup: (state, action) => {
+			// Reducer to set the current group
+			state.currentGroup = action.payload; // Set the current group directly from action payload
+		},
 		fetchOneGroupInfo: (state, action) => {
 			state.groupInfo = action.payload; // Store the detailed information of one group
+			state.memberInfo = action.payload.members;
+
+			console.log(`Action payload: ${action.payload}`);
+			console.log(`Group info: ${state.groupInfo}`);
 		},
 		setRequests: (state, action) => {
 			// Reducer to set the list of join requests

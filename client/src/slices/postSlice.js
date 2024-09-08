@@ -20,7 +20,7 @@ const postSlice = createSlice({
 			// Reducer to set multiple posts
 			state.posts = action.payload.posts; // Set posts from action payload
 		},
-    	setCommentHistory: (state, action) => {
+		setCommentHistory: (state, action) => {
 			// Reducer to set multiple posts
 			state.commentHistories = action.payload; // Set posts from action payload
 		},

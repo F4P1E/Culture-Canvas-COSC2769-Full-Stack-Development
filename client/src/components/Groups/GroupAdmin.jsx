@@ -148,12 +148,12 @@ const GroupAdmin = () => {
 	// );
 
 	// Handle approving a join request
-	const handleApproveJoinRequest = (groupId) => {
+	const handleApproveJoinRequest = (requestId) => {
 		const approveRequest = async () => {
 			try {
 				// Send DELETE request to the server to unfriend the user
 				const response = await fetch(
-					`http://localhost:8000/group/approve/${groupId}/:requestId`,
+					`http://localhost:8000/group/approve/${selectedGroupId}/${requestId}`,
 					{
 						method: "POST",
 						credentials: "include",
@@ -167,6 +167,8 @@ const GroupAdmin = () => {
 
 				const data = await response.json(); // Parse the response data.
 				dispatch(approveJoinRequest(data));
+				alert("Request approved successfully");
+				window.location.reload();
 			} catch (error) {
 				// Handle any errors
 				console.error("Network error:", error);
@@ -180,12 +182,14 @@ const GroupAdmin = () => {
 	};
 
 	// Handle deleting a member from a group
-	const handleDeleteMember = (groupId, memberId) => {
+	const handleDeleteMember = (memberId) => {
+		console.log(`Selected group ID: ${selectedGroupId}`);
+		console.log(`Selected member ID: ${memberId}`);
 		const deleteMember = async () => {
 			try {
 				// Send DELETE request to the server to unfriend the user
 				const response = await fetch(
-					`http://localhost:8000/group/approve/${groupId}/${memberId}`,
+					`http://localhost:8000/group/${selectedGroupId}/${memberId}`,
 					{
 						method: "DELETE",
 						credentials: "include",
@@ -199,6 +203,8 @@ const GroupAdmin = () => {
 
 				const data = await response.json(); // Parse the response data.
 				dispatch(deleteMemberFromGroup(data));
+				alert("Member removed successfully");
+				window.location.reload();
 			} catch (error) {
 				// Handle any errors
 				console.error("Network error:", error);
@@ -271,7 +277,9 @@ const GroupAdmin = () => {
 						) => (
 							<li key={request._id}>
 								{request.username}
-								<button onClick={handleApproveJoinRequest}>
+								<button onClick={() => {
+									handleApproveJoinRequest(request._id);
+								}}>
 									Approve Request
 								</button>
 							</li>
@@ -289,7 +297,13 @@ const GroupAdmin = () => {
 						) => (
 							<li>
 								{member.username}
-								<button onClick={handleDeleteMember}>Remove Member</button>
+								<button
+									onClick={() => {
+										handleDeleteMember(member._id);
+									}}
+								>
+									Remove Member
+								</button>
 							</li>
 						)
 					)}

@@ -12,7 +12,7 @@ const {
 	getAdminGroups,
 	requestJoinGroup,
 	approveJoinGroup,
-    deleteMemberFromGroup,
+	deleteMemberFromGroup,
 } = require("../controllers/groupController");
 
 router.get("/", getGroups); // Get all groups that has not been joined
@@ -27,11 +27,11 @@ router.get("/:id/requests", getGroupRequests); // Get group requests (for admins
 
 router.get("/:id/members", getGroupMembers); // Get group members
 
-router.post("/request/:id", requestJoinGroup);  // Send group join request
+router.post("/request/:id", requestJoinGroup); // Send group join request
 
-router.post("/approve/:id/:requestId", approveJoinGroup);  // Add user to specific group
+router.post("/approve/:id/:requestId", approveJoinGroup); // Add user to specific group
 
-router.post("/", createGroup);  // Create new group
+router.post("/", createGroup); // Create new group
 
 router.delete("/:id/:userId", deleteMemberFromGroup); // Delete user from specific group
 

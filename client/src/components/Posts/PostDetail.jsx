@@ -2,246 +2,233 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
-  updatePost,
-  getComments,
-  addComment,
-  setCommentFailure,
+	updatePost,
+	getComments,
+	addComment,
+	setCommentFailure,
 } from "../../slices/postSlice";
 
 const PostDetail = ({ postId }) => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const posts = useSelector((state) => state.posts.posts);
-  const post = posts.find((p) => p._id === postId);
-  const comments = useSelector((state) => state.posts.comments);
-  const [content, setComment] = useState("");
-  const [editPostContent, setEditPostContent] = useState(post?.content || ""); // Local state for post editing
-  const [editCommentId, setEditCommentId] = useState(null); // Track the comment being edited
-  const [editCommentContent, setEditCommentContent] = useState(""); // Local state for comment editing
-  const [commentFailure, setCommentFailure] = useState(null);
-  const [isEditingPost, setIsEditingPost] = useState(false); // Toggle editing state for post
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
+	const posts = useSelector((state) => state.posts.posts);
+	const post = posts.find((p) => p._id === postId);
+	const comments = useSelector((state) => state.posts.comments);
+	const [content, setComment] = useState("");
+	const [editPostContent, setEditPostContent] = useState(post?.content || ""); // Local state for post editing
+	const [editCommentId, setEditCommentId] = useState(null); // Track the comment being edited
+	const [editCommentContent, setEditCommentContent] = useState(""); // Local state for comment editing
+	const [commentFailure, setCommentFailure] = useState(null);
+	const [isEditingPost, setIsEditingPost] = useState(false); // Toggle editing state for post
 
-  useEffect(() => {
-    if (postId) {
-      const fetchPost = async () => {
-        const response = await fetch(
-          `http://localhost:8000/post/${postId}`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-        const data = await response.json();
-        if (data && data.post) {
-          dispatch(updatePost({ post: data.post })); // Update post with comments
-        }
-      };
+	useEffect(() => {
+		if (postId) {
+			const fetchPost = async () => {
+				const response = await fetch(`http://localhost:8000/post/${postId}`, {
+					method: "GET",
+					credentials: "include",
+				});
+				const data = await response.json();
+				if (data && data.post) {
+					dispatch(updatePost({ post: data.post })); // Update post with comments
+				}
+			};
 
-      fetchPost();
-    }
-  }, [dispatch, postId]);
+			fetchPost();
+		}
+	}, [dispatch, postId]);
 
-  useEffect(() => {
-    if (postId) {
-      const fetchComments = async () => {
-        const response = await fetch(
-          `http://localhost:8000/post/${postId}/comments`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-        const data = await response.json();
-        dispatch(getComments(data));
-      };
-      fetchComments();
-    }
-  }, [postId, dispatch]);
+	useEffect(() => {
+		if (postId) {
+			const fetchComments = async () => {
+				const response = await fetch(
+					`http://localhost:8000/post/${postId}/comments`,
+					{
+						method: "GET",
+						credentials: "include",
+					}
+				);
+				const data = await response.json();
+				dispatch(getComments(data));
+			};
+			fetchComments();
+		}
+	}, [postId, dispatch]);
 
-  // Function to handle adding a new comment
-  const handleAddComment = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:8000/post/${postId}/comment`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content }),
-          credentials: "include",
-        }
-      );
+	// Function to handle adding a new comment
+	const handleAddComment = async () => {
+		try {
+			const response = await fetch(
+				`http://localhost:8000/post/${postId}/comment`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ content }),
+					credentials: "include",
+				}
+			);
 
-      if (response.ok) {
-        const data = await response.json();
-        dispatch(addComment({ postId, comment: data.comment }));
-        setComment(""); // Clear the input field
-      }
-    } catch (err) {
-      dispatch(setCommentFailure(err.message));
-    }
-  };
+			if (response.ok) {
+				const data = await response.json();
+				dispatch(addComment({ postId, comment: data.comment }));
+				setComment(""); // Clear the input field
+			}
+		} catch (err) {
+			dispatch(setCommentFailure(err.message));
+		}
+	};
 
-  // Function to handle post editing
-  const handlePostEdit = async () => {
-    try {
-      // Record current post content in history
-      dispatch(recordPostHistory({ postId, content: post.content }));
+	// Function to handle post editing
+	const handlePostEdit = async () => {
+		try {
+			const response = await fetch(`http://localhost:8000/post/${postId}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ content: editPostContent }),
+				credentials: "include",
+			});
 
-      const response = await fetch(
-        `http://localhost:8000/post/${postId}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content: editPostContent }),
-          credentials: "include",
-        }
-      );
+			if (response.ok) {
+				window.location.reload();
+			}
+		} catch (error) {
+			console.error("Failed to update post:", error);
+		}
+	};
 
-      if (response.ok) {
-        const data = await response.json();
-        dispatch(editPost({ postId, content: data.post.content }));
-        setIsEditingPost(false); // Exit edit mode
-        window.location.reload();
-      }
-    } catch (error) {
-      console.error("Failed to update post:", error);
-    }
-  };
+	// Function to handle comment editing
+	const handleCommentEdit = async (commentId) => {
+		try {
+			const response = await fetch(
+				`http://localhost:8000/post/${postId}/comment/${commentId}`,
+				{
+					method: "PATCH",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ content: editCommentContent }),
+					credentials: "include",
+				}
+			);
 
-  // Function to handle comment editing
-  const handleCommentEdit = async (commentId) => {
-    try {
-      // Record current comment content in history
-      // const commentToEdit = post.comments.find(
-      //   (comment) => comment._id === commentId
-      // );
-      // console.log(`COMMENT: ${JSON.stringify(commentToEdit)}`);
-      // dispatch(
-      //   recordCommentHistory({ postId, commentId, content: commentToEdit.content })
-      // );
+			if (response.ok) {
+				const data = await response.json();
+				console.log(`Data: ${JSON.stringify(data)}`);
+				setEditCommentContent(data);
+				setEditCommentId(null); // Exit edit mode for comment
+				alert("Comment updated successfully!");
+				window.location.reload();
+			}
+		} catch (error) {
+			console.error("Failed to update comment:", error);
+		}
+	};
 
-      const response = await fetch(
-        `http://localhost:8000/post/${postId}/comment/${commentId}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content: editCommentContent }),
-          credentials: "include",
-        }
-      );
+	const handleRedirectToPostHistory = (currentId) => {
+		navigate(`/posthistory/${currentId}`);
+	};
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log(`Data: ${JSON.stringify(data)}`)
-        //dispatch(editComment({ postId, commentId, text: data.content }));
-        setEditCommentContent(data);
-        setEditCommentId(null); // Exit edit mode for comment
-        alert("Comment updated successfully!");
-      }
-    } catch (error) {
-      console.error("Failed to update comment:", error);
-    }
-  };
+	const handleRedirectToCommentHistory = (currentId) => {
+		navigate(`/commenthistory/${currentId}`);
+	};
 
-  const handleRedirectToPostHistory = (currentId) => {
-    navigate(`/posthistory/${currentId}`);
-  }
+	return (
+		<div>
+			{post ? (
+				<>
+					{/* Post content */}
+					{isEditingPost ? (
+						<div>
+							<textarea
+								rows="4"
+								cols="50"
+								value={editPostContent}
+								onChange={(e) => setEditPostContent(e.target.value)}
+							/>
+							<button onClick={handlePostEdit}>Save Post</button>
+							<button onClick={() => setIsEditingPost(false)}>Cancel</button>
+						</div>
+					) : (
+						<div>
+							{/* Ensure user exists before accessing username */}
+							<p>
+								<strong>By: {post?.username || "Anonymous"}</strong>
+							</p>
+							<p>{post.content}</p>
+							<button onClick={() => setIsEditingPost(true)}>Edit Post</button>
+							<button
+								onClick={() => {
+									handleRedirectToPostHistory(postId);
+								}}
+							>
+								View post history!
+							</button>
+						</div>
+					)}
 
-  const handleRedirectToCommentHistory = (currentId) => {
-    navigate(`/commenthistory/${currentId}`);
-  }
+					<h3>Comments</h3>
+					<ul>
+						{comments.map((comment) => (
+							<li key={comment._id}>
+								{editCommentId === comment._id ? (
+									<div>
+										<p>
+											<strong>{comment?.username || "Anonymous"}</strong>
+										</p>
+										<input
+											type="text"
+											value={editCommentContent}
+											onChange={(e) => setEditCommentContent(e.target.value)}
+										/>
+										<button onClick={() => handleCommentEdit(comment._id)}>
+											Save
+										</button>
+										<button onClick={() => setEditCommentId(null)}>
+											Cancel
+										</button>
+									</div>
+								) : (
+									<div>
+										{/* Ensure user exists before accessing username */}
+										{/* The backend is not returning any username yet (getPostComments)*/}
+										<p>
+											<strong>{comment?.username || "Anonymous"}</strong>
+										</p>
+										<p>{comment.content}</p>
+										<button
+											onClick={() => {
+												setEditCommentId(comment._id);
+												setEditCommentContent(comment.content);
+											}}
+										>
+											Edit
+										</button>
+										<button
+											onClick={() => {
+												setEditCommentId(comment._id);
+												handleRedirectToCommentHistory(comment._id);
+											}}
+										>
+											View comment history!
+										</button>
+									</div>
+								)}
+							</li>
+						))}
+					</ul>
 
-  return (
-    <div>
-      {post ? (
-        <>
-          {/* Post content */}
-          {isEditingPost ? (
-            <div>
-              <textarea
-                value={editPostContent}
-                onChange={(e) => setEditPostContent(e.target.value)}
-              />
-              <button onClick={handlePostEdit}>Save Post</button>
-              <button onClick={() => setIsEditingPost(false)}>Cancel</button>
-            </div>
-          ) : (
-            <div>
-              {/* Ensure user exists before accessing username */}
-              <p><strong>By: {post?.username || "Anonymous"}</strong></p>
-              <p>{post.content}</p>
-              <button onClick={() => setIsEditingPost(true)}>Edit Post</button>
-              <button
-                      onClick={() => {
-                        handleRedirectToPostHistory(postId);
-                      }}
-                    >
-                      View post history!
-                    </button>
-            </div>
-          )}
-
-          <h3>Comments</h3>
-          <ul>
-            {comments.map((comment) => (
-              <li key={comment._id}>
-                {editCommentId === comment._id ? (
-                  <div>
-                    <p><strong>{comment?.username || "Anonymous"}</strong></p>
-                    <input
-                      type="text"
-                      value={editCommentContent}
-                      onChange={(e) => setEditCommentContent(e.target.value)}
-                    />
-                    <button onClick={() => handleCommentEdit(comment._id)}>
-                      Save
-                    </button>
-                    <button onClick={() => setEditCommentId(null)}>
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <div>
-                    {/* Ensure user exists before accessing username */}
-                    {/* The backend is not returning any username yet (getPostComments)*/}
-                    <p><strong>{comment?.username || "Anonymous"}</strong></p>
-                    <p>{comment.content}</p>
-                    <button
-                      onClick={() => {
-                        setEditCommentId(comment._id);
-                        setEditCommentContent(comment.content);
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => {
-                        setEditCommentId(comment._id);
-                        handleRedirectToCommentHistory(comment._id);
-                      }}
-                    >
-                      View comment history!
-                    </button>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-
-          {/* Add new comment */}
-          <input
-            type="text"
-            value={content}
-            onChange={(e) => setComment(e.target.value)}
-          />
-          <button onClick={handleAddComment}>Add Comment</button>
-          {commentFailure && <p>Error: {commentFailure}</p>}
-        </>
-      ) : (
-        <p>Loading post details...</p>
-      )}
-    </div>
-  );
+					{/* Add new comment */}
+					<input
+						type="text"
+						value={content}
+						onChange={(e) => setComment(e.target.value)}
+					/>
+					<button onClick={handleAddComment}>Add Comment</button>
+					{commentFailure && <p>Error: {commentFailure}</p>}
+				</>
+			) : (
+				<p>Loading post details...</p>
+			)}
+		</div>
+	);
 };
 
 export default PostDetail;

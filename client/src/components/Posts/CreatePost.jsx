@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { addPost } from "../../slices/postSlice";
 
 const CreatePost = () => {
-	const [username, setUsername] = useState("");
 	const [content, setContent] = useState("");
 	const [visibility, setVisibility] = useState("public");
 	const [error, setError] = useState("");
@@ -19,7 +18,7 @@ const CreatePost = () => {
 		}
 
 		try {
-      console.log(`Content: ${content}, Visibility: ${visibility}`);
+			console.log(`Content: ${content}, Visibility: ${visibility}`);
 
 			const response = await fetch("http://localhost:8000/post", {
 				method: "POST",
@@ -48,15 +47,19 @@ const CreatePost = () => {
 			<form onSubmit={handleSubmit}>
 				<div>
 					<label htmlFor="content">Content:</label>
+					<br />
 					<textarea
+						rows="4"
+						cols="50"
 						id="content"
+						placeholder="What's on your mind?"
 						value={content}
 						onChange={(e) => setContent(e.target.value)}
 						required
 					/>
 				</div>
 				<div>
-					<label htmlFor="visibility">Visibility:</label>
+					<label htmlFor="visibility">Visibility: </label>
 					<select
 						id="visibility"
 						value={visibility}
@@ -66,8 +69,10 @@ const CreatePost = () => {
 						<option value="friendsOnly">Friends Only</option>
 					</select>
 				</div>
+				<br />
 				<button type="submit">Create Post</button>
 			</form>
+			<br />
 		</div>
 	);
 };

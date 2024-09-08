@@ -77,8 +77,7 @@ const StrangerList = () => {
 			<ul>
 				{strangers.map((stranger) => (
 					<li key={stranger._id}>
-						{stranger.username}
-						<br />
+						{stranger.username}&nbsp;&nbsp;
 						<button onClick={() => handleAddFriend(stranger._id)}>
 							Add Friend
 						</button>

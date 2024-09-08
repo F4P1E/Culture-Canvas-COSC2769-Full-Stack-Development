@@ -29,8 +29,8 @@ const createPost = async (request, response) => {
 	try {
 		// Get user ID and username
 		const userId = request.user._id;
-		const user = await userModel.findById(userId)
-		const username = user.username
+		const user = await userModel.findById(userId);
+		const username = user.username;
 
 		console.log(`User ID: ${userId}`);
 		console.log(`Username: ${username}`);
@@ -135,17 +135,18 @@ const deletePost = async (request, response) => {
 
 // Update a post
 const updatePost = async (request, response) => {
-	const { id } = request.params;
+	const postId = request.params.id;
+	const postContent = request.body.content;
 
-	if (!mongoose.isValidObjectId(id)) {
+	if (!mongoose.isValidObjectId(postId)) {
 		return response.status(404).json({ error: "Incorrect ID" });
 	}
 
 	try {
 		const post = await postModel.findOneAndUpdate(
-			{ _id: id },
+			{ _id: postId },
 			{
-				$set: { ...request.body },
+				$set: { "content": postContent },
 				$inc: { __v: 1 },
 			},
 			{ upsert: true, new: true }
@@ -155,7 +156,7 @@ const updatePost = async (request, response) => {
 			return response.status(400).json({ error: "No such post" });
 		}
 
-		response.status(200).json({ message: "Post updated" });
+		response.status(200).json(post);
 	} catch (error) {
 		response.status(500).json({ error: "Internal server error" });
 	}
@@ -382,7 +383,7 @@ const getCommentHistory = async (request, response) => {
 };
 
 // Add reaction to a post
-const reaction = async (request, response) => {
+const postReaction = async (request, response) => {
 	const { id } = request.params;
 	const { reactionType } = request.body;
 	const userId = request.user._id;
@@ -491,6 +492,6 @@ module.exports = {
 	updateComment,
 	getPostComment,
 	getCommentHistory,
-	reaction,
+	postReaction,
 	commentReaction,
 };
