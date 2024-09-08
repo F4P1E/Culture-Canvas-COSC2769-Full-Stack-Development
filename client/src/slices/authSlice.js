@@ -16,8 +16,7 @@ const authSlice = createSlice({
 		},
 		setRegisterSuccess: (state, action) => {
 			state.isLoading = false;
-			// Ensure that action.payload contains the entire user object, including the role
-			state.user = action.payload.user; 
+			state.user = action.payload.user;
 		},
 		setRegisterFailure: (state, action) => {
 			state.isLoading = false;
@@ -29,8 +28,7 @@ const authSlice = createSlice({
 		},
 		setLoginSuccess: (state, action) => {
 			state.isLoading = false;
-			// Assuming action.payload.user has the user data including the role
-			state.user = action.payload.user;
+			state.user = action.payload;
 		},
 		setLoginFailure: (state, action) => {
 			state.isLoading = false;
@@ -42,7 +40,6 @@ const authSlice = createSlice({
 	},
 });
 
-// Exporting actions
 export const {
 	setRegisterStart,
 	setRegisterSuccess,
@@ -53,5 +50,4 @@ export const {
 	setLogout,
 } = authSlice.actions;
 
-// Default export the reducer
 export default authSlice.reducer;

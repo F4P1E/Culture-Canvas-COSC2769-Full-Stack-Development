@@ -1,4 +1,3 @@
-
 // Importing createSlice from Redux Toolkit to create a slice of the Redux state.
 import { createSlice } from "@reduxjs/toolkit";
 

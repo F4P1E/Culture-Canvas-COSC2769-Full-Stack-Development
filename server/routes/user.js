@@ -1,49 +1,51 @@
-const express = require('express');
-
+const express = require("express");
 
 const router = express.Router();
 
-//controller function
-const { loginUser, signupUser, sendFriendRequest, cancelFriendRequest, acceptRequest, unFriend, getFriends, getStranger, getPosts, getPostsFromSpecificUser, getEditHistory, getCommentsFromPost, getCommentEditHistory, suspendAccount } = require('../controllers/userController');
+// Controller functions
+const {
+	loginUser,
+	signupUser,
+	viewFriendList,
+	sendFriendRequest,
+	cancelFriendRequest,
+	acceptFriendRequest,
+	getStrangers,
+	unFriend,
+} = require("../controllers/userController");
 
+// Login
+router.post("/login", loginUser);
 
+// Logout
+router.get("/logout", (request, response) => {
+	request.session.destroy((err) => {
+		if (err) {
+			return response.status(500).send("Failed to destroy session");
+		}
+		response.status(200).send("Logged out successfully");
+	});
+});
 
-//login
-router.post('/login', loginUser);
+// Signup
+router.post("/signup", signupUser);
 
-//signup
-router.post('/signup', signupUser);
+// See friend list
+router.get("/:id/friends", viewFriendList);
 
-//addFriend
+// Add Friend
+router.post("/friend/:id", sendFriendRequest);
 
-router.put('/addFriend/:id', sendFriendRequest);
+// Accept Request
+router.post("/friendRequest/:id", acceptFriendRequest);
 
-//cancelFriendRequest
-router.put('/cancelFriend/:id', cancelFriendRequest);
+// Cancel Friend Request
+router.delete("/friendRequest/:id", cancelFriendRequest);
 
-//acceptRequest
-router.put('/acceptRequest/:id', acceptRequest);
+// Get Strangers
+router.get("/:id/strangers", getStrangers);
 
-//unfriend
-router.put('/unfriend/:id', unFriend);
-
-
-router.get('/', getPosts); 
-
-router.get('/:id/post', getPostsFromSpecificUser);   //:id is user id   let the front end people implement the user page for this
-
-router.get('/post/:id/history', getEditHistory); //id is post id
-
-router.get('/comment/:id/history', getCommentEditHistory); //id is comment id
-
-router.get('/post/:id/comment', getCommentsFromPost);  //id is post id
-
-router.get('/friends', getFriends);
-
-router.get('/stranger', getStranger);
-
-
-router.patch('/user/:id', suspendAccount); //id is user id
-
+// Unfriend
+router.delete("/friend/:id", unFriend);
 
 module.exports = router;

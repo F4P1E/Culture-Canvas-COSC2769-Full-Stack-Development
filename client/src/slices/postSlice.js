@@ -8,6 +8,7 @@ const initialState = {
   editHistory: {}, // Store post edit history
   commentEditHistory: {}, // Store comment edit history
   commentHistories: {}, // Object to store comment history: { postId: { commentId: [history array] } }
+  comments: [],
   isLoading: false, // Track loading state
   error: null, // Track errors
 };
@@ -39,6 +40,10 @@ const postSlice = createSlice({
       state.posts = state.posts.filter(
         (post) => post._id !== action.payload.postId
       ); // Remove post by ID
+    },
+    getComments: (state, action) => {
+      // Reducer to set comments for a post
+      state.comments = action.payload;
     },
     addComment: (state, action) => {
       // Reducer to add a comment to a post
@@ -191,6 +196,7 @@ export const {
   addPost,
   updatePost,
   deletePost,
+  getComments,
   addComment,
   deleteComment,
   updateComment,

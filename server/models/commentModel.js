@@ -1,41 +1,37 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const Schema = mongoose.Schema;
+const commentSchema = new Schema(
+    {
+        postId: { type: Schema.ObjectId, required: true },
+        userId: { type: Schema.ObjectId, required: true },
+        content: { type: String, required: true },
+        reactions: [
+            {
+                userId: { type: Schema.ObjectId, required: true },
+                reactionType: { type: String, required: true },
+            },
+        ],
+        reactionCount: { type: Number, default: 0 },
+        oldVersions: [
+            {
+                version: { type: Number, required: true },
+                content: { type: Schema.Types.Mixed, required: true },
+            },
+        ],
+    },
+    { timestamps: true }
+);
 
-const commentSchema = new Schema({
-    postId:{
-        type: String,
-        require: true
-    },
-    userId:{
-        type: String,
-        require: true
-    },
-    content: {
-        type: String,
-        required: true
-    },
-    reactions: [{
-        userId: {
-            type: String,
-            required: true,
-        },
-        reactionType: {
-            type: String,
-            required: true,
-        },
-    }],
-    reactionCount: {
-        type: Number,
-        default: 0,
-    },
-    oldVersions: [{
-        version: Number,
-        content: Schema.Types.Mixed
-    }],
-}, { timestamps: true });
+// Ensure that reactions can be an empty array
+commentSchema.path('reactions').validate(function (value) {
+    // Allow empty array, otherwise check that all required fields are present
+    return Array.isArray(value) && value.every(reaction => 
+        reaction.userId && reaction.reactionType
+    );
+}, "Invalid reaction format");
 
-commentSchema.pre(['updateOne', 'findOneAndUpdate'], async function(next) {
+commentSchema.pre(["updateOne", "findOneAndUpdate"], async function (next) {
     const update = this.getUpdate();
     const filter = this.getFilter();
     const doc = await this.model.findOne(filter);
@@ -52,4 +48,6 @@ commentSchema.pre(['updateOne', 'findOneAndUpdate'], async function(next) {
     next();
 });
 
-module.exports =  mongoose.model('Comment', commentSchema);
+const Comment = mongoose.models.Comment || mongoose.model("Comment", commentSchema);
+
+module.exports = Comment;

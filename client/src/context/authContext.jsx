@@ -1,43 +1,44 @@
-import React, { createContext, useReducer, useEffect, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
 
-const authReducer = (state, action) => {
-  switch (action.type) {
-    case "LOGIN":
-      return { user: action.payload };
-    case "LOGOUT":
-      return { user: null };
-    default:
-      return state;
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  	if (!context) {
+    throw Error('useAuthContext must be used inside an AuthContextProvider');
   }
+
+  const setUser = (user) => {
+    context.setUser(user);
+  };
+
+  return { ...context, setUser };
 };
 
 export const AuthProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(authReducer, { user: null });
+	const [user, setUser] = useState(() => {
+		// Retrieve user from localStorage if available
 
-  useEffect(() => {
-    const savedUser = JSON.parse(localStorage.getItem("user"));
-    if (savedUser) {
-      dispatch({ type: "LOGIN", payload: savedUser });
-    }
-  }, []);
+		const savedUser = localStorage.getItem("user");
+		return savedUser ? JSON.parse(savedUser) : null;
+	});
 
-  useEffect(() => {
-    if (state.user) {
-      localStorage.setItem("user", JSON.stringify(state.user));
-    } else {
-      localStorage.removeItem("user");
-    }
-  }, [state.user]);
+	const isAuthenticated = !!user;
 
-  return (
-    <AuthContext.Provider value={{ user: state.user, dispatch }}>
-      {children}
-    </AuthContext.Provider>
-  );
+	// Save user data to localStorage whenever it changes
+	useEffect(() => {
+		if (user) {
+			localStorage.setItem("user", JSON.stringify(user));
+		} else {
+			localStorage.removeItem("user");
+		}
+	}, [user]);
+
+	return (
+		<AuthContext.Provider value={{ user, setUser, isAuthenticated }}>
+			{children}
+		</AuthContext.Provider>
+	);
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export default AuthProvider;
