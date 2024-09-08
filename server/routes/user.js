@@ -7,6 +7,7 @@ const {
 	loginUser,
 	signupUser,
 	viewFriendList,
+	viewFriendRequest,
 	sendFriendRequest,
 	cancelFriendRequest,
 	acceptFriendRequest,
@@ -36,8 +37,11 @@ router.get("/:id/friends", viewFriendList);
 // Add Friend
 router.post("/friend/:id", sendFriendRequest);
 
+// View request to add friend
+router.get("/requests/:id", viewFriendRequest); //id is user id
+
 // Accept Request
-router.post("/friendRequest/:id", acceptFriendRequest);
+router.post("/friendRequest/:id", acceptFriendRequest); 
 
 // Cancel Friend Request
 router.delete("/friendRequest/:id", cancelFriendRequest);

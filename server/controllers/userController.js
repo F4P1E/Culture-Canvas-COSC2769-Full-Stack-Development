@@ -1,4 +1,5 @@
 const userModel = require("../models/userModel");
+const mongoose = require("mongoose");
 
 const loginUser = async (request, response) => {
 	const { email, password } = request.body;
@@ -68,10 +69,28 @@ const viewFriendList = async (request, response) => {
 };
 
 // Get group requests (for admins)
-const getFriendRequest = async (req, res) => {
+const viewFriendRequest = async (req, res) => {
 	const userId = req.user._id;
 
-	
+	// Check if the ID is valid
+	if (!mongoose.isValidObjectId(userId)) {
+		return res.status(404).json({ error: "Incorrect ID" });
+	}
+
+	try {
+		// Find the user
+		const user = await userModel.findById(userId);
+		if (!user) {
+			return res.status(404).json({ error: "User not found" });
+		}
+
+		// If the user is an admin, populate requests and return them
+		//await user.populate("requests");
+		res.status(200).json(user.requests);
+
+	} catch (error) {
+		res.status(500).json("Cannot get friend request: ", error)
+	}
 };
 
 const sendFriendRequest = async (request, response) => {
@@ -233,6 +252,7 @@ module.exports = {
 	loginUser,
 	signupUser,
 	viewFriendList,
+	viewFriendRequest,
 	sendFriendRequest,
 	cancelFriendRequest,
 	acceptFriendRequest,

@@ -1,47 +1,49 @@
 // Importing React hooks for state and effect, and Redux hook for accessing state.
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { acceptFriendRequest, viewStrangersList } from '../../slices/friendSlice';
+import { acceptFriendRequest, viewFriendRequest } from '../../slices/friendSlice';
 
 const FriendRequest = () => {
-  const [requests, setRequests] = useState([]); // Local state for storing friend requests.
-  const { strangers } = useSelector((state) => state.friends); // Accessing strangers list from Redux store.
+  const { requestId } = useSelector((state) => state.friends.requests); // Accessing strangers list from Redux store.
   const dispatch = useDispatch(); // Hook to dispatch Redux actions.
+
+  // Access user ID from the Redux store
+	const userId = useSelector((state) => state.auth.user?._id);
 
   // useEffect to fetch friend requests when the component mounts.
   useEffect(() => {
     const fetchRequests = async () => {
-      const response = await fetch('/api/friend-requests');
+      const response = await fetch(`http://localhost:8000/${userId}/requests`, {
+        method: "GET",
+				credentials: "include",
+      }) ;
       const data = await response.json(); // Parse the response data.
-      setRequests(data); // Update state with fetched requests.
+      dispatch(viewFriendRequest(data)); // Update state with fetched requests.
     };
 
-    fetchRequests(); // Call the fetch function.
+    if (userId) {
+      fetchRequests(); // Call the fetch function.
+    }
+    
   }, []); // Empty dependency array to run effect once when component mounts.
 
   // Function to handle accepting a friend request.
-  const handleAcceptRequest = async (strangerId) => {
+  const handleAcceptRequest = async (requestId) => {
     try {
-      const response = await fetch(`/api/friend-request/${strangerId}`, {
+      const response = await fetch(`http://localhost:8000/friendRequest/${requestId}`, {
         method: 'POST',
       });
 
       if (!response.ok) {
-        throw new Error('Failed to accept friend request');
+        throw new Error('Network error');
       }
 
+      const data = await response.json();
       // Dispatch the acceptFriendRequest action.
-      dispatch(acceptFriendRequest(strangerId));
-
-      // Update the local state to remove the accepted request from the list.
-      setRequests((prevRequests) =>
-        prevRequests.filter((request) => request.sender._id !== strangerId)
-      );
-
-      // Remove the stranger from the strangers list.
-      dispatch(viewStrangersList(strangers.filter((stranger) => stranger._id !== strangerId)));
+      dispatch(acceptFriendRequest(data));
+      
     } catch (error) {
-      console.error('Error accepting friend request:', error);
+      console.error('Failed to accept friend request:', error);
     }
   };
 
@@ -51,7 +53,7 @@ const FriendRequest = () => {
       <ul>
         {requests.map((request) => ( // Map over requests array to render each request.
           <li key={request._id}>
-            {request.sender.firstName} {request.sender.lastName}
+            {request.username} 
             <button onClick={() => handleAcceptRequest(request.sender._id)}>
               Accept friend request
             </button>

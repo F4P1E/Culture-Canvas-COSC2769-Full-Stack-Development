@@ -6,6 +6,7 @@ const friendsSlice = createSlice({
 	initialState: {
 		friends: [],
 		strangers: [],
+		requests: [],
 		loading: false,
 		error: null,
 	},
@@ -13,6 +14,11 @@ const friendsSlice = createSlice({
 		// Set the friends list
 		viewFriendList: (state, action) => {
 			state.friends = action.payload;
+			state.loading = false;
+		},
+		// Set the friends requests
+		viewFriendRequest: (state, action) => {
+			state.requests = action.payload;
 			state.loading = false;
 		},
 		// Add a friend
@@ -61,6 +67,7 @@ const friendsSlice = createSlice({
 
 export const {
 	viewFriendList,
+	viewFriendRequest,
 	addFriend,
 	unFriend,
 	acceptFriendRequest,
