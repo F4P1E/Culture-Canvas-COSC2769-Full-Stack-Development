@@ -1,6 +1,8 @@
 
 .sidebar{
     width: 215 px;
+    height: 100vh; /* Full viewport height */
+    background-color: white;
   }
   .sidebar .list-group-item {
       border-bottom: 1px solid #dee2e6; 
@@ -28,4 +30,12 @@
       color: white; /* Active item text color */
     }
   
-  
+    .sidebar-container {
+      transition: margin-left 0.5s ease;
+      margin-left: -250px; /* Adjust width based on your sidebar's width */
+    }
+    
+    .sidebar-container.show {
+      margin-left: 0;
+    }
+    
