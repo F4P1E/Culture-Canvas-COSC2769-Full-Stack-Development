@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-function Group() {
+function Groups() {
     const [groups, setGroups] = useState([]);
 
     // Fetch groups from the backend
@@ -37,4 +37,4 @@ function Group() {
     );
 }
 
-export default Group;
+export default Groups;

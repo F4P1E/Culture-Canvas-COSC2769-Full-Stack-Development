@@ -1,5 +1,6 @@
 const postModel = require("../models/postModel");
 const commentModel = require("../models/commentModel");
+const userModel = require("../models/userModel");
 const mongoose = require("mongoose");
 
 // Create new post
@@ -47,6 +48,59 @@ const createPost = async (request, response) => {
 		return response.status(201).json(newPost);
 	} catch (error) {
 		return response.status(500).json({ error: "Server error" });
+	}
+};
+
+// Get all posts
+const getPosts = async (request, response) => {
+	try {
+		const posts = await postModel.find({}).select("-oldVersions").exec();
+
+		for (let i = posts.length - 1; i >= 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[posts[i], posts[j]] = [posts[j], posts[i]];
+		}
+
+		response.status(200).json(posts);
+	} catch (error) {
+		response
+			.status(500)
+			.json({ status: "error", message: "Failed to retrieve posts" });
+	}
+};
+
+// Get all posts from a user
+const getPostsFromSpecificUser = async (request, response) => {
+	try {
+		const userId = request.params.id;
+		const posts = await postModel
+			.find({ userId })
+			.sort({ createdAt: -1 })
+			.exec();
+		response.status(200).json({ status: "success", data: posts });
+	} catch (error) {
+		response
+			.status(500)
+			.json({ status: "error", message: "Failed to retrieve posts from user" });
+	}
+};
+
+// Get a single post
+const getSpecificPost = async (request, response) => {
+	const { id } = request.params;
+	if (!mongoose.isValidObjectId(id)) {
+		return response.status(404).json({ error: "Incorrect ID" });
+	}
+	try {
+		const post = await postModel.findById(id).populate("comments").exec();
+		if (!post) {
+			return response.status(404).json({ error: "Post not found" });
+		}
+		response.status(200).json({ status: "success", data: post });
+	} catch (error) {
+		response
+			.status(500)
+			.json({ status: "error", message: "Failed to retrieve post" });
 	}
 };
 
@@ -106,17 +160,35 @@ const updatePost = async (request, response) => {
 	}
 };
 
-//GET TOTAL POST
-const getPostCount = async (req, res) => {
-	try {
-	  const count = await postModel.countDocuments();
-	  res.status(200).json({ totalPosts: count });
-	} catch (error) {
-	  console.error('Error fetching post count:', error);
-	  res.status(500).json({ error: 'Internal server error' });
+const getPostComments = async (request, response) => {
+	const postId = request.params.id;
+
+	// Check if the ID is valid
+	if (!mongoose.isValidObjectId(postId)) {
+		return response.status(404).json({ error: "Incorrect ID" });
 	}
-  };
-  
+
+	try {
+		// Get the post and populate the comments
+		const post = await postModel.findById(postId).populate("comments");
+
+		// Collect updated comments
+		const commentsWithUsernames = await Promise.all(
+			post.comments.map(async (comment) => {
+				const commentUser = await userModel.findById(comment.userId); // Get the user name from the comment
+				commentLocal = comment.toObject(); // Convert Mongo docs into JS objects
+				commentLocal.username = commentUser.username; // Update the local comment object with the username
+
+				return commentLocal;
+			})
+		);
+
+		// Send the response with the updated comments
+		response.status(200).json(commentsWithUsernames);
+	} catch (error) {
+		response.status(500).json({ error: "Failed to retrieve comments" });
+	}
+};
 
 const createComment = async (request, response) => {
 	try {
@@ -200,8 +272,10 @@ const deleteComment = async (request, response) => {
 
 // Update comment
 const updateComment = async (request, response) => {
-	const postId = request.params.postId;
+	const userId = request.user._id;
+	const postId = request.params.id;
 	const commentId = request.params.commentId;
+	const content = request.body.content;
 
 	if (
 		!mongoose.isValidObjectId(postId) ||
@@ -214,7 +288,7 @@ const updateComment = async (request, response) => {
 		const comment = await commentModel.findOneAndUpdate(
 			{ _id: commentId },
 			{
-				$set: { ...request.body },
+				$set: { content },
 				$inc: { __v: 1 },
 			},
 			{ new: true }
@@ -224,9 +298,85 @@ const updateComment = async (request, response) => {
 			return response.status(400).json({ error: "No such comment" });
 		}
 
-		response.status(200).json({ message: "Comment updated" });
+		// Check if the user is the author
+		console.log(`userId: ${userId}, comment.userId: ${comment.userId}`);
+		if (JSON.stringify(userId) !== JSON.stringify(comment.userId)) {
+			return response
+				.status(400)
+				.json({ error: "You are not the author of this comment" });
+		}
+
+		response.status(200).json(comment);
 	} catch (error) {
 		response.status(500).json({ error: "Internal server error" });
+	}
+};
+
+// Get all comments from a post
+const getPostComment = async (request, response) => {
+	const { id } = request.params;
+
+	if (!mongoose.isValidObjectId(id)) {
+		return response.status(404).json({ error: "Incorrect ID" });
+	}
+
+	try {
+		const post = await postModel.findById(id).populate("comments").exec();
+
+		if (!post) {
+			return response.status(404).json({ error: "No such post" });
+		}
+
+		response.status(200).json({ comments: post.comments });
+	} catch (error) {
+		response.status(500).json({ error: "Failed to retrieve comments" });
+	}
+};
+
+// Get edit history
+const getPostHistory = async (request, response) => {
+	const postId = request.params.id;
+
+	// Check if the ID is valid
+	if (!mongoose.isValidObjectId(postId)) {
+		return response.status(404).json({ error: "Incorrect ID" });
+	}
+
+	try {
+		const post = await postModel.findOne({ _id: postId });
+
+		if (!post) {
+			return response.status(400).json({ error: "No such post" });
+		}
+
+		const postHistory = post.oldVersions;
+
+		response.status(200).json(postHistory);
+	} catch (error) {
+		response.status(500).json({ error: "Failed to retrieve post history" });
+	}
+};
+
+// Get comment edit history
+const getCommentHistory = async (request, response) => {
+	const commentId = request.params.id;
+
+	if (!mongoose.isValidObjectId(commentId)) {
+		return response.status(404).json({ error: "Incorrect ID" });
+	}
+
+	try {
+		const comment = await commentModel.findById(commentId);
+
+		if (!comment) {
+			return response.status(404).json({ error: "No such comment" });
+		}
+
+		const commentHistory = comment.oldVersions;
+
+		response.status(200).json(commentHistory);
+	} catch (error) {
+		response.status(500).json({ error: "Failed to retrieve comment history" });
 	}
 };
 
@@ -328,11 +478,18 @@ const commentReaction = async (request, response) => {
 
 module.exports = {
 	createPost,
+	getPosts,
+	getPostsFromSpecificUser,
+	getSpecificPost,
 	deletePost,
 	updatePost,
+	getPostHistory,
+	getPostComments,
 	createComment,
 	deleteComment,
 	updateComment,
+	getPostComment,
+	getCommentHistory,
 	reaction,
 	commentReaction,
 };

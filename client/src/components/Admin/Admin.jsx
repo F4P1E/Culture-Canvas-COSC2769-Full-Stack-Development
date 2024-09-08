@@ -1,37 +1,48 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import Sidebar from "./sidebar";
-import Dashboard from "./dashboard";
+import AdminDashboard from "./dashboard";
 import Groups from "./groups";
 import Users from "./users";
-import Posts from "./posts";
-import { useAuth } from "../../context/authContext"; // Make sure this path is correct
+import Posts from "./posts"
+import { Link } from "react-router-dom";
+import { useAuth} from "../../context/authContext"; // Updated import
 
 const Admin = () => {
+  const [toggle, setToggle] = useState(false);
+  const { user } = useAuth();
+  const Toggle = () => {
+    setToggle(!toggle);
+  };
+
   const [activePage, setActivePage] = useState("Dashboard");
-  const { user } = useAuth(); // Ensure you have a hook or context providing user and auth state
-  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    // Implement logout functionality here
-    // localStorage.removeItem('token'); // Example: Clear stored auth token
-    navigate('/login'); // Redirect to login after logout
-  };
-
-  // Sidebar content change handler
   const selectPage = (page) => {
-    if (page === "Logout") {
-      handleLogout();
-    } else {
-      setActivePage(page);
-    }
+    setActivePage(page);
   };
 
-  // Conditional rendering based on user role and authentication state
-  const renderContent = () => {
-    if (!user || !user.admin) {
+  const authCheck = () => {
+    if (user && user.admin === true) {
+      return (
+        <div className="container-fluid bg-secondary min-vh-100">
+          <div className="row">
+            {toggle && (
+              <div className="col-2 bg-white vh-100">
+                <Sidebar selectPage={selectPage} />
+              </div>
+            )}
+            <div className="col">
+              {activePage === "Dashboard" && <AdminDashboard Toggle={Toggle} />}
+              {activePage === "Groups" && <Groups Toggle={Toggle} />}
+              {activePage === "Users" && <Users Toggle={Toggle} />}
+              {activePage === "Posts" && <Posts Toggle={Toggle} />}
+              <button onClick={Toggle}>Toggle Sidebar</button>
+            </div>
+          </div>
+        </div>
+      );
+    } else {
       return (
         <div>
           <h1>You are not authorized to access this page.</h1>
@@ -39,32 +50,9 @@ const Admin = () => {
         </div>
       );
     }
-    switch (activePage) {
-      case "Dashboard":
-        return <Dashboard />;
-      case "Groups":
-        return <Groups />;
-      case "Users":
-        return <Users />;
-      case "Posts":
-        return <Posts />;
-      default:
-        return <Dashboard />; // Fallback to Dashboard
-    }
   };
 
-  return (
-    <div className="container-fluid bg-secondary min-vh-50">
-      <div className="row">
-        <div className="col-2 bg-white">
-          <Sidebar selectPage={selectPage} />
-        </div>
-        <div className="col-10">
-          {renderContent()}
-        </div>
-      </div>
-    </div>
-  );
+  return (<>{authCheck()}</>);
 };
 
 export default Admin;

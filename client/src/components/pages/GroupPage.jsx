@@ -10,30 +10,30 @@ const GroupPage = () => {
   const [group, setGroup] = useState(null); // Local state for storing group data.
   const token = useSelector((state) => state.auth.token); // Accessing auth token from Redux store.
 
-  // useEffect to fetch group data when the component mounts or ID/token changes.
+ 
   useEffect(() => {
     const fetchGroup = async () => {
       // Fetch group data from server.
-      const response = await fetch(`/api/groups/${id}`, {
+      const response = await fetch(`http://localhost:8000/group/${id}`, {
         headers: { Authorization: `Bearer ${token}` }, // Authorization header with token.
       });
-      const data = await response.json(); // Parse the response data.
+      const data = await response.json(); 
       setGroup(data); // Update state with fetched group data.
     };
 
-    fetchGroup(); // Call the fetch function.
+    fetchGroup(); 
   }, [id, token]); // Dependency array with ID and token to refetch when they change.
 
-  if (!group) return <div>Loading...</div>; // Loading state while fetching data.
+  if (!group) return <div>Loading...</div>; 
 
   // Render the group page with group details, admin actions, and posts.
   return (
     <div>
       <h1>{group.name}</h1>
       <p>{group.description}</p>
-      {group.admin && <GroupAdmin groupId={id} />} // Conditionally render GroupAdmin if user is admin.
+      {group.admin && <GroupAdmin groupId={id} />} 
       <h2>Group Posts</h2>
-      <PostFeed posts={group.posts} /> // Render PostFeed with group's posts.
+      <PostFeed posts={group.posts} /> 
     </div>
   );
 };

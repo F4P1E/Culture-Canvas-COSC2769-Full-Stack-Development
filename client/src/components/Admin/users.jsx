@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
-function User() {
+function Users() {
     const [users, setUsers] = useState([]);
 
     // Fetch users from the backend
     useEffect(() => {
-        fetch('http://localhost:8000/users')  
+        fetch('http://localhost:8000/user')  
             .then(response => response.json())
             .then(data => setUsers(data))
             .catch(error => console.error('Failed to fetch users:', error));
@@ -13,7 +13,7 @@ function User() {
 
     // Function to handle user deletion
     const deleteUser = (userId) => {
-        fetch(`http://localhost:8000/users/${userId}`, { method: 'DELETE' })  // Adjust your API endpoint as needed
+        fetch(`http://localhost:8000/user/${userId}`, { method: 'DELETE' })  // Adjust your API endpoint as needed
             .then(response => {
                 if (response.ok) {
                     // Filter out the user from the state to update the UI
@@ -38,4 +38,4 @@ function User() {
     );
 }
 
-export default User;
+export default Users;

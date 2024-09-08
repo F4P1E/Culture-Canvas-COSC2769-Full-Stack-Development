@@ -1,4 +1,5 @@
 const userModel = require("../models/userModel");
+const mongoose = require("mongoose");
 
 const loginUser = async (request, response) => {
 	const { email, password } = request.body;
@@ -51,6 +52,56 @@ const signupUser = async (request, response) => {
 	}
 };
 
+const getAllUsers = async (request, response) => {
+	try {
+		const users = await userModel.find().select('-password'); // exclude password from the response
+		response.status(200).json(users);
+	} catch (error) {
+		response.status(500).json({ error: "Failed to retrieve users" });
+	}
+};
+
+const viewFriendList = async (request, response) => {
+	try {
+		const user = await userModel
+			.findById(request.params.id)
+			.populate("friends");
+
+		if (!user) {
+			return response.status(404).send("User not found");
+		}
+
+		response.status(200).json(user.friends);
+	} catch (error) {
+		response.status(500).send("Error fetching friends");
+	}
+};
+
+// Get group requests (for admins)
+const viewFriendRequest = async (req, res) => {
+	const userId = req.user._id;
+
+	// Check if the ID is valid
+	if (!mongoose.isValidObjectId(userId)) {
+		return res.status(404).json({ error: "Incorrect ID" });
+	}
+
+	try {
+		// Find the user
+		const user = await userModel.findById(userId);
+		if (!user) {
+			return res.status(404).json({ error: "User not found" });
+		}
+
+		// If the user is an admin, populate requests and return them
+		//await user.populate("requests");
+		res.status(200).json(user.requests);
+
+	} catch (error) {
+		res.status(500).json("Cannot get friend request: ", error)
+	}
+};
+
 const sendFriendRequest = async (request, response) => {
 	try {
 		if (request.user._id !== request.params.id) {
@@ -85,23 +136,6 @@ const sendFriendRequest = async (request, response) => {
 		response.status(500).json({ error: "Internal server error" });
 	}
 };
-
-const viewFriendList = async (request, response) => {
-	try {
-		const user = await userModel
-			.findById(request.params.id)
-			.populate("friends");
-
-		if (!user) {
-			return response.status(404).send("User not found");
-		}
-
-		response.status(200).json(user.friends);
-	} catch (error) {
-		response.status(500).send("Error fetching friends");
-	}
-};
-
 
 const cancelFriendRequest = async (request, response) => {
 	try {
@@ -203,22 +237,6 @@ const unFriend = async (request, response) => {
 	}
 };
 
-
-//GET TOTAL USERS
-const getUserCount = async (req, res) => {
-	try {
-	  const count = await userModel.countDocuments();
-	  res.status(200).json({ totalUsers: count });
-	} catch (error) {
-	  console.error('Error fetching user count:', error);
-	  res.status(500).json({ error: 'Internal server error' });
-	}
-  };
-  
-
-
-//GET REQUESTS
-
 const getStrangers = async (request, response) => {
 	console.log("Testing");
 	try {
@@ -239,185 +257,15 @@ const getStrangers = async (request, response) => {
 	}
 };
 
-const getFriends = async (request, response) => {
-  try {
-    const user = await UserModel.findById(request.user._id).populate('friends', 'username');
-    if (!user) {
-      response.status(404).json({ error: 'User not found' });
-      return;
-    }
-    
-    const friends = user.friends.map(friend => friend.username);
-    response.json(friends);
-    
-  } catch {
-    response.status(500).json({ error: 'Internal server error' });
-  }
-}
-
-
-// Get group requests (for admins)
-const getFriendRequest = async (req, res) => {
-	const userId = req.user._id;
-
-	
-};
-
-// Get all post
-
-const getPosts = async (request, response) => {
-  try {
-    const userId = request.user.id; 
-    const user = await UserModel.findById(userId);
-    if (!user) {
-      response.status(404).json({ status: 'error', message: 'User not found' });
-      return;
-    }
-
-    const friendIds = user.friends.map(friend => friend.toString());
-    friendIds.push(userId); 
-
-    const posts = await postModel.find({
-      $or: [
-        { userId: { $in: friendIds } },
-        { visibility: 'public' } 
-      ]
-    }).select('-oldVersions').exec();
-
-    for (let i = posts.length - 1; i >= 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [posts[i], posts[j]] = [posts[j], posts[i]];
-    }
-
-    response.status(200).json({ status: 'success', data: posts });
-  } catch (error) {
-    response.status(500).json({ status: 'error', message: 'Failed to retrieve posts' });
-  }
-};
-
-// Get all post from a user
-
-const getPostsFromSpecificUser = async (request, response) => {
-  try {
-    const userId = request.params.id;
-    const posts = await postModel.find({ userId }).sort({ createdAt: -1 }).exec();
-    response.status(200).json({ status: 'success', data: posts });
-  } catch (error) {
-    response.status(500).json({ status: 'error', message: 'Failed to retrieve posts from user' });
-  }
-};
-
-// Get edit history
-const getEditHistory = async (request, response) => {
-    const { id } = request.params;
-
-    if (!mongoose.isValidObjectId(id)) {
-      response.status(404).json({ error: "Incorrect ID" });
-    }
-
-    const post = await postModel.findOne({ _id: id });
-    
-    if (!post) {
-      return response.status(400).json({ error: "No such post" });
-    }
-
-    const editHistory = post.oldVersions;
-
-    response.status(200).json(editHistory);
-}
-
-//View all comment from a post
-
-const getCommentsFromPost = async (request, response) => {
-  try {
-    const postId = request.params.id;
-    const post = await postModel.findById(postId);
-
-    if (!post) {
-      return response.status(404).json({ error: "Post not found" });
-    }
-
-    const commentIds = post.comments;
-    const comments = await commentModel.find({ _id: { $in: commentIds } }).select('-oldVersions').exec();
-
-    response.status(200).json({ status: 'success', data: comments });
-  } catch (error) {
-    response.status(500).json({ status: 'error', message: 'Failed to retrieve comments' });
-  }
-};
-
-// Get comment edit history
-const getCommentEditHistory = async (request, response) => {
-    const commentId = request.params.id;
-
-    if (!mongoose.isValidObjectId(commentId)) {
-      response.status(404).json({ error: "Incorrect ID" });
-    }
-
-    const comment = await commentModel.findOne({ _id: commentId });
-
-    if (!comment) {
-      return response.status(400).json({ error: "No such comment" });
-    }
-
-    const editHistory = comment.oldVersions;
-
-    response.status(200).json(editHistory);
-};
-
-//Suspense user accoungt
-
-const suspendAccount = async (request, response) => {
-  try {
-    const userId = request.params.id;
-    const adminId = request.user._id;
-    const adminRole = (await UserModel.findOne({ _id: adminId })).role;
-
-    if (!mongoose.isValidObjectId(userId)) {
-      return response.status(404).json({ error: "Incorrect ID" });
-    }
-
-    if (!adminId || adminRole !== "Admin") {
-      return response.status(401).json({ error: "Unauthorized" });
-    }
-
-    const user = await UserModel.findOne({ _id: userId });
-
-    if (!user) {
-      return response.status(400).json({ error: "No such user" });
-    }
-
-    let newStatus;
-    if (user.status === "Suspended") {
-      newStatus = "Normal";
-      await UserModel.findOneAndUpdate({ _id: userId }, { $set: { status: newStatus } });
-      response.status(200).json({ message: "User account resumed" });
-    } else {
-      newStatus = "Suspended";
-      await UserModel.findOneAndUpdate({ _id: userId }, { $set: { status: newStatus } });
-      response.status(200).json({ message: "User account suspended" });
-    }
-  } catch (error) {
-    console.error(error);
-    response.status(500).json({ error: error.message });
-  }
-};
-
 module.exports = {
 	loginUser,
 	signupUser,
+	getAllUsers,
 	viewFriendList,
+	viewFriendRequest,
 	sendFriendRequest,
 	cancelFriendRequest,
 	acceptFriendRequest,
 	getStrangers,
 	unFriend,
-	getFriends,
-	getPosts,
-	getPostsFromSpecificUser,
-	getCommentEditHistory,
-	getCommentsFromPost,
-	getEditHistory,
-	suspendAccount
-
 };

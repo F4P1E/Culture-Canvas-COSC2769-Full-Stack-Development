@@ -6,6 +6,7 @@ const router = express.Router();
 const {
 	loginUser,
 	signupUser,
+	getAllUsers,
 	viewFriendList,
 	sendFriendRequest,
 	cancelFriendRequest,
@@ -32,6 +33,10 @@ router.post("/signup", signupUser);
 
 // See friend list
 router.get("/:id/friends", viewFriendList);
+
+//get All User
+
+router.get("/user", getAllUsers);
 
 // Add Friend
 router.post("/friend/:id", sendFriendRequest);

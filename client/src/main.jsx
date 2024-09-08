@@ -27,6 +27,7 @@ import ProtectedRoute from "./context/protectedRoute";
 import UnjoinedGroupList from "./components/Groups/UnjoinedGroupList";
 import GroupAdmin from "./components/Groups/GroupAdmin";
 import Admin from "./components/Admin/Admin";
+import Groups from "./components/Admin/groups"
 
 const { store, persistor } = storeConfig;
 
@@ -52,8 +53,12 @@ const router = createBrowserRouter([
 				element: <ProfilePage />,
 			},
 			{
-				path: "/groups",
+				path: "/group",
 				element: <GroupPage />,
+			},
+			{
+				path: "/groups",
+				element: <Groups />,
 			},
 			{
 				path: "/admin",

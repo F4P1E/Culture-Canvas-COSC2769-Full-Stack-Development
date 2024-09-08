@@ -9,23 +9,16 @@ function AdminDashboard() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const accessToken = localStorage.getItem('accessToken');
-            if (!accessToken) {
-                console.log('Access token not found. Please login again.');
-                return;
-            }
-
             const urls = [
-                'http://localhost:8000/groups',
-                'http://localhost:8000/posts',
-                'http://localhost:8000/users'
+                'http://localhost:8000/group',
+                'http://localhost:8000/post',
+                'http://localhost:8000/user'
             ];
 
             const fetchOptions = {
-                headers: { Authorization: `Bearer ${accessToken}` }
+                credentials: 'include'
             };
 
-            // Fetch data from multiple endpoints
             try {
                 const responses = await Promise.all(urls.map(url => fetch(url, fetchOptions)));
                 const dataPromises = responses.map(res => {

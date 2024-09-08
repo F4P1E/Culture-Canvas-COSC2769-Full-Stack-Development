@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
-import '../admin/admin.css';  // Ensure you have the corresponding CSS
+import '../admin/admin.css'; 
+import { useAuth } from "../../context/authContext"; 
 
 function Sidebar({ selectPage }) {
-  const navigate = useNavigate(); // Instantiate navigate function
-  const [activeItem, setActiveItem] = useState('Dashboard'); // Default active page
+  const navigate = useNavigate(); 
+  const [activeItem, setActiveItem] = useState('Dashboard');
 
-  const handleLogout = () => {
-    // Simply navigate to the login page
+  const handleLogout = async () => {
+    await logout();
     navigate('/login');
   };
 
@@ -22,26 +23,35 @@ function Sidebar({ selectPage }) {
   };
 
   return (
-    <div style={{ height: '100vh', backgroundColor: 'white' }} className="p-3">
-    <h3>Admin Panel</h3>
-    <div className="list-group">
-      <button className="list-group-item list-group-item-action" onClick={() => selectPage('Dashboard')}>
-        Dashboard
-      </button>
-      <button className="list-group-item list-group-item-action" onClick={() => selectPage('Groups')}>
-        Groups
-      </button>
-      <button className="list-group-item list-group-item-action" onClick={() => selectPage('Users')}>
-        Users
-      </button>
-      <button className="list-group-item list-group-item-action" onClick={() => selectPage('Posts')}>
-        Posts
-      </button>
-      <button className="list-group-item list-group-item-action text-danger" onClick={() => selectPage('Logout')}>
-        Logout
-      </button>
+    <div className='bg-white sidebar p-2'>
+      <div className='m-2'>
+        <i className='bi bi-bootstrap-fill me-3 fs-4'></i>
+        <span className='brand-name fs-4'>AdminPanel</span>
+      </div>
+      <hr className='text-dark'/>
+      <div className='list-group list-group-flush'>
+        <button onClick={() => handleSelectPage('Dashboard')} className={`list-group-item py-2 ${activeItem === 'Dashboard' ? 'active' : ''}`}>
+          <i className='bi bi-speedometer2 fs-5 me-3'></i>
+          <span className='fs-5'>Dashboard</span>
+        </button>
+        <button onClick={() => handleSelectPage('Groups')} className={`list-group-item py-2 ${activeItem === 'Groups' ? 'active' : ''}`}>
+          <i className='bi bi-people fs-5 me-3'></i>
+          <span className='fs-5'>Groups</span>
+        </button>
+        <button onClick={() => handleSelectPage('Users')} className={`list-group-item py-2 ${activeItem === 'Users' ? 'active' : ''}`}>
+          <i className='bi bi-person-check fs-5 me-3'></i>
+          <span className='fs-5'>Users</span>
+        </button>
+        <button onClick={() => handleSelectPage('Posts')} className={`list-group-item py-2 ${activeItem === 'Users' ? 'active' : ''}`}>
+          <i className='bi bi-person-check fs-5 me-3'></i>
+          <span className='fs-5'>Posts</span>
+        </button>
+        <button onClick={() => handleSelectPage('Logout')} className={`list-group-item py-2 ${activeItem === 'Logout' ? 'active' : ''}`}>
+          <i className='bi bi-box-arrow-right fs-5 me-3'></i>
+          <span className='fs-5'>Logout</span>
+        </button>
+      </div>
     </div>
-  </div>
   );
 }
 
