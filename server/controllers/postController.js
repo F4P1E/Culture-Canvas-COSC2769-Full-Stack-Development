@@ -5,14 +5,13 @@ const mongoose = require("mongoose");
 
 // Create new post
 const createPost = async (request, response) => {
-	const { username, content, reactions, reactionCount, visibility, comments } =
+	const { content, reactions, reactionCount, visibility, comments } =
 		request.body;
+
+	console.log(`Content: ${content}`);
 
 	let emptyFields = [];
 
-	if (!username) {
-		emptyFields.push("username");
-	}
 	if (!content) {
 		emptyFields.push("content");
 	}
@@ -28,13 +27,16 @@ const createPost = async (request, response) => {
 	}
 
 	try {
-		const userId = request.user?._id;
-		if (!userId) {
-			return response.status(401).json({ error: "Unauthorized" });
-		}
+		// Get user ID and username
+		const userId = request.user._id;
+		const user = await userModel.findById(userId)
+		const username = user.username
+
+		console.log(`User ID: ${userId}`);
+		console.log(`Username: ${username}`);
 
 		// Create the new post
-		const newPost = new postModel({
+		const newPost = await postModel.create({
 			userId,
 			username,
 			content,
@@ -44,7 +46,6 @@ const createPost = async (request, response) => {
 			comments,
 		});
 
-		await newPost.save();
 		return response.status(201).json(newPost);
 	} catch (error) {
 		return response.status(500).json({ error: "Server error" });

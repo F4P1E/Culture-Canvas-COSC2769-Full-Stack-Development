@@ -23,6 +23,11 @@ const HomePage = () => {
 		navigate("/people");
 	};
 
+	const handleRedirectToPostFeed = (e) => {
+		e.preventDefault();
+		navigate("/feed");
+	}
+
 	const handleRedirectToFriendRequests = (e) => {
 		e.preventDefault();
 		navigate("/friendRequest");
@@ -70,8 +75,7 @@ const HomePage = () => {
 			</section>
 
 			<section>
-				<h2>Latest Posts</h2>
-				<PostFeed />
+				<button onClick={handleRedirectToPostFeed}>Go to post feed</button>
 			</section>
 
 			<section>
@@ -81,7 +85,6 @@ const HomePage = () => {
 
 			<section>
 			<button onClick={handleRedirect}>See more people</button>
-				<FriendRequest />
 			</section>
 
 			<section>

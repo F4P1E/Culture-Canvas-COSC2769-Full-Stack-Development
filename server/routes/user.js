@@ -38,7 +38,7 @@ router.get("/:id/friends", viewFriendList);
 router.post("/friend/:id", sendFriendRequest);
 
 // View request to add friend
-router.get("/requests/:id", viewFriendRequest); //id is user id
+router.get("/friendRequest", viewFriendRequest); //id is user id
 
 // Accept Request
 router.post("/friendRequest/:id", acceptFriendRequest); 

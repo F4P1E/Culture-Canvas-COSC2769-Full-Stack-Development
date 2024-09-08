@@ -59,6 +59,7 @@ const StrangerList = () => {
 				}
 
 				dispatch(addFriend(strangerId));
+				window.location.reload();
 			} catch (error) {
 				console.error("Failed to connect:", error);
 			}
