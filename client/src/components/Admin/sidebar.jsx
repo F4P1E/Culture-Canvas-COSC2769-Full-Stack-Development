@@ -42,6 +42,10 @@ function Sidebar({ selectPage }) {
           <i className='bi bi-person-check fs-5 me-3'></i>
           <span className='fs-5'>Users</span>
         </button>
+        <button onClick={() => handleSelectPage('Users')} className={`list-group-item py-2 ${activeItem === 'Users' ? 'active' : ''}`}>
+          <i className='bi bi-person-check fs-5 me-3'></i>
+          <span className='fs-5'>Posts</span>
+        </button>
         <button onClick={() => handleSelectPage('Logout')} className={`list-group-item py-2 ${activeItem === 'Logout' ? 'active' : ''}`}>
           <i className='bi bi-box-arrow-right fs-5 me-3'></i>
           <span className='fs-5'>Logout</span>

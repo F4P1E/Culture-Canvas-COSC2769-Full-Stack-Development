@@ -5,6 +5,7 @@ import Sidebar from "./sidebar";
 import Dashboard from "./dashboard";
 import Groups from "./groups";
 import Users from "./users";
+import Posts from "./posts"
 import { Link } from "react-router-dom";
 import { useAuth} from "../../context/authContext"; // Updated import
 
@@ -35,6 +36,7 @@ const Admin = () => {
               {activePage === "Dashboard" && <Dashboard Toggle={Toggle} />}
               {activePage === "Groups" && <Groups Toggle={Toggle} />}
               {activePage === "Users" && <Users Toggle={Toggle} />}
+              {activePage === "Posts" && <Posts Toggle={Toggle} />}
             </div>
           </div>
         </div>
