@@ -234,6 +234,28 @@ const requestCreateGroup = async (req, res) => {
 	}
 };
 
+// Get group create requests
+const getCreateGroupRequests = async (req, res) => {
+	const userId = req.user._id;
+
+	try {
+		// Check if the user is an admin
+		const user = await userModel.findById(userId);
+		if (!user.admin) {
+			return res
+				.status(403)
+				.json({ error: "Only admins can view group create requests" });
+		}
+
+		// Find all group create requests
+		const groupRequests = await groupRequestModel.find({}).exec();
+
+		res.status(200).json(groupRequests);
+	} catch (error) {
+		res.status(500).json("Cannot get group create requests: ", error);
+	}
+};
+
 // Request to join group
 const requestJoinGroup = async (req, res) => {
 	const userId = req.user._id;
@@ -382,6 +404,7 @@ module.exports = {
 	getGroupMembers,
 	requestCreateGroup,
 	approveCreateGroup,
+	getCreateGroupRequests,
 	getAdminGroups,
 	requestJoinGroup,
 	approveJoinGroup,
