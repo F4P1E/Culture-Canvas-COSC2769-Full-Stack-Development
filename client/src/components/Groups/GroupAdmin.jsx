@@ -58,7 +58,7 @@ const GroupAdmin = () => {
 		const fetchRequests = async () => {
 			try {
 				const response = await fetch(
-					`http://localhost:8000/group/${selectedGroupId}/requests`,
+					`http://localhost:8000/group/requests/${selectedGroupId}`,
 					{
 						method: "GET",
 						credentials: "include",

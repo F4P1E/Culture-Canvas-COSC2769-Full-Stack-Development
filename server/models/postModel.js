@@ -23,56 +23,32 @@ const postModel = new Schema(
 		},
 		reactions: {
 			like: [
-			  {
-				userId: {
-				  type: Schema.Types.ObjectId,
-				  ref: "User",
-				  required: true,
+				{
+					type: Schema.Types.ObjectId,
+					ref: "User",
+					required: true,
 				},
-				username: {
-				  type: String,
-				  required: true,
-				},
-			  },
 			],
 			love: [
-			  {
-				userId: {
-				  type: Schema.Types.ObjectId,
-				  ref: "User",
-				  required: true,
+				{
+					type: Schema.Types.ObjectId,
+					ref: "User",
+					required: true,
 				},
-				username: {
-				  type: String,
-				  required: true,
-				},
-			  },
 			],
 			haha: [
-			  {
-				userId: {
-				  type: Schema.Types.ObjectId,
-				  ref: "User",
-				  required: true,
+				{
+					type: Schema.Types.ObjectId,
+					ref: "User",
+					required: true,
 				},
-				username: {
-				  type: String,
-				  required: true,
-				},
-			  },
 			],
 			angry: [
-			  {
-				userId: {
-				  type: Schema.Types.ObjectId,
-				  ref: "User",
-				  required: true,
+				{
+					type: Schema.Types.ObjectId,
+					ref: "User",
+					required: true,
 				},
-				username: {
-				  type: String,
-				  required: true,
-				},
-			  },
 			],
 		},
 		visibility: {
