@@ -18,6 +18,7 @@ import {
 import Register from "./components/Auth/Register";
 import Login from "./components/Auth/Login";
 import HomePage from "./components/pages/HomePage";
+import PostFeed from "./components/Posts/PostFeed";
 import NotFound from "./components/pages/NotFound";
 import ProfilePage from "./components/pages/ProfilePage"; // Example ProfilePage import
 import GroupPage from "./components/pages/GroupPage"; // Example GroupPage import
@@ -26,8 +27,13 @@ import AuthProvider from "./context/authContext";
 import ProtectedRoute from "./context/protectedRoute";
 import UnjoinedGroupList from "./components/Groups/UnjoinedGroupList";
 import GroupAdmin from "./components/Groups/GroupAdmin";
+import FriendRequest from "./components/Friends/FriendRequest";
+import PostHistory from "./components/Posts/PostHistory";
+import CommentHistory from "./components/Posts/CommentHistory";
 import Admin from "./components/Admin/Admin";
 import Groups from "./components/Admin/groups"
+import Posts from "./components/Admin/posts"
+import Users from "./components/Admin/users"
 
 const { store, persistor } = storeConfig;
 
@@ -49,6 +55,10 @@ const router = createBrowserRouter([
 				element: <HomePage />,
 			},
 			{
+				path: "/feed",
+				element: <PostFeed />,
+			},
+			{
 				path: "/profile",
 				element: <ProfilePage />,
 			},
@@ -61,6 +71,14 @@ const router = createBrowserRouter([
 				element: <Groups />,
 			},
 			{
+				path: "/posts",
+				element: <Posts />,
+			},
+			{
+				path: "/users",
+				element: <Users />,
+			},
+			{
 				path: "/admin",
 				element: <Admin />,
 			},
@@ -69,13 +87,25 @@ const router = createBrowserRouter([
 				element: <PeoplePage />,
 			},
 			{
+				path: "/friendRequest",
+				element: <FriendRequest />,
+			},
+			{
 				path: "/moregroups",
 				element: <UnjoinedGroupList />,
 			},
 			{
 				path: "/groupadmin",
 				element: <GroupAdmin />,
-			}
+			},
+			{
+				path: "/posthistory/:postId",
+				element: <PostHistory/>,
+			},
+			{
+				path: "/commenthistory/:commentId",
+				element: <CommentHistory/>,
+			},
 		],
 		errorElement: <NotFound />,
 	},

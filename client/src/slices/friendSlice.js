@@ -4,11 +4,12 @@ import { createSlice } from "@reduxjs/toolkit";
 const friendsSlice = createSlice({
 	name: "friends",
 	initialState: {
-		friends: [],
-		strangers: [],
-		loading: false,
-		error: null,
-	},
+        friends: [],
+        strangers: [],
+        requests: [],
+        loading: false,
+        error: null,
+    },
 	reducers: {
 		// Set the friends list
 		viewFriendList: (state, action) => {
@@ -30,6 +31,11 @@ const friendsSlice = createSlice({
 			);
 			state.loading = false;
 		},
+		//View Friend Request
+		viewFriendRequest: (state, action) => {
+            state.requests = action.payload;
+            state.loading = false;
+        },
 		// Accept a friend request
 		acceptFriendRequest: (state, action) => {
 			state.friends.push(action.payload);
@@ -63,6 +69,7 @@ export const {
 	viewFriendList,
 	addFriend,
 	unFriend,
+	viewFriendRequest,
 	acceptFriendRequest,
 	cancelFriendRequest,
 	viewStrangersList,

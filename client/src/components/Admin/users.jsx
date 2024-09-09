@@ -1,22 +1,29 @@
 import React, { useEffect, useState } from 'react';
 
 function Users() {
-    const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState([]); 
 
     // Fetch users from the backend
     useEffect(() => {
-        fetch('http://localhost:8000/user')  
+        fetch('http://localhost:8000/user', {
+            credentials: 'include',
+        })
             .then(response => response.json())
-            .then(data => setUsers(data))
+            .then(data => {
+                const usersArray = Array.isArray(data) ? data : [data];
+                setUsers(usersArray);
+            })
             .catch(error => console.error('Failed to fetch users:', error));
     }, []);
 
     // Function to handle user deletion
     const deleteUser = (userId) => {
-        fetch(`http://localhost:8000/user/${userId}`, { method: 'DELETE' })  // Adjust your API endpoint as needed
+        fetch(`http://localhost:8000/user/${userId}`, {
+            method: 'DELETE',
+            credentials: 'include',
+        })
             .then(response => {
                 if (response.ok) {
-                    // Filter out the user from the state to update the UI
                     setUsers(users.filter(user => user._id !== userId));
                 } else {
                     alert('Failed to delete the user.');
@@ -28,7 +35,7 @@ function Users() {
     return (
         <div>
             <h1>User List</h1>
-            {users.map(user => (
+            {users.map((user, index) => (
                 <div key={user._id}>
                     <span>{user.username}</span>
                     <button onClick={() => deleteUser(user._id)}>Delete</button>

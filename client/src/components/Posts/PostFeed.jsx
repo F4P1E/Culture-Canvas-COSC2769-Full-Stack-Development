@@ -1,59 +1,60 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setPosts, setError, setLoading } from "../../slices/postSlice";
-import Post from "./Post";
+import React, { useEffect, useState } from 'react';
 
-const PostFeed = () => {
-  const dispatch = useDispatch();
-  const { posts, isLoading, error } = useSelector((state) => state.posts); // Accessing posts, loading, and error states from Redux.
+function Posts() {
+  const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
-      dispatch(setLoading({ isLoading: true }));
+      setIsLoading(true);
       try {
-        const response = await fetch("http://localhost:8000/post/", {
-          method: "GET",
-          credentials: "include",
+        const response = await fetch('http://localhost:8000/post', {
+          credentials: 'include',
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch posts. Please try again later.");
+          throw new Error('Failed to fetch posts. Please try again later.');
         }
 
         const data = await response.json();
-
-        if (data.status === "success") {
-          dispatch(setPosts({ posts: data.data })); // Dispatch action to set posts in Redux store.
-        } else {
-          throw new Error(data.message || "Failed to fetch posts.");
-        }
+        const publicPosts = data.filter((post) => post.visibility === 'public');
+        setPosts(publicPosts);
       } catch (err) {
-        dispatch(setError({ error: err.message })); // Dispatch error to Redux store.
+        console.error('Error fetching posts:', err);
+        setError(err.message);
       } finally {
-        dispatch(setLoading({ isLoading: false })); // Turn off loading state.
+        setIsLoading(false);
       }
     };
 
-    fetchPosts(); // Call the fetch function on component mount.
-  }, [dispatch]);
+    fetchPosts();
+  }, []);
 
   if (isLoading) {
-    return <div>Loading posts...</div>; // Show loading indicator.
+    return <div>Loading posts...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>; // Show error message.
+    return <div>Error: {error}</div>;
   }
 
   return (
     <div>
+      <h1>All Posts</h1>
+
       {posts.length ? (
-        posts.map((post) => <Post key={post._id} post={post} />) // Render each post.
+        posts.map((post) => (
+          <div key={post._id}>
+            <h2>{post.username}</h2>
+            <p>{post.content}</p>
+          </div>
+        ))
       ) : (
-        <p>No posts available</p> // Message if no posts are found.
+        <p>No posts available</p>
       )}
     </div>
   );
-};
+}
 
-export default PostFeed;
+export default Posts;

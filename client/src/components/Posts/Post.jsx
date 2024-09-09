@@ -70,6 +70,7 @@ const Post = ({ post }) => {
   return (
     <div>
       <h4>{post?.title}</h4>
+      <p><strong>By: {post?.username || "Anonymous"}</strong></p> {/* Display username */}
       <p>{showDetails ? post?.content : getShortContent(post?.content)}</p>
       <button onClick={handleToggleDetails}>
         {showDetails ? "Hide Details" : "Show Details"}
@@ -79,6 +80,8 @@ const Post = ({ post }) => {
       <div>
         <button onClick={() => handleReaction("like")}>Like</button>
         <button onClick={() => handleReaction("love")}>Love</button>
+        <button onClick={() => handleReaction("haha")}>Haha</button>
+        <button onClick={() => handleReaction("angry")}>Angry</button>
       </div>
 
       {/* Conditionally render the PostDetail component when showDetails is true */}

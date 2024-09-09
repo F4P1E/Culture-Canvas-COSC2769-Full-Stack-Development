@@ -13,7 +13,7 @@ const {
 	updateComment,
 	getPostComment,
 	getCommentHistory,
-	reaction,
+	postReaction,
 	commentReaction,
 } = require("../controllers/postController");
 
@@ -45,7 +45,7 @@ router.patch("/:id/comment/:commentId", updateComment); //     post/postID/comme
 
 router.get("/:id/comment", getPostComment);
 
-router.post("/:id/react", reaction); //react to post
+router.post("/:id/react", postReaction); //react to post
 
 router.post("/comment/:id/react", commentReaction); // react to comment
 

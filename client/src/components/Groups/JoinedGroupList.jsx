@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setGroups } from "../../slices/groupSlice";
-import { fetchOneGroupInfo } from "../../slices/groupSlice";
+import { useNavigate } from "react-router-dom";
 
 const JoinedGroupList = () => {
 	const dispatch = useDispatch();
-
+	const navigate = useNavigate();
 	// Access user ID and groups from the Redux store
 	const userId = useSelector((state) => state.auth.user?._id);
 	const groups = useSelector((state) => state.groups.groups); // Access the groups array from state
@@ -35,25 +35,9 @@ const JoinedGroupList = () => {
 		}
 	}, [userId, dispatch]);
 
-	// Handle requesting to join a group
-	const handleViewGroup = async (groupId) => {
-		try {
-			const response = await fetch(`http://localhost:8000/group/${groupId}`, {
-				method: "GET",
-				credentials: "include",
-			});
-
-			if (!response.ok) {
-				throw new Error("Network response was not ok");
-			}
-
-			const data = await response.json(); // Parse the response data
-			dispatch(fetchOneGroupInfo(data)); // Update Redux store with fetched groups
-		} catch (err) {
-			console.error("Failed to send join request:", err);
-			alert("Error sending join request.");
-		}
-
+	// Handle redirection to view group
+	const handleRedirectToViewGroup = (groupId) => {
+		navigate(`/group/${groupId}`);
 	};
 
 	return (
@@ -62,7 +46,8 @@ const JoinedGroupList = () => {
 				{groups.map((group) => (
 					<li key={group._id}>
 						{group.name}
-						<button onClick={() => handleViewGroup(group._id)}>
+						&nbsp;&nbsp;
+						<button onClick={() => handleRedirectToViewGroup(group._id)}>
 							View Group
 						</button>
 					</li>

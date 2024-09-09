@@ -53,9 +53,7 @@ const Login = () => {
       dispatch(setLoginSuccess(data));
 
       // Check email domain to redirect
-      if (email.endsWith("@gmail.com")) {
-        navigate("/admin");
-      } else if (email.endsWith("@admin")) {
+      if (email.endsWith("@admin")) {
         navigate("/admin");
       } else {
         navigate("/home"); // Default redirection

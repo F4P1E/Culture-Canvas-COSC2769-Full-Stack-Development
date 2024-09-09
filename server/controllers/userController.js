@@ -5,10 +5,10 @@ const loginUser = async (request, response) => {
 	const { email, password } = request.body;
 
 	const user = await userModel.findOne({ email: email });
-	console.log(
+	/* console.log(
 		`- id: ${user._id}\n- username: ${user.username}\n- email: ${email}\n`
 	);
-
+ */
 	try {
 		const user = await userModel.login(email, password);
 
@@ -52,15 +52,6 @@ const signupUser = async (request, response) => {
 	}
 };
 
-const getAllUsers = async (request, response) => {
-	try {
-		const users = await userModel.find().select('-password'); // exclude password from the response
-		response.status(200).json(users);
-	} catch (error) {
-		response.status(500).json({ error: "Failed to retrieve users" });
-	}
-};
-
 const viewFriendList = async (request, response) => {
 	try {
 		const user = await userModel
@@ -74,6 +65,15 @@ const viewFriendList = async (request, response) => {
 		response.status(200).json(user.friends);
 	} catch (error) {
 		response.status(500).send("Error fetching friends");
+	}
+};
+
+const getAllUsers = async (request, response) => {
+	try {
+		const users = await userModel.find().select('-password'); // exclude password from the response
+		response.status(200).json(users);
+	} catch (error) {
+		response.status(500).json({ error: "Failed to retrieve users" });
 	}
 };
 

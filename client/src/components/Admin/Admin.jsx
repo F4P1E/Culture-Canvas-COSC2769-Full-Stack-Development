@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import { useAuth} from "../../context/authContext"; // Updated import
 
 const Admin = () => {
-  const [toggle, setToggle] = useState(false);
+  const [toggle, setToggle] = useState(true);
   const { user } = useAuth();
   const Toggle = () => {
     setToggle(!toggle);
@@ -37,7 +37,7 @@ const Admin = () => {
               {activePage === "Groups" && <Groups Toggle={Toggle} />}
               {activePage === "Users" && <Users Toggle={Toggle} />}
               {activePage === "Posts" && <Posts Toggle={Toggle} />}
-              <button onClick={Toggle}>Toggle Sidebar</button>
+              <button onClick={Toggle}>Sidebar</button>
             </div>
           </div>
         </div>

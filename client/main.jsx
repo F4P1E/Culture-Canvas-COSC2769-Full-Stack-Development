@@ -4,73 +4,107 @@ import ReactDOM from "react-dom/client";
 
 // React Redux
 import { Provider } from "react-redux";
-import store from "./store";
+import { PersistGate } from "redux-persist/integration/react";
+import storeConfig from "./store";
 
 // React Router
 import {
 	createBrowserRouter,
 	RouterProvider,
 	Navigate,
-	Outlet,
-	useLocation,
 } from "react-router-dom";
 
 // Import components
 import Register from "./components/Auth/Register";
 import Login from "./components/Auth/Login";
 import HomePage from "./components/pages/HomePage";
+import PostFeed from "./components/Posts/PostFeed";
 import NotFound from "./components/pages/NotFound";
 import ProfilePage from "./components/pages/ProfilePage"; // Example ProfilePage import
 import GroupPage from "./components/pages/GroupPage"; // Example GroupPage import
-import Navbar from "./components/navbar/Navbar";
-import LeftBar from "./components/leftBar/LeftBar";
-import RightBar from "./components/rightBar/RightBar";
-import "./style.scss";
-import { useContext, useEffect, useState } from "react";
+import PeoplePage from "./components/pages/PeoplePage";
+import AuthProvider from "./context/authContext";
+import ProtectedRoute from "./context/protectedRoute";
+import UnjoinedGroupList from "./components/Groups/UnjoinedGroupList";
+import GroupAdmin from "./components/Groups/GroupAdmin";
+import FriendRequest from "./components/Friends/FriendRequest";
+import PostHistory from "./components/Posts/PostHistory";
+import CommentHistory from "./components/Posts/CommentHistory";
+import Admin from "./components/Admin/Admin";
+import Groups from "./components/Admin/groups"
+import Posts from "./components/Admin/posts"
+import Users from "./components/Admin/users"
 
-import {
-	DarkModeContext,
-	DarkModeContextProvider,
-} from "./context/darkModeContext";
-import { AuthContext, AuthContextProvider } from "./context/authContext";
+const { store, persistor } = storeConfig;
 
-const Layout = () => {
-	const { darkMode } = useContext(DarkModeContext);
-
-	return (
-		<div className={`theme-${darkMode ? "dark" : "light"}`}>
-			<Navbar />
-			<div style={{ display: "flex" }}>
-				<LeftBar />
-				<div style={{ flex: 6 }}>
-					<Outlet />
-				</div>
-				<RightBar />
-			</div>
-		</div>
-	);
+const HandleNavigation = () => {
+	if (window.location.pathname === "/") {
+		window.location.href = "/home";
+		return null;
+	}
+	return null;
 };
 
 const router = createBrowserRouter([
 	{
 		path: "/",
-		element: (
-			<ProtectedRoute>
-				<Layout />
-			</ProtectedRoute>
-		),
+		element: <ProtectedRoute />,
 		children: [
 			{
 				path: "/home",
 				element: <HomePage />,
 			},
 			{
-				path: "/profile/:id",
+				path: "/feed",
+				element: <PostFeed />,
+			},
+			{
+				path: "/profile",
 				element: <ProfilePage />,
 			},
 			{
-				path: "/groups",
+				path: "/group",
 				element: <GroupPage />,
+			},
+			{
+				path: "/groups",
+				element: <Groups />,
+			},
+			{
+				path: "/posts",
+				element: <Posts />,
+			},
+			{
+				path: "/users",
+				element: <Users />,
+			},
+			{
+				path: "/admin",
+				element: <Admin />,
+			},
+			{
+				path: "/people",
+				element: <PeoplePage />,
+			},
+			{
+				path: "/friendRequest",
+				element: <FriendRequest />,
+			},
+			{
+				path: "/moregroups",
+				element: <UnjoinedGroupList />,
+			},
+			{
+				path: "/groupadmin",
+				element: <GroupAdmin />,
+			},
+			{
+				path: "/posthistory/:postId",
+				element: <PostHistory/>,
+			},
+			{
+				path: "/commenthistory/:commentId",
+				element: <CommentHistory/>,
 			},
 		],
 		errorElement: <NotFound />,
@@ -85,38 +119,16 @@ const router = createBrowserRouter([
 	},
 ]);
 
-const App = () => {
-	const { darkMode } = useContext(DarkModeContext);
-	const { currentUser } = useContext(AuthContext);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		// Set loading to false after initial load
-		if (currentUser !== undefined) {
-			setLoading(false);
-		}
-	}, [currentUser]);
-
-	if (loading) {
-		return <div>Loading...</div>; // Replace with a spinner or similar if preferred
-	}
-
-	return (
-		<div className={darkMode ? "dark" : ""}>
-			<RouterProvider router={router} />
-		</div>
-	);
-};
-
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
 	<React.StrictMode>
 		<Provider store={store}>
-			<DarkModeContextProvider>
-				<AuthContextProvider>
-					<App />
-				</AuthContextProvider>
-			</DarkModeContextProvider>
+			<PersistGate loading={null} persistor={persistor}>
+				<AuthProvider>
+					<RouterProvider router={router} />
+					<HandleNavigation />
+				</AuthProvider>
+			</PersistGate>
 		</Provider>
 	</React.StrictMode>
 );
