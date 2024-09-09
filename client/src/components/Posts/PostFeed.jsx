@@ -22,11 +22,7 @@ const PostFeed = () => {
 
 				const data = await response.json();
 
-				if (data.status === "success") {
-					dispatch(setPosts({ posts: data.data })); // Dispatch action to set posts in Redux store.
-				} else {
-					throw new Error(data.message || "Failed to fetch posts.");
-				}
+				dispatch(setPosts(data)); // Dispatch action to set posts in Redux store.
 			} catch (err) {
 				dispatch(setError({ error: err.message })); // Dispatch error to Redux store.
 			} finally {
