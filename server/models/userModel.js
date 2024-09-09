@@ -50,9 +50,6 @@ userSchema.statics.signup = async function (username, email, password) {
 	if (email.length < 12) {
 		throw Error("Email must be at least 12 characters");
 	}
-	// if (!email.endsWith("@gmail.com")) {
-	// 	throw new Error("Email must be a Gmail account");
-	// }
 	if (password.length < 8) {
 		throw new Error("Password must be at least 8 characters long");
 	}

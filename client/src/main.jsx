@@ -30,6 +30,7 @@ import GroupAdmin from "./components/Groups/GroupAdmin";
 import FriendRequest from "./components/Friends/FriendRequest";
 import PostHistory from "./components/Posts/PostHistory";
 import CommentHistory from "./components/Posts/CommentHistory";
+import AdminDashboard from "./components/Admin/dashboard";
 
 const { store, persistor } = storeConfig;
 
@@ -86,6 +87,11 @@ const router = createBrowserRouter([
 				path: "/commenthistory/:commentId",
 				element: <CommentHistory/>,
 			},
+			{
+				path: "/admindashboard",
+				element: <AdminDashboard/>,
+			},
+			
 		],
 		errorElement: <NotFound />,
 	},

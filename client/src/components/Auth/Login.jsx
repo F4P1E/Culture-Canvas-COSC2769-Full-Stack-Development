@@ -8,6 +8,8 @@ import {
 } from "../../slices/authSlice";
 import { useAuth } from "../../context/authContext";
 
+
+
 const Login = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -23,18 +25,19 @@ const Login = () => {
 		dispatch(setLoginStart());
 
 		try {
+			console.log(`WORKS`)
 			const response = await fetch("http://localhost:8000/login", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ email, password }),
 				credentials: "include",
 			});
-
 			if (!response.ok) {
 				throw new Error("Login failed");
 			}
 
 			const data = await response.json();
+			console.log(`${data}`)
 
 			function removePassFromUser(user) {
 				const {password, ...userWithoutPassword} = user
@@ -46,7 +49,12 @@ const Login = () => {
 			setUser(removePassFromUser(data));
 
 			dispatch(setLoginSuccess(data));
-			navigate("/home");
+			// Check email domain to redirect
+			if (email.endsWith("@admin")) {
+				navigate("/admindashboard");
+			  } else {
+				navigate("/home"); // Default redirection
+			  }
 		} catch (error) {
 			dispatch(setLoginFailure(error.message));
 		}
