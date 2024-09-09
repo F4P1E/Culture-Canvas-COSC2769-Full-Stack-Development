@@ -68,7 +68,7 @@ const Post = ({ post }) => {
   };
 
   return (
-    <div>
+    <div className="post-container">
       <h4>{post?.title}</h4>
       <p><strong>By: {post?.username || "Anonymous"}</strong></p> {/* Display username */}
       <p>{showDetails ? post?.content : getShortContent(post?.content)}</p>

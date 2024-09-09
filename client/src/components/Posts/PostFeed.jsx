@@ -46,7 +46,7 @@ const PostFeed = () => {
 	}
 
 	return (
-		<div>
+		<div className="posts-feed-container">
 			<h1>Posts Feed</h1>
 
 			{posts.length ? (
@@ -58,7 +58,7 @@ const PostFeed = () => {
 						) => <Post key={post._id} post={post} />
 					)
 			) : (
-				<p>No posts available</p>
+				<p className="no-posts">No posts available</p>
 			)}
 		</div>
 	);
