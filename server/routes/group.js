@@ -9,6 +9,7 @@ const {
 	getGroupRequests,
 	getGroupMembers,
 	requestCreateGroup,
+	approveCreateGroup,
 	getAdminGroups,
 	requestJoinGroup,
 	approveJoinGroup,
@@ -31,7 +32,9 @@ router.post("/request/:id", requestJoinGroup); // Send group join request
 
 router.post("/approve/:id/:requestId", approveJoinGroup); // Add user to specific group
 
-router.post("/", requestCreateGroup); // Create new group
+router.post("/create", requestCreateGroup); // Create new group
+
+router.post("/create/approve/:id", approveCreateGroup); // Add user to specific group
 
 router.delete("/:id/:userId", deleteMemberFromGroup); // Delete user from specific group
 

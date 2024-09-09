@@ -56,7 +56,13 @@ groupRequestModel.methods.approveRequest = async function () {
 		});
 		await newGroup.save(); // Save the group
 
-		await this.remove(); // Remove the request after the group has been created
+        // Add group to user
+        const User = mongoose.model("User");
+        const user = await User.findById(this.admins[0]);
+        user.groups.push(newGroup._id);
+        await user.save();
+
+		await this.deleteOne(); // Remove the request after the group has been created
 		return newGroup;
 	} catch (err) {
 		throw new Error("Error approving the group request: " + err.message);

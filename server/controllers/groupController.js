@@ -170,15 +170,21 @@ const getGroupMembers = async (req, res) => {
 
 // Create a new group
 const approveCreateGroup = async (req, res) => {
-	const { name } = req.body;
 	const userId = req.user._id;
+	const groupRequestId = req.params.id;
 
 	try {
-		// Get the group request ID from the request parameters
-		const { requestId } = req.params;
+		// Check if the user is an admin
+		const user = await userModel.findById(userId);
+		if (!user.admin) {
+			return res
+				.status(403)
+				.json({ message: "Only admins can approve group requests" });
+		}
 
 		// Find the group request by ID
-		const groupRequest = await GroupRequest.findById(requestId);
+		const groupRequest = await groupRequestModel.findById(groupRequestId);
+		console.log(`- groupRequest: ${await groupRequestModel.findById(groupRequestId)}`);
 
 		if (!groupRequest) {
 			return res.status(404).json({ message: "Group request not found" });
@@ -374,8 +380,8 @@ module.exports = {
 	getUserGroups,
 	getGroupRequests,
 	getGroupMembers,
-	approveCreateGroup,
 	requestCreateGroup,
+	approveCreateGroup,
 	getAdminGroups,
 	requestJoinGroup,
 	approveJoinGroup,
