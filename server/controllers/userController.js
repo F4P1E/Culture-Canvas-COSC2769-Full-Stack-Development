@@ -1,6 +1,20 @@
 const userModel = require("../models/userModel");
 const mongoose = require("mongoose");
 
+// Get all posts
+const getUsers = async (request, response) => {
+	try {
+		const users = await userModel.find({}).exec();
+		console.log(`Users: ${users}`);
+
+		response.status(200).json(users);
+	} catch (error) {
+		response
+			.status(500)
+			.json({ status: "error", message: "Failed to retrieve posts" });
+	}
+};
+
 const loginUser = async (request, response) => {
 	const { email, password } = request.body;
 
@@ -236,6 +250,7 @@ const getStrangers = async (request, response) => {
 };
 
 module.exports = {
+	getUsers,
 	loginUser,
 	signupUser,
 	viewFriendList,

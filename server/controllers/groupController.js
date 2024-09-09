@@ -1,4 +1,5 @@
 const groupModel = require("../models/groupModel");
+const groupRequestModel = require("../models/groupRequestModel");
 const userModel = require("../models/userModel");
 
 const mongoose = require("mongoose");
@@ -168,7 +169,40 @@ const getGroupMembers = async (req, res) => {
 };
 
 // Create a new group
-const createGroup = async (req, res) => {
+const approveCreateGroup = async (req, res) => {
+	const { name } = req.body;
+	const userId = req.user._id;
+
+	try {
+		// Get the group request ID from the request parameters
+		const { requestId } = req.params;
+
+		// Find the group request by ID
+		const groupRequest = await GroupRequest.findById(requestId);
+
+		if (!groupRequest) {
+			return res.status(404).json({ message: "Group request not found" });
+		}
+
+		// Call the approveRequest method on the group request document
+		const newGroup = await groupRequest.approveRequest();
+
+		// Return success response with the newly created group
+		return res.status(200).json({
+			message: "Group request approved and group created successfully",
+			group: newGroup,
+		});
+	} catch (err) {
+		// Handle any errors that occurred during the process
+		return res.status(500).json({
+			message: "Error approving group request",
+			error: err.message,
+		});
+	}
+};
+
+// Request to create group
+const requestCreateGroup = async (req, res) => {
 	const { name } = req.body;
 	const userId = req.user._id;
 
@@ -178,22 +212,19 @@ const createGroup = async (req, res) => {
 			return res.status(400).json({ error: "Name is required" });
 		}
 
-		// Create the group
-		const group = await groupModel.create({ name });
+		// Create the group request
+		const group = await groupRequestModel.create({ name });
 
 		// Add user to the group member and admin
-		await groupModel.findByIdAndUpdate(group._id, {
+		await groupRequestModel.findByIdAndUpdate(group._id, {
 			$push: { members: userId, admins: userId },
 		});
 
-		// Add group to user
-		await userModel.findByIdAndUpdate(userId, {
-			$push: { groups: group._id },
-		});
-
-		res.status(200).json({ message: "Group created successfully", group });
+		res
+			.status(200)
+			.json({ message: "Group request created successfully", group });
 	} catch (error) {
-		res.status(500).json("Cannot get create group: ", error);
+		res.status(500).json("Cannot create group request: ", error);
 	}
 };
 
@@ -343,7 +374,8 @@ module.exports = {
 	getUserGroups,
 	getGroupRequests,
 	getGroupMembers,
-	createGroup,
+	approveCreateGroup,
+	requestCreateGroup,
 	getAdminGroups,
 	requestJoinGroup,
 	approveJoinGroup,

@@ -62,7 +62,7 @@ const getPosts = async (request, response) => {
 			[posts[i], posts[j]] = [posts[j], posts[i]];
 		}
 
-		response.status(200).json({ status: "success", data: posts });
+		response.status(200).json(posts);
 	} catch (error) {
 		response
 			.status(500)

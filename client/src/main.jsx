@@ -30,7 +30,10 @@ import GroupAdmin from "./components/Groups/GroupAdmin";
 import FriendRequest from "./components/Friends/FriendRequest";
 import PostHistory from "./components/Posts/PostHistory";
 import CommentHistory from "./components/Posts/CommentHistory";
-import AdminDashboard from "./components/Admin/dashboard";
+import Admin from "./components/Admin/Admin";
+import Groups from "./components/Admin/groups";
+import Users from "./components/Admin/users";
+import Posts from "./components/Admin/posts";
 
 const { store, persistor } = storeConfig;
 
@@ -81,17 +84,28 @@ const router = createBrowserRouter([
 			},
 			{
 				path: "/posthistory/:postId",
-				element: <PostHistory/>,
+				element: <PostHistory />,
 			},
 			{
 				path: "/commenthistory/:commentId",
-				element: <CommentHistory/>,
+				element: <CommentHistory />,
 			},
 			{
 				path: "/admindashboard",
-				element: <AdminDashboard/>,
+				element: <Admin />,
 			},
-			
+			{
+				path: "/groups",
+				element: <Groups />,
+			},
+			{
+				path: "/users",
+				element: <Users />,
+			},
+			{
+				path: "/posts",
+				element: <Posts />,
+			},
 		],
 		errorElement: <NotFound />,
 	},

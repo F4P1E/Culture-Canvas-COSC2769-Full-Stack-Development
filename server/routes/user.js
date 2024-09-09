@@ -4,6 +4,7 @@ const router = express.Router();
 
 // Controller functions
 const {
+	getUsers,
 	loginUser,
 	signupUser,
 	viewFriendList,
@@ -14,6 +15,10 @@ const {
 	getStrangers,
 	unFriend,
 } = require("../controllers/userController");
+
+
+// Get all users
+router.get("/user", getUsers);
 
 // Login
 router.post("/login", loginUser);

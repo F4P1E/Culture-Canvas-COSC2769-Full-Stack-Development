@@ -9,6 +9,8 @@ import Posts from "./posts"
 import { Link } from "react-router-dom";
 import { useAuth} from "../../context/authContext"; // Updated import
 
+console.log(`WORKKKK!!!!`);
+
 const Admin = () => {
   const [toggle, setToggle] = useState(true);
   const { user } = useAuth();
@@ -25,10 +27,10 @@ const Admin = () => {
   const authCheck = () => {
     if (user && user.admin === true) {
       return (
-        <div className="container-fluid bg-secondary min-vh-100">
+        <div className="container-fluid min-vh-100">
           <div className="row">
             {toggle && (
-              <div className="col-2 bg-white vh-100">
+              <div className="col-3 bg-white vh-100">
                 <Sidebar selectPage={selectPage} />
               </div>
             )}
@@ -37,7 +39,7 @@ const Admin = () => {
               {activePage === "Groups" && <Groups Toggle={Toggle} />}
               {activePage === "Users" && <Users Toggle={Toggle} />}
               {activePage === "Posts" && <Posts Toggle={Toggle} />}
-              <button onClick={Toggle}>Sidebar</button>
+              <button className="button" onClick={Toggle}>Sidebar</button>
             </div>
           </div>
         </div>
