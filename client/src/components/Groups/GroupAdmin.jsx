@@ -54,67 +54,67 @@ const GroupAdmin = () => {
 	}, [userId, dispatch]); // Dependency array to refetch when it changes.
 
 	// useEffect to fetch group requests when the component mounts.
-	useEffect(() => {
-		const fetchRequests = async () => {
-			try {
-				const response = await fetch(
-					`http://localhost:8000/group/${selectedGroupId}/requests`,
-					{
-						method: "GET",
-						credentials: "include",
-					}
-				);
+useEffect(() => {
+  const fetchRequests = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/group/${selectedGroupId}/requests`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
-				if (!response.ok) {
-					throw new Error("Network response was not ok");
-				}
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
 
-				const data = await response.json(); // Parse the response data.
+      const data = await response.json(); // Parse the response data.
 
-				dispatch(setRequests(data)); // Update Redux store with fetched groups.
-			} catch (err) {
-				console.error("Failed to fetch requests:", err);
-			}
-		};
+      dispatch(setRequests(data)); // Update Redux store with fetched groups.
+    } catch (err) {
+      console.error("Failed to fetch requests:", err);
+    }
+  };
 
-		if (userId) {
-			fetchRequests();
-		}
-	}, [userId, selectedGroupId, dispatch]); // Dependency array to refetch when it changes.
+  if (userId && selectedGroupId) {
+    fetchRequests();
+  }
+}, [userId, selectedGroupId, dispatch]); // Dependency array to refetch when it changes.
 
-	// useEffect to fetch group members when the component mounts.
-	useEffect(() => {
-		const fetchMembers = async () => {
-			try {
-				const response = await fetch(
-					`http://localhost:8000/group/${selectedGroupId}/members`,
-					{
-						method: "GET",
-						credentials: "include",
-					}
-				);
+// useEffect to fetch group members when the component mounts.
+useEffect(() => {
+  const fetchMembers = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/group/${selectedGroupId}/members`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
-				if (!response.ok) {
-					throw new Error("Network response was not ok");
-				}
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
 
-				const data = await response.json(); // Parse the response data.
-				dispatch(
-					setMembers({
-						groupId: selectedGroupId,
-						currentUserId: userId,
-						members: data,
-					})
-				); // Update Redux store with fetched groups.
-			} catch (err) {
-				console.error("Failed to fetch members:", err);
-			}
-		};
+      const data = await response.json(); // Parse the response data.
+      dispatch(
+        setMembers({
+          groupId: selectedGroupId,
+          currentUserId: userId,
+          members: data,
+        })
+      ); // Update Redux store with fetched groups.
+    } catch (err) {
+      console.error("Failed to fetch members:", err);
+    }
+  };
 
-		if (userId) {
-			fetchMembers();
-		}
-	}, [userId, selectedGroupId, dispatch]); // Dependency array to refetch when it changes.
+  if (userId && selectedGroupId) {
+    fetchMembers();
+  }
+}, [userId, selectedGroupId, dispatch]); // Dependency array to refetch when it changes..
 
 	//
 	// useEffect(
@@ -268,48 +268,51 @@ const GroupAdmin = () => {
 				</select>
 			</div>
 
+			{selectedGroupId && (
 			<div>
 				<h3>Group Requests</h3>
 				<ul>
-					{requests.map(
-						(
-							request // Map over requests array to render each request.
-						) => (
-							<li key={request._id}>
-								{request.username}
-								<button onClick={() => {
-									handleApproveJoinRequest(request._id);
-								}}>
-									Approve Request
-								</button>
-							</li>
-						)
-					)}
+				{requests.map(
+					(
+					request // Map over requests array to render each request.
+					) => (
+					<li key={request._id}>
+						{request.username}
+						<button onClick={() => {
+						handleApproveJoinRequest(request._id);
+						}}>
+						Approve Request
+						</button>
+					</li>
+					)
+				)}
 				</ul>
 			</div>
+			)}
 
+			{selectedGroupId && (
 			<div>
 				<h3>Group Members</h3>
 				<ul>
-					{members.map(
-						(
-							member // Map over requests array to render each request.
-						) => (
-							<li>
-								{member.username}
-								<button
-									onClick={() => {
-										handleDeleteMember(member._id);
-									}}
-								>
-									Remove Member
-								</button>
-							</li>
-						)
-					)}
+				{members.map(
+					(
+					member // Map over requests array to render each request.
+					) => (
+					<li>
+						{member.username}
+						<button
+						onClick={() => {
+							handleDeleteMember(member._id);
+						}}
+						>
+						Remove Member
+						</button>
+					</li>
+					)
+				)}
 				</ul>
 			</div>
-
+			)}
 			{/* Delete post */}
 			<div
 				value={selectedPostId}
