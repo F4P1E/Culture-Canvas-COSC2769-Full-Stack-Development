@@ -9,6 +9,7 @@ const initialState = {
 	comments: [],
 	isLoading: false, // Track loading state
 	error: null, // Track errors
+	reactions: [],
 };
 
 // Creating a slice for posts with name 'posts'.
@@ -92,26 +93,35 @@ const postSlice = createSlice({
 			}
 		},
 		addReaction: (state, action) => {
-			// Reducer to add or update a reaction to a post
 			const postIndex = state.posts.findIndex(
 				(post) => post._id === action.payload.postId
 			);
+		
 			if (postIndex !== -1) {
+				// Ensure reactions array exists
+				state.posts[postIndex].reactions = state.posts[postIndex].reactions || [];
+		
+				// Find existing reaction
 				const existingReaction = state.posts[postIndex].reactions.find(
-					(reaction) => reaction.userId === action.payload.userId
+					(reaction) => reaction.userId.toString() === action.payload.userId.toString()
 				);
+		
 				if (existingReaction) {
-					existingReaction.reactionType = action.payload.reactionType; // Update reaction
+					// Update reaction
+					existingReaction.reactionType = action.payload.reactionType;
 				} else {
+					// Add new reaction
 					state.posts[postIndex].reactions.push({
 						userId: action.payload.userId,
 						reactionType: action.payload.reactionType,
-					}); // Add new reaction
+					});
 				}
-				state.posts[postIndex].reactionCount =
-					state.posts[postIndex].reactions.length;
+		
+				// Update reaction count
+				state.posts[postIndex].reactionCount = state.posts[postIndex].reactions.length;
 			}
 		},
+		
 		addCommentReaction: (state, action) => {
 			// Reducer to add or update a reaction to a comment
 			const postIndex = state.posts.findIndex(

@@ -80,6 +80,8 @@ const Post = ({ post }) => {
       <div>
         <button onClick={() => handleReaction("like")}>Like</button>
         <button onClick={() => handleReaction("love")}>Love</button>
+        <button onClick={() => handleReaction("haha")}>Haha</button>
+        <button onClick={() => handleReaction("angry")}>Angry</button>
       </div>
 
       {/* Conditionally render the PostDetail component when showDetails is true */}

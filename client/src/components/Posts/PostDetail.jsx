@@ -20,6 +20,7 @@ const PostDetail = ({ postId }) => {
 	const [editCommentContent, setEditCommentContent] = useState(""); // Local state for comment editing
 	const [commentFailure, setCommentFailure] = useState(null);
 	const [isEditingPost, setIsEditingPost] = useState(false); // Toggle editing state for post
+	const [reactions, setReactions] = useState({ like: [], love: [], haha: [], angry: [] });
 
 	useEffect(() => {
 		if (postId) {
@@ -31,6 +32,7 @@ const PostDetail = ({ postId }) => {
 				const data = await response.json();
 				if (data && data.post) {
 					dispatch(updatePost({ post: data.post })); // Update post with comments
+					setReactions(data.reactions); // Assuming the backend returns reactions grouped by type
 				}
 			};
 
@@ -153,6 +155,16 @@ const PostDetail = ({ postId }) => {
 								<strong>By: {post?.username || "Anonymous"}</strong>
 							</p>
 							<p>{post.content}</p>
+
+							{/* Reactions Section */}
+							<h3>Reactions</h3>
+							<div>
+								<p>Like: {reactions.like.map(user => user.username).join(", ")}</p>
+								<p>Love: {reactions.love.map(user => user.username).join(", ")}</p>
+								<p>Haha: {reactions.haha.map(user => user.username).join(", ")}</p>
+								<p>Angry: {reactions.angry.map(user => user.username).join(", ")}</p>
+							</div>
+
 							<button onClick={() => setIsEditingPost(true)}>Edit Post</button>
 							<button
 								onClick={() => {

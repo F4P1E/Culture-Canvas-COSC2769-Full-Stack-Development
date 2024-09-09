@@ -383,47 +383,45 @@ const getCommentHistory = async (request, response) => {
 };
 
 // Add reaction to a post
-const postReaction = async (request, response) => {
-	const { id } = request.params;
-	const { reactionType } = request.body;
-	const userId = request.user._id;
-
-	if (!mongoose.isValidObjectId(id)) {
-		return response.status(404).json({ error: "Incorrect ID" });
-	}
-
-	if (!reactionType) {
-		return response.status(400).json({ error: "Reaction type is required" });
-	}
-
+const postReaction = async (req, res) => {
 	try {
-		const post = await postModel.findById(id);
-
-		if (!post) {
-			return response.status(404).json({ error: "No such post" });
-		}
-
-		// Check if user already reacted
-		const existingReaction = post.reactions.find(
-			(r) => r.userId.toString() === userId.toString()
+	  const { postId } = req.params;
+	  const { reactionType } = req.body; // Reaction type from the request (like, love, haha, angry)
+	  const userId = req.user.id; // Assuming you have the user ID from the session
+	  const username = req.user.username; // Assuming you have the username from the session
+  
+	  const post = await Post.findById(postId);
+	  if (!post) {
+		return res.status(404).json({ message: 'Post not found' });
+	  }
+  
+	  // Remove user from previous reactions
+	  Object.keys(post.reactions).forEach((key) => {
+		post.reactions[key] = post.reactions[key].filter(
+		  (reaction) => reaction.userId.toString() !== userId
 		);
-
-		if (existingReaction) {
-			// Update existing reaction
-			existingReaction.reactionType = reactionType;
-		} else {
-			// Add new reaction
-			post.reactions.push({ userId, reactionType });
+	  });
+  
+	  // Add user to the new reaction type
+	  post.reactions[reactionType].push({ username, userId });
+  
+	  await post.save();
+  
+	  // Send back the updated reactions
+	  res.json({
+		message: 'Reaction updated',
+		reaction: {
+		  like: post.reactions.like,
+		  love: post.reactions.love,
+		  haha: post.reactions.haha,
+		  angry: post.reactions.angry
 		}
-
-		post.reactionCount = post.reactions.length;
-		await post.save();
-
-		response.status(200).json(post);
+	  });
 	} catch (error) {
-		response.status(500).json({ error: "Internal server error" });
+	  console.error('Failed to update reaction:', error);
+	  res.status(500).json({ message: 'Server error' });
 	}
-};
+  };
 
 // Add reaction to a comment
 const commentReaction = async (request, response) => {
