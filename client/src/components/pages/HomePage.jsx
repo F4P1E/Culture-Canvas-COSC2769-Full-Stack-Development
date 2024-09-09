@@ -8,6 +8,7 @@ import FriendRequest from "../Friends/FriendRequest";
 import GroupList from "../Groups/JoinedGroupList";
 import JoinedGroupList from "../Groups/JoinedGroupList";
 import UnjoinedGroupList from "../Groups/UnjoinedGroupList";
+import GroupCreation from "../Groups/GroupCreation";
 
 import { setLogout } from "../../slices/authSlice";
 import { useAuth } from "../../context/authContext";
@@ -42,6 +43,11 @@ const HomePage = () => {
 		e.preventDefault();
 		navigate("/groupadmin");
 	};
+
+	const handleRedirectToGroupCreation = (e) => {
+		e.preventDefault();
+		navigate("/groupcreation")
+	}
 
 	const handleLogout = async (e) => {
 		try {
@@ -94,15 +100,18 @@ const HomePage = () => {
 			<section>
 				<h2>Your Groups:</h2>
 				<JoinedGroupList />
+				<button onClick={handleRedirectToGroupCreation}>Create a new group</button>
 			</section>
 
-			<button onClick={handleRedirectToMoreGroups}>See new groups</button>
-
 			<br />
+			<button onClick={handleRedirectToMoreGroups}>See new groups</button>
+			<br />
+			
+
 			<br />
 			<button onClick={handleRedirectToGroupsAdmin}>See your groups</button>
-
 			<br />
+			
 			<br />
 			<button style={{ height: "50px", width: "100px", fontSize: "15px", backgroundColor: "red", color: "white", fontWeight: "1000"}} onClick={handleLogout}>Logout</button>
 		</div>

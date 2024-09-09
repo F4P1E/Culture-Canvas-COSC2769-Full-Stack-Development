@@ -34,6 +34,7 @@ import Admin from "./components/Admin/Admin";
 import Groups from "./components/Admin/groups";
 import Users from "./components/Admin/users";
 import Posts from "./components/Admin/posts";
+import GroupCreation from "./components/Groups/GroupCreation";
 
 const { store, persistor } = storeConfig;
 
@@ -105,6 +106,10 @@ const router = createBrowserRouter([
 			{
 				path: "/posts",
 				element: <Posts />,
+			},
+			{
+				path: "/groupcreation",
+				element: <GroupCreation />,
 			},
 		],
 		errorElement: <NotFound />,
