@@ -40,15 +40,33 @@ const ProfilePage = () => {
 
   // Render the profile page with user details, friend list, and posts.
   return (
-    <div className='profile-page'>
-      <h1>{profile.firstName} {profile.lastName}</h1>
-      <p>Location: {profile.location}</p>
-      <p>Occupation: {profile.occupation}</p>
-      <FriendList userId={id} /> // Render FriendList with user ID.
-      <h2>Posts</h2>
-      <PostFeed posts={posts} /> // Render PostFeed with user's posts.
+    <div className="profile-page">
+      <div className="profile-header">
+        <h1>
+          {profile.firstName} {profile.lastName}
+        </h1>
+        <p>Location: {profile.location}</p>
+        <p>Occupation: {profile.occupation}</p>
+      </div>
+
+      <div className="profile-info">
+        <div className="profile-details">
+          <p>Location: {profile.location}</p>
+          <p>Occupation: {profile.occupation}</p>
+        </div>
+      </div>
+
+      <div className="friend-list">
+        <FriendList userId={id} /> {/* Render FriendList with user ID.*/}
+      </div>
+
+      <div className="post-feed">
+        <h2>Posts</h2>
+        <PostFeed posts={posts} /> {/* Render PostFeed with user's posts.*/}
+      </div>
     </div>
   );
 };
+
 
 export default ProfilePage;
