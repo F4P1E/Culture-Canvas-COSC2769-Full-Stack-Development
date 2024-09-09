@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setGroups } from '../../slices/groupSlice'; 
 import { requestJoinGroup } from '../../slices/groupSlice'; 
+import "../styles/UnjoinedGroupList.scss";
 
 const UnjoinedGroupList = () => {
   const dispatch = useDispatch();
@@ -59,7 +60,7 @@ const UnjoinedGroupList = () => {
   };
 
   return (
-    <div>
+    <div className='unjoined-group-list'>
       <h2>Available Groups</h2>
       <ul>
         {groups.map((group) => (

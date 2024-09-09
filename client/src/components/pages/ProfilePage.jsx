@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import FriendList from '../Friends/FriendList'; // Importing FriendList component.
 import PostFeed from '../Posts/PostFeed'; // Importing PostFeed component.
+import "../styles/ProfilePage.scss";
 
 const ProfilePage = () => {
   const { id } = useParams(); // Getting user ID from route parameters.
@@ -39,7 +40,7 @@ const ProfilePage = () => {
 
   // Render the profile page with user details, friend list, and posts.
   return (
-    <div>
+    <div className='profile-page'>
       <h1>{profile.firstName} {profile.lastName}</h1>
       <p>Location: {profile.location}</p>
       <p>Occupation: {profile.occupation}</p>

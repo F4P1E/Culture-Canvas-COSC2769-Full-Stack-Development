@@ -8,6 +8,7 @@ import FriendRequest from "../Friends/FriendRequest";
 import GroupList from "../Groups/JoinedGroupList";
 import JoinedGroupList from "../Groups/JoinedGroupList";
 import UnjoinedGroupList from "../Groups/UnjoinedGroupList";
+import "../styles/HomePage.scss";
 
 import { setLogout } from "../../slices/authSlice";
 import { useAuth } from "../../context/authContext";
@@ -66,7 +67,7 @@ const HomePage = () => {
 	};
 
 	return (
-		<div>
+		<div className="homepage">
 			<h1>Home Page</h1>
 
 			<section>
@@ -83,25 +84,26 @@ const HomePage = () => {
 				<FriendList />
 			</section>
 
-			<section>
+			<section className="spacing">
 			<button onClick={handleRedirect}>See more people</button>
 			</section>
 			<br />
-			<section>
+			<section className="spacing">
 			<button onClick={handleRedirectToFriendRequests}>View Friend Request</button>
 			</section>
 
-			<section>
+			<section className="spacing">
 				<h2>Your Groups:</h2>
 				<JoinedGroupList />
 			</section>
-
+			<section className="spacing">
 			<button onClick={handleRedirectToMoreGroups}>See new groups</button>
-
+			</section>
 			<br />
 			<br />
+			<section className="spacing">
 			<button onClick={handleRedirectToGroupsAdmin}>See your groups</button>
-
+			</section>
 			<br />
 			<br />
 			<button style={{ height: "50px", width: "100px", fontSize: "15px", backgroundColor: "red", color: "white", fontWeight: "1000"}} onClick={handleLogout}>Logout</button>

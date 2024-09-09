@@ -6,6 +6,7 @@ import { fetchOneGroupInfo } from "../../slices/groupSlice";
 
 import PostFeed from "../Posts/PostFeed";
 import CreatePost from "../Posts/CreatePost";
+import "../styles/GroupPage.scss";
 
 const GroupPage = () => {
 	const dispatch = useDispatch();
@@ -54,10 +55,10 @@ const GroupPage = () => {
 
 	// Render the group page with group details, admin actions, and posts.
 	return (
-		<div>
+		<div className="group-page"> 
 			<h1>{groupInfo.name || "Loading..."}</h1>
 			<h2>Members</h2>
-			<ul>
+			<ul className="members-lists">
 				{groupInfo.members && groupInfo.members.length > 0 ? (
 					groupInfo.members.map((member) => (
 						<li key={member._id}>
@@ -70,9 +71,11 @@ const GroupPage = () => {
 			</ul>
 
 			<h2>Post something...</h2>
+			<div className="post-creation">
 			<CreatePost />
 			<PostFeed posts={groupInfo.posts || []} />
 			{/* Render PostFeed with group's posts. */}
+		</div>
 		</div>
 	);
 };

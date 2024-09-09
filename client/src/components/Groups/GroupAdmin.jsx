@@ -11,6 +11,7 @@ import {
 	deletePostFromGroup,
 	removeCommentFromPost,
 } from "../../slices/groupSlice";
+import "../styles/GroupAdmin.scss";
 
 const GroupAdmin = () => {
 	const dispatch = useDispatch();
@@ -245,7 +246,7 @@ const GroupAdmin = () => {
 	};
 
 	return (
-		<div>
+		<div className="group-admin-panel">
 			<h2>Group Admin Panel</h2>
 
 			{/* Group selection */}
