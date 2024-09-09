@@ -25,7 +25,7 @@ router.get("/joined", getUserGroups); // Get groups that has been joined
 
 router.get("/joined/admin", getAdminGroups); // Get groups that has been joined with admin privilege
 
-router.get("/:id/requests", getGroupRequests); // Get group requests (for admins)
+router.get("/requests/:id", getGroupRequests); // Get group requests (for admins)
 
 router.get("/:id/members", getGroupMembers); // Get group members
 
