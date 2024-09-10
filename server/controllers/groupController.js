@@ -402,6 +402,82 @@ const deleteMemberFromGroup = async (req, res) => {
 	}
 };
 
+const removePostFromGroup = async (req, res) => {
+    try {
+        const { groupId, postId } = req.params;
+
+        // Step 1: Find the group by groupId
+        const group = await Group.findById(groupId);
+        if (!group) {
+            return res.status(404).json({ message: "Group not found" });
+        }
+
+        // Step 2: Find the post within the group's posts array
+        const postIndex = group.posts.findIndex(
+            (post) => post.toString() === postId
+        );
+        if (postIndex === -1) {
+            return res.status(404).json({ message: "Post not found in this group" });
+        }
+
+        // Step 3: Remove the post from the group
+        group.posts.splice(postIndex, 1);
+
+        // Step 4: Remove the post from the Post collection (optional)
+        await Post.findByIdAndDelete(postId);
+
+        // Step 5: Save the updated group
+        await group.save();
+
+        // Step 6: Send a success response
+        res.status(200).json({ message: "Post removed successfully" });
+    } catch (error) {
+        console.error("Error removing post from group:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+const removeCommentFromPost = async (req, res) => {
+    try {
+        const { groupId, postId, commentId } = req.params;
+
+        // Step 1: Find the group by groupId
+        const group = await groupModel.findById(groupId);
+        if (!group) {
+            return res.status(404).json({ message: "Group not found" });
+        }
+
+        // Step 2: Find the post within the group's posts array
+        const post = group.posts.id(postId); // Assuming posts are subdocuments in the group model
+        if (!post) {
+            return res.status(404).json({ message: "Post not found in this group" });
+        }
+
+        // Step 3: Find the comment within the post's comments array
+        const commentIndex = post.comments.findIndex(
+            (comment) => comment.toString() === commentId
+        );
+        if (commentIndex === -1) {
+            return res.status(404).json({ message: "Comment not found in this post" });
+        }
+
+        // Step 4: Remove the comment from the post
+        post.comments.splice(commentIndex, 1);
+
+        // Step 5: Optionally, remove the comment from the database
+        await Comment.findByIdAndDelete(commentId);
+
+        // Step 6: Save the updated group
+        await group.save();
+
+        // Step 7: Send a success response
+        res.status(200).json({ message: "Comment removed successfully" });
+    } catch (error) {
+        console.error("Error removing comment from post:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 module.exports = {
 	getGroups,
 	getOneGroup,
@@ -415,4 +491,6 @@ module.exports = {
 	requestJoinGroup,
 	approveJoinGroup,
 	deleteMemberFromGroup,
+	removePostFromGroup,
+	removeCommentFromPost
 };

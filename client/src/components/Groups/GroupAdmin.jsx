@@ -12,6 +12,8 @@ import {
 	removeCommentFromPost,
 } from "../../slices/groupSlice";
 
+import { setPosts, setLoading, setError } from "../../slices/postSlice";
+
 const GroupAdmin = () => {
 	const dispatch = useDispatch();
 	const [selectedGroupId, setSelectedGroupId] = useState(null);
@@ -22,6 +24,8 @@ const GroupAdmin = () => {
 	const groups = useSelector((state) => state.groups.groups); // Access the groups array from state
 	const requests = useSelector((state) => state.groups.requests);
 	const members = useSelector((state) => state.groups.members);
+
+	const { posts, isLoading, error } = useSelector((state) => state.posts); 
 
 	const currentGroupId = useSelector((state) => state.groups.currentGroupId);
 
@@ -217,30 +221,98 @@ const GroupAdmin = () => {
 		}
 	};
 
+	useEffect(() => {
+		const fetchPosts = async () => {
+			dispatch(setLoading({ isLoading: true }));
+			try {
+				let response;
+
+				if (groupId) {
+					response = await fetch("http://localhost:8000/post/", {
+						method: "GET",
+						credentials: "include",
+						headers: { "Group-ID": groupId },
+					});
+				} else {
+					response = await fetch("http://localhost:8000/post/", {
+						method: "GET",
+						credentials: "include",
+					});
+				}
+
+				if (!response.ok) {
+					throw new Error("Failed to fetch posts. Please try again later.");
+				}
+
+				const data = await response.json();
+
+				dispatch(setPosts(data)); // Dispatch action to set posts in Redux store.
+			} catch (err) {
+				dispatch(setError({ error: err.message })); // Dispatch error to Redux store.
+			} finally {
+				dispatch(setLoading({ isLoading: false })); // Turn off loading state.
+			}
+		};
+
+		fetchPosts(); // Call the fetch function on component mount.
+	}, [dispatch]);
+
+	if (isLoading) {
+		return <div>Loading posts...</div>; // Show loading indicator.
+	}
+
+	if (error) {
+		return <div>Error: {error}</div>; // Show error message.
+	}
+
 	// Handle deleting a post from a group
-	const handleDeletePost = () => {
+	const handleDeletePost = async () => {
 		if (selectedGroupId && selectedPostId) {
-			dispatch(
-				deletePostFromGroup({
-					groupId: selectedGroupId,
-					postId: selectedPostId,
-				})
-			);
-			setSelectedPostId("");
+			try {
+				const response = await fetch(
+					`http://localhost:8000/group/${selectedGroupId}/posts/${selectedPostId}`,
+					{
+						method: "DELETE",
+						credentials: "include",
+					}
+				);
+
+				if (!response.ok) {
+					throw new Error("Failed to delete post");
+				}
+
+				// After successfully deleting the post, refetch the group details
+				dispatch(fetchOneGroupInfo(selectedGroupId));
+				alert("Post deleted successfully");
+
+			} catch (error) {
+				console.error("Error deleting post:", error);
+			}
 		}
 	};
 
-	// Handle removing a comment from a post
-	const handleRemoveComment = () => {
-		if (selectedGroupId && selectedPostId && selectedCommentId) {
-			dispatch(
-				removeCommentFromPost({
-					groupId: selectedGroupId,
-					postId: selectedPostId,
-					commentId: selectedCommentId,
-				})
-			);
-			setSelectedCommentId("");
+
+	// Handle removing a comment from a specific post
+	const handleRemoveComment = async (postId, commentId) => {
+		if (currentGroupId && postId && commentId) {
+			try {
+				const response = await fetch(
+					`http://localhost:8000/group/${currentGroupId}/posts/${postId}/comments/${commentId}`,
+					{
+						method: "DELETE",
+						credentials: "include",
+					}
+				);
+
+				if (!response.ok) {
+					throw new Error("Failed to delete comment");
+				}
+
+				dispatch(removeCommentFromPost({ postId, commentId })); 
+				alert("Comment deleted successfully");
+			} catch (error) {
+				console.error("Error deleting comment:", error);
+			}
 		}
 	};
 
@@ -310,20 +382,37 @@ const GroupAdmin = () => {
 				</ul>
 			</div>
 
-			{/* Delete post */}
-			<div
-				value={selectedPostId}
-				onChange={(e) => setSelectedPostId(e.target.value)}
-			/>
-			<button onClick={handleDeletePost}>Delete Post</button>
-
-			{/* Remove comment */}
-			<div
-				value={selectedCommentId}
-				onChange={(e) => setSelectedCommentId(e.target.value)}
-			/>
-			<button onClick={handleRemoveComment}>Remove Comment</button>
-		</div>
+			{/* Group Posts */}
+            <div>
+                <h3>Group Posts</h3>
+                {isLoading && <p>Loading posts...</p>}
+                {error && <p>Error fetching posts: {error}</p>}
+                {!isLoading && !error && posts && (
+                    <ul>
+                        {posts.map((post) => (
+                            <li key={post._id}>
+                                <div>{post.content}</div>
+                                <button onClick={() => handleDeletePost(post._id)}>
+                                    Delete Post
+                                </button>
+                                <ul>
+                                    {post.comments.map((comment) => (
+                                        <li key={comment._id}>
+                                            {comment.text}
+                                            <button
+                                                onClick={() => handleRemoveComment(post._id, comment._id)}
+                                            >
+                                                Delete Comment
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+        </div>
 	);
 };
 
