@@ -110,7 +110,7 @@ Group-Assigment-Social-Network/
 
 - If not exist, create a `.env` in `/server` file with the following content:
 
-```json
+```js
 PORT="8000"
 MONGO_URI="mongodb+srv://Singani:singani1530@groupproject.m8wl1tq.mongodb.net/?retryWrites=true&w=majority&appName=GroupProject"
 SECRET="CrystalCrusherisbetterthanCodependenceeventhoughitisharderchangemymindlmaooo"
