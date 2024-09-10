@@ -5,6 +5,7 @@ import {
 	acceptFriendRequest,
 	viewFriendRequest,
 } from "../../slices/friendSlice";
+import "../styles/FriendRequest.scss";
 
 const FriendRequest = () => {
 	const { requestId } = useSelector((state) => state.friends.requests); // Accessing strangers list from Redux store.
@@ -53,7 +54,7 @@ const FriendRequest = () => {
 
 	// Render a list of friend requests with Accept button.
 	return (
-		<div>
+		<div className="friend-request">
 			<h1>Friend Requests</h1>
 
 			<ul>
