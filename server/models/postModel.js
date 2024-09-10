@@ -2,6 +2,14 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
+const reactionSchema = new Schema({
+	user: {
+		type: Schema.Types.ObjectId,
+		ref: "User",
+		required: true,
+	},
+});
+
 const postModel = new Schema(
 	{
 		userId: {
@@ -22,61 +30,46 @@ const postModel = new Schema(
 			default: 0,
 		},
 		reactions: {
-			like: [
-			  {
-				userId: {
-				  type: Schema.Types.ObjectId,
-				  ref: "User",
-				  required: true,
+			like: {
+				type: [reactionSchema],
+				validate: {
+					validator: function (v) {
+						return Array.isArray(v) && v.every((reaction) => reaction.user);
+					},
+					message: "Invalid like reactions format",
 				},
-				username: {
-				  type: String,
-				  required: true,
+			},
+			love: {
+				type: [reactionSchema],
+				validate: {
+					validator: function (v) {
+						return Array.isArray(v) && v.every((reaction) => reaction.user);
+					},
+					message: "Invalid love reactions format",
 				},
-			  },
-			],
-			love: [
-			  {
-				userId: {
-				  type: Schema.Types.ObjectId,
-				  ref: "User",
-				  required: true,
+			},
+			haha: {
+				type: [reactionSchema],
+				validate: {
+					validator: function (v) {
+						return Array.isArray(v) && v.every((reaction) => reaction.user);
+					},
+					message: "Invalid haha reactions format",
 				},
-				username: {
-				  type: String,
-				  required: true,
+			},
+			angry: {
+				type: [reactionSchema],
+				validate: {
+					validator: function (v) {
+						return Array.isArray(v) && v.every((reaction) => reaction.user);
+					},
+					message: "Invalid angry reactions format",
 				},
-			  },
-			],
-			haha: [
-			  {
-				userId: {
-				  type: Schema.Types.ObjectId,
-				  ref: "User",
-				  required: true,
-				},
-				username: {
-				  type: String,
-				  required: true,
-				},
-			  },
-			],
-			angry: [
-			  {
-				userId: {
-				  type: Schema.Types.ObjectId,
-				  ref: "User",
-				  required: true,
-				},
-				username: {
-				  type: String,
-				  required: true,
-				},
-			  },
-			],
+			},
 		},
 		visibility: {
 			type: String,
+			enum: ["public", "friendsOnly", "private"],
 			default: "public",
 		},
 		commentCount: {

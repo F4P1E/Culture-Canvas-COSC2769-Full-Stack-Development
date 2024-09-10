@@ -55,10 +55,12 @@ const StrangerList = () => {
 				);
 				
 				if (!response.ok) {
+					alert("Already sent a friend request!");
 					throw new Error("Failed to send friend request");
 				}
 
 				dispatch(addFriend(strangerId));
+				alert("Friend request sent!");
 				window.location.reload();
 			} catch (error) {
 				console.error("Failed to connect:", error);

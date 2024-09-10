@@ -43,7 +43,8 @@ const GroupCreationRequest = () => {
       const data = await response.json();
       if (response.ok) {
         dispatch(addGroup({ group: data.group })); // Add the new group to Redux state
-        dispatch(setRequests(requests.filter((req) => req._id !== requestId))); // Remove the approved request from the requests list
+        dispatch(setRequests(requests.filter((req) => req._id !== requestId))); // Remove the approved request from the requests 
+        alert("Group creation request approved!");
       } else {
         setError(data.message || "Failed to approve the request.");
       }
@@ -61,10 +62,10 @@ const GroupCreationRequest = () => {
         {requests.map((request) => (
           <li key={request._id}>
             <p>
-              <strong>Group Name:</strong> {request.groupName}
+              <strong>Group Name:</strong> {request.name}
             </p>
             <p>
-              <strong>Requested By:</strong> {request.requestedBy}
+              <strong>Requested By:</strong> {request.admins[0].username}
             </p>
             <button onClick={() => handleApproveRequest(request._id)}>
               Approve Request

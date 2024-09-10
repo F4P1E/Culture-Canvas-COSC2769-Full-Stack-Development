@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addPost } from "../../slices/postSlice";
 
-const CreatePost = () => {
+const CreatePost = (groupIdRaw) => {
+	const groupId = groupIdRaw.groupId;
 	const [content, setContent] = useState("");
 	const [visibility, setVisibility] = useState("public");
 	const [error, setError] = useState("");
@@ -18,26 +19,43 @@ const CreatePost = () => {
 		}
 
 		try {
-			console.log(`Content: ${content}, Visibility: ${visibility}`);
+			console.log(
+				`Content: ${content}, Visibility: ${visibility}, GroupId: ${groupId}`
+			);
 
-			const response = await fetch("http://localhost:8000/post", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ content }),
-				credentials: "include",
-			});
+			let response;
+
+			if (groupId) {
+				response = await fetch(`http://localhost:8000/post`, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ content, visibility, groupId }),
+					credentials: "include",
+				});
+			} else {
+				response = await fetch(`http://localhost:8000/post`, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ content, visibility }),
+					credentials: "include",
+				});
+			}
 
 			if (!response.ok) {
 				throw new Error("Create post failed");
 			}
 
 			dispatch(addPost({ content, visibility }));
+
 			// Clear fields on success
 			setContent("");
 			setVisibility("public");
 			setError("");
+
+			alert("Post created successfully");
+			window.location.reload();
 		} catch (error) {
-			console.log(error.message);
+			console.log("Error: ", error.message);
 		}
 	};
 
@@ -65,8 +83,17 @@ const CreatePost = () => {
 						value={visibility}
 						onChange={(e) => setVisibility(e.target.value)}
 					>
-						<option value="public">Public</option>
-						<option value="friendsOnly">Friends Only</option>
+						{!groupId ? (
+							<>
+								<option value="public">Public</option>
+								<option value="friendsOnly">Friends Only</option>
+							</>
+						) : (
+							<>
+								<option value="public">Public</option>
+								<option value="private">Private</option>
+							</>
+						)}
 					</select>
 				</div>
 				<br />

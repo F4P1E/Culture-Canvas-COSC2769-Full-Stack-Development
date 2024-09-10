@@ -12,7 +12,6 @@ const getGroups = async (req, res) => {
 		const user = await userModel.findById(userId).populate("groups").exec();
 		if (user && Array.isArray(user.groups)) {
 			const groupIdWithUser = user.groups.map((group) => group._id);
-			console.log("- groupIdWithUser:", groupIdWithUser);
 
 			const groups = await groupModel.find({
 				_id: { $nin: groupIdWithUser },
@@ -184,7 +183,9 @@ const approveCreateGroup = async (req, res) => {
 
 		// Find the group request by ID
 		const groupRequest = await groupRequestModel.findById(groupRequestId);
-		console.log(`- groupRequest: ${await groupRequestModel.findById(groupRequestId)}`);
+		console.log(
+			`- groupRequest: ${await groupRequestModel.findById(groupRequestId)}`
+		);
 
 		if (!groupRequest) {
 			return res.status(404).json({ message: "Group request not found" });
@@ -194,7 +195,7 @@ const approveCreateGroup = async (req, res) => {
 		const newGroup = await groupRequest.approveRequest();
 
 		// Return success response with the newly created group
-		return res.status(200).json({
+		return res.status(201).json({
 			message: "Group request approved and group created successfully",
 			group: newGroup,
 		});
@@ -227,7 +228,7 @@ const requestCreateGroup = async (req, res) => {
 		});
 
 		res
-			.status(200)
+			.status(201)
 			.json({ message: "Group request created successfully", group });
 	} catch (error) {
 		res.status(500).json("Cannot create group request: ", error);
@@ -247,10 +248,15 @@ const getCreateGroupRequests = async (req, res) => {
 				.json({ error: "Only admins can view group create requests" });
 		}
 
-		// Find all group create requests
-		const groupRequests = await groupRequestModel.find({}).exec();
-
-		res.status(200).json(groupRequests);
+		// Get group create requests with members
+		const group = await groupRequestModel.find({}).populate([
+			{ path: "members" },
+			{ path: "admins" },
+		]).exec();
+		if (!group) {
+			return res.status(404).json({ error: "Group not found" });
+		}
+		res.status(200).json(group);
 	} catch (error) {
 		res.status(500).json("Cannot get group create requests: ", error);
 	}
@@ -292,7 +298,7 @@ const requestJoinGroup = async (req, res) => {
 			$push: { requests: userId },
 		});
 
-		res.status(200).json({ message: "Join request sent successfully", group });
+		res.status(201).json({ message: "Join request sent successfully", group });
 	} catch (err) {
 		// handle the error
 		console.error(err);

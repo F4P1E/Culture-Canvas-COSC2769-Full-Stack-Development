@@ -26,6 +26,13 @@ const groupModel = new Schema(
 				default: [],
 			},
 		],
+		posts: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "Post",
+				default: [],
+			},
+		],
 	},
 	{ timestamps: true }
 );

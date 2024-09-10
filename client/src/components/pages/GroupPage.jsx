@@ -14,9 +14,7 @@ const GroupPage = () => {
 	const userId = useSelector((state) => state.auth.user._id);
 	// const memberInfo = useSelector((state) => state.groups.memberInfo);
 
-	console.log(`GroupInfo: ${JSON.stringify(groupInfo)}`);
-	console.log(`MemberInfo: ${JSON.stringify(memberInfo)}`);
-	console.log(`GroupID: ${groupId}`);
+	console.log(`Group ID: ${groupId}`);
 
 	// useEffect to fetch group data when the component mounts or ID/token changes.
 	useEffect(() => {
@@ -36,7 +34,6 @@ const GroupPage = () => {
 				}
 
 				const data = await response.json();
-				console.log(`Data received from API: ${JSON.stringify(data)}`);
 
 				// Check if data has the expected structure
 				if (data && data.members && Array.isArray(data.members)) {
@@ -70,8 +67,8 @@ const GroupPage = () => {
 			</ul>
 
 			<h2>Post something...</h2>
-			<CreatePost />
-			<PostFeed posts={groupInfo.posts || []} />
+			<CreatePost groupId={groupId} />
+			<PostFeed groupId={groupId} />
 			{/* Render PostFeed with group's posts. */}
 		</div>
 	);

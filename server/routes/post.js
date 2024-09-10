@@ -2,6 +2,7 @@ const express = require("express");
 const {
 	createPost,
 	getPosts,
+	getGroupPosts,
 	getPostsFromSpecificUser,
 	getSpecificPost,
 	deletePost,
@@ -20,6 +21,8 @@ const {
 const router = express.Router();
 
 router.get("/", getPosts);
+
+router.get("/group/:groupId", getGroupPosts);
 
 router.post("/", createPost);
 

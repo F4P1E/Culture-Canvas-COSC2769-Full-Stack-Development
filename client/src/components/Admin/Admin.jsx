@@ -9,8 +9,6 @@ import Posts from "./posts"
 import { Link } from "react-router-dom";
 import { useAuth} from "../../context/authContext"; // Updated import
 
-console.log(`WORKKKK!!!!`);
-
 const Admin = () => {
   const [toggle, setToggle] = useState(true);
   const { user } = useAuth();

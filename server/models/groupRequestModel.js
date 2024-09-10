@@ -26,7 +26,13 @@ const groupRequestModel = new Schema(
 				default: [],
 			},
 		],
-		description: { type: String },
+		posts: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "Post",
+				default: [],
+			},
+		],
 	},
 	{ timestamps: true }
 );
@@ -53,14 +59,15 @@ groupRequestModel.methods.approveRequest = async function () {
 			admins: this.admins,
 			requests: this.requests,
 			members: this.members,
+			posts: this.posts,
 		});
 		await newGroup.save(); // Save the group
 
-        // Add group to user
-        const User = mongoose.model("User");
-        const user = await User.findById(this.admins[0]);
-        user.groups.push(newGroup._id);
-        await user.save();
+		// Add group to user
+		const User = mongoose.model("User");
+		const user = await User.findById(this.admins[0]);
+		user.groups.push(newGroup._id);
+		await user.save();
 
 		await this.deleteOne(); // Remove the request after the group has been created
 		return newGroup;

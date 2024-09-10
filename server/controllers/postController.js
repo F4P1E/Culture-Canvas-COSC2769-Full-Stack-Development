@@ -1,14 +1,13 @@
 const postModel = require("../models/postModel");
 const commentModel = require("../models/commentModel");
+const groupModel = require("../models/groupModel");
 const userModel = require("../models/userModel");
 const mongoose = require("mongoose");
 
 // Create new post
 const createPost = async (request, response) => {
-	const { content, reactions, reactionCount, visibility, comments } =
+	const { content, reactions, reactionCount, visibility, comments, groupId } =
 		request.body;
-
-	console.log(`Content: ${content}`);
 
 	let emptyFields = [];
 
@@ -16,8 +15,17 @@ const createPost = async (request, response) => {
 		emptyFields.push("content");
 	}
 
-	if (visibility && visibility !== "public" && visibility !== "friendsOnly") {
+	if (
+		visibility &&
+		visibility !== "public" &&
+		visibility !== "friendsOnly" &&
+		visibility !== "private"
+	) {
 		return response.status(400).json({ error: "Invalid visibility" });
+	}
+
+	if (groupId && !mongoose.Types.ObjectId.isValid(groupId)) {
+		return response.status(400).json({ error: "Invalid group ID" });
 	}
 
 	if (emptyFields.length > 0) {
@@ -32,8 +40,21 @@ const createPost = async (request, response) => {
 		const user = await userModel.findById(userId);
 		const username = user.username;
 
-		console.log(`User ID: ${userId}`);
-		console.log(`Username: ${username}`);
+		if (groupId) {
+			const group = await groupModel.findById(groupId);
+			if (!group) {
+				return response.status(404).json({ error: "Group not found" });
+			}
+		} else {
+			if (
+				!visibility ||
+				(visibility !== "public" && visibility !== "friendsOnly")
+			) {
+				return response
+					.status(400)
+					.json({ error: "Invalid visibility setting" });
+			}
+		}
 
 		// Create the new post
 		const newPost = await postModel.create({
@@ -44,31 +65,87 @@ const createPost = async (request, response) => {
 			reactionCount,
 			visibility,
 			comments,
+			groupId,
 		});
 
-		return response.status(201).json(newPost);
+		// Add the post to the group
+		if (groupId) {
+			const group = await groupModel.findByIdAndUpdate(groupId, {
+				$push: { posts: newPost._id },
+			});
+			if (!group) {
+				return response.status(404).json({ error: "Group not found" });
+			}
+
+			return response.status(201).json(newPost);
+		} else {
+			return response.status(201).json(newPost);
+		}
 	} catch (error) {
-		return response.status(500).json({ error: "Server error" });
+		return response.status(500).json({ error: "Server error", message: error });
 	}
 };
 
 // Get all posts
 const getPosts = async (request, response) => {
+	// // Shuffle posts array
+	// for (let i = posts.length - 1; i >= 0; i--) {
+	// 	const j = Math.floor(Math.random() * (i + 1));
+	// 	[posts[i], posts[j]] = [posts[j], posts[i]];
+	// }
+
 	try {
-		const posts = await postModel.find({}).select("-oldVersions").exec();
+		const userId = request.user._id;
+		const user = await userModel.findById(userId);
+		const userFriendIds = user.friends;
+		const groupId = request.headers["group-id"];
 
-		for (let i = posts.length - 1; i >= 0; i--) {
-			const j = Math.floor(Math.random() * (i + 1));
-			[posts[i], posts[j]] = [posts[j], posts[i]];
+		if (groupId) {
+			const group = await groupModel.findById(groupId);
+			if (!group) {
+				return response.status(404).json({ error: "Group not found" });
+			}
+
+			// Find posts in the group
+			const { posts } = await groupModel.findById(groupId).populate({
+				path: "posts",
+				select: "-oldVersions",
+				options: { sort: { createdAt: -1 } },
+			});
+
+			response.status(200).json(posts);
+		} else {
+			// Find public posts or friends-only posts where the user is a friend of the post's author
+			const posts = await postModel
+				.find({
+					$or: [
+						{ visibility: "public" },
+						{
+							visibility: "friendsOnly",
+							userId: { $in: userFriendIds },
+						},
+						{
+							visibility: "friendsOnly",
+							userId: { $in: userId },
+						},
+					],
+				})
+				.select("-oldVersions")
+				.sort({ createdAt: -1 })
+				.exec();
+
+			response.status(200).json(posts);
 		}
-
-		response.status(200).json(posts);
 	} catch (error) {
-		response
-			.status(500)
-			.json({ status: "error", message: "Failed to retrieve posts" });
+		response.status(500).json({
+			status: "error",
+			message: "Failed to retrieve posts",
+		});
 	}
 };
+
+// Get all posts from a group
+const getGroupPosts = async (request, response) => {};
 
 // Get all posts from a user
 const getPostsFromSpecificUser = async (request, response) => {
@@ -97,7 +174,7 @@ const getSpecificPost = async (request, response) => {
 		if (!post) {
 			return response.status(404).json({ error: "Post not found" });
 		}
-		response.status(200).json({ status: "success", data: post });
+		response.status(200).json(post);
 	} catch (error) {
 		response
 			.status(500)
@@ -146,7 +223,7 @@ const updatePost = async (request, response) => {
 		const post = await postModel.findOneAndUpdate(
 			{ _id: postId },
 			{
-				$set: { "content": postContent },
+				$set: { content: postContent },
 				$inc: { __v: 1 },
 			},
 			{ upsert: true, new: true }
@@ -385,43 +462,71 @@ const getCommentHistory = async (request, response) => {
 // Add reaction to a post
 const postReaction = async (req, res) => {
 	try {
-	  const { postId } = req.params;
-	  const { reactionType } = req.body; // Reaction type from the request (like, love, haha, angry)
-	  const userId = req.user.id; // Assuming you have the user ID from the session
-	  const username = req.user.username; // Assuming you have the username from the session
-  
-	  const post = await Post.findById(postId);
-	  if (!post) {
-		return res.status(404).json({ message: 'Post not found' });
-	  }
-  
-	  // Remove user from previous reactions
-	  Object.keys(post.reactions).forEach((key) => {
-		post.reactions[key] = post.reactions[key].filter(
-		  (reaction) => reaction.userId.toString() !== userId
-		);
-	  });
-  
-	  // Add user to the new reaction type
-	  post.reactions[reactionType].push({ username, userId });
-  
-	  await post.save();
-  
-	  // Send back the updated reactions
-	  res.json({
-		message: 'Reaction updated',
-		reaction: {
-		  like: post.reactions.like,
-		  love: post.reactions.love,
-		  haha: post.reactions.haha,
-		  angry: post.reactions.angry
+		const postId = req.params.id;
+		const { reactionType } = req.body; // Reaction type (like, love, haha, angry)
+		const userId = req.user._id;
+
+		// Find the post
+		const post = await postModel.findById(postId);
+		if (!post) {
+			return res.status(404).json({ message: "Post not found" });
 		}
-	  });
+
+		// Ensure the reactionType is valid based on the schema
+		if (!["like", "love", "haha", "angry"].includes(reactionType)) {
+			return res.status(400).json({ message: "Invalid reaction type" });
+		}
+
+		// Check if the user has already reacted with the given type
+		const hasReacted = post.reactions[reactionType].some(
+			(reaction) => reaction.user.toString() === userId.toString()
+		);
+
+		if (hasReacted) {
+			// Remove the user's reaction
+			post.reactions[reactionType] = post.reactions[reactionType].filter(
+				(reaction) => reaction.user.toString() !== userId.toString()
+			);
+		} else {
+			// Remove the user from any previous reactions
+			Object.keys(post.reactions).forEach((key) => {
+				post.reactions[key] = post.reactions[key].filter(
+					(reaction) => reaction.user.toString() !== userId.toString()
+				);
+			});
+
+			// Add the user to the new reaction type
+			post.reactions[reactionType].push({ user: userId });
+		}
+
+		// Update reactionCount by counting all reactions across types
+		const totalReactions = Object.values(post.reactions).reduce(
+			(acc, reactionArray) => acc + reactionArray.length,
+			0
+		);
+		post.reactionCount = totalReactions;
+
+		await post.save();
+
+		// Populate user details in reactions
+		const populatedPost = await postModel
+			.findById(postId)
+			.populate("reactions.like.user")
+			.populate("reactions.love.user")
+			.populate("reactions.haha.user")
+			.populate("reactions.angry.user");
+
+		// Return the updated post with populated user details
+		res.json({
+			message: "Reaction updated",
+			reactionCount: populatedPost.reactionCount,
+			reactions: populatedPost.reactions,
+		});
 	} catch (error) {
-	  console.error('Failed to update reaction:', error);
-	  res.status(500).json({ message: 'Server error' });
+		console.error("Failed to update reaction:", error);
+		res.status(500).json({ message: "Server error" });
 	}
-  };
+};
 
 // Add reaction to a comment
 const commentReaction = async (request, response) => {
@@ -479,6 +584,7 @@ const commentReaction = async (request, response) => {
 module.exports = {
 	createPost,
 	getPosts,
+	getGroupPosts,
 	getPostsFromSpecificUser,
 	getSpecificPost,
 	deletePost,

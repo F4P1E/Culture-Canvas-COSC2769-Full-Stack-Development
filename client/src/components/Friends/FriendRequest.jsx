@@ -20,7 +20,6 @@ const FriendRequest = () => {
 			});
 			const data = await response.json(); // Parse the response data.
 
-      console.log(`Request from FETCH: ${data}`)
 			dispatch(viewFriendRequest(data)); // Update state with fetched requests.
 		};
 
@@ -34,7 +33,7 @@ const FriendRequest = () => {
 				`http://localhost:8000/friendRequest/${requestId}`,
 				{
 					method: "POST",
-          credentials: "include",
+					credentials: "include",
 				}
 			);
 
@@ -45,7 +44,8 @@ const FriendRequest = () => {
 			const data = await response.json();
 			// Dispatch the acceptFriendRequest action.
 			dispatch(acceptFriendRequest(data));
-      window.location.reload();
+			alert("Friend request accepted");
+			window.location.reload();
 		} catch (error) {
 			console.error("Failed to accept friend request:", error);
 		}
@@ -54,10 +54,9 @@ const FriendRequest = () => {
 	// Render a list of friend requests with Accept button.
 	return (
 		<div>
-      <h1>Friend Requests</h1>
+			<h1>Friend Requests</h1>
 
 			<ul>
-        {console.log(`Request: ${requests}`)}
 				{requests.map(
 					(
 						request // Map over requests array to render each request.

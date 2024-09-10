@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { setPosts, setError, setLoading } from "../../slices/postSlice";
 import Post from "./Post";
 
-const PostFeed = () => {
+const PostFeed = (groupIdRaw) => {
+	const groupId = groupIdRaw.groupId;
 	const dispatch = useDispatch();
 	const { posts, isLoading, error } = useSelector((state) => state.posts); // Accessing posts, loading, and error states from Redux.
 
@@ -11,10 +12,20 @@ const PostFeed = () => {
 		const fetchPosts = async () => {
 			dispatch(setLoading({ isLoading: true }));
 			try {
-				const response = await fetch("http://localhost:8000/post/", {
-					method: "GET",
-					credentials: "include",
-				});
+				let response;
+
+				if (groupId) {
+					response = await fetch("http://localhost:8000/post/", {
+						method: "GET",
+						credentials: "include",
+						headers: { "Group-ID": groupId },
+					});
+				} else {
+					response = await fetch("http://localhost:8000/post/", {
+						method: "GET",
+						credentials: "include",
+					});
+				}
 
 				if (!response.ok) {
 					throw new Error("Failed to fetch posts. Please try again later.");
@@ -43,7 +54,7 @@ const PostFeed = () => {
 
 	return (
 		<div>
-			<h1>Posts Feed</h1>
+			<h1>{groupId ? "Group Posts" : "Post Feed"}</h1>
 
 			{posts.length ? (
 				posts

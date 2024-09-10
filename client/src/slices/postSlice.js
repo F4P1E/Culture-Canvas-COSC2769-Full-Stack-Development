@@ -92,36 +92,51 @@ const postSlice = createSlice({
 				}
 			}
 		},
-		addReaction: (state, action) => {
-			const postIndex = state.posts.findIndex(
-				(post) => post._id === action.payload.postId
-			);
-		
-			if (postIndex !== -1) {
-				// Ensure reactions array exists
-				state.posts[postIndex].reactions = state.posts[postIndex].reactions || [];
-		
-				// Find existing reaction
-				const existingReaction = state.posts[postIndex].reactions.find(
-					(reaction) => reaction.userId.toString() === action.payload.userId.toString()
-				);
-		
-				if (existingReaction) {
-					// Update reaction
-					existingReaction.reactionType = action.payload.reactionType;
-				} else {
-					// Add new reaction
-					state.posts[postIndex].reactions.push({
-						userId: action.payload.userId,
-						reactionType: action.payload.reactionType,
-					});
-				}
-		
-				// Update reaction count
-				state.posts[postIndex].reactionCount = state.posts[postIndex].reactions.length;
-			}
-		},
-		
+		// addReaction: (state, action) => {
+		// 	const { postId, userId, reactions } = action.payload;
+		// 	console.log(`Payload: ${JSON.stringify(action.payload)}`);
+
+		// 	// Find the index of the post
+		// 	const postIndex = state.posts.findIndex((post) => post._id === postId);
+
+		// 	console.log(
+		// 		`Index: ${postIndex}, User: ${userId}, Type: ${JSON.stringify(
+		// 			reactions
+		// 		)}`
+		// 	);
+		// 	if (postIndex !== -1) {
+		// 		// Ensure reactions fields exist and are arrays
+		// 		state.posts[postIndex].reactions = {
+		// 			like: state.posts[postIndex].reactions?.like || [],
+		// 			love: state.posts[postIndex].reactions?.love || [],
+		// 			haha: state.posts[postIndex].reactions?.haha || [],
+		// 			angry: state.posts[postIndex].reactions?.angry || [],
+		// 		};
+
+		// 		// Remove the user from any previous reactions
+		// 		Object.keys(state.posts[postIndex].reactions).forEach((key) => {
+		// 			state.posts[postIndex].reactions[key] = state.posts[
+		// 				postIndex
+		// 			].reactions[key].filter((reaction) => {
+		// 				console.log(
+		// 					`Reaction: ${JSON.stringify(
+		// 						state.posts[postIndex].reactions[key]
+		// 					)}\nUser: ${userId}\nReaction User: ${reaction.user}`
+		// 				),
+		// 					reaction.user.toString() !== userId.toString();
+		// 			});
+		// 		});
+
+		// 		// Add the user to the new reaction type
+		// 		state.posts[postIndex].reactions[reactions].push({ user: userId });
+
+		// 		// Update reactionCount by counting all reactions across types
+		// 		const totalReactions = Object.values(
+		// 			state.posts[postIndex].reactions
+		// 		).reduce((acc, reactionArray) => acc + reactionArray.length, 0);
+		// 		state.posts[postIndex].reactionCount = totalReactions;
+		// 	}
+		// },
 		addCommentReaction: (state, action) => {
 			// Reducer to add or update a reaction to a comment
 			const postIndex = state.posts.findIndex(

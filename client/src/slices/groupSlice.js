@@ -27,9 +27,6 @@ const groupSlice = createSlice({
 		fetchOneGroupInfo: (state, action) => {
 			state.groupInfo = action.payload; // Store the detailed information of one group
 			state.memberInfo = action.payload.members;
-
-			console.log(`Action payload: ${action.payload}`);
-			console.log(`Group info: ${state.groupInfo}`);
 		},
 		setRequests: (state, action) => {
 			// Reducer to set the list of join requests

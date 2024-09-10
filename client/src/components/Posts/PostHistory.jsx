@@ -5,11 +5,8 @@ import { useParams } from "react-router-dom";
 
 const PostHistory = () => {
 	const dispatch = useDispatch();
-	//let commentId = useSelector((state) => state.posts.currentId);
 	const { postId } = useParams();
-	console.log(`CommentId:${postId}`);
 	const postHistory = useSelector((state) => state.posts.postHistories);
-	console.log(`History:${JSON.stringify(postHistory)}`);
 
 	useEffect(() => {
 		const fetchPosttHistory = async () => {
