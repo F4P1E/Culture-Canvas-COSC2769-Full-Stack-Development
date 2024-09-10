@@ -297,7 +297,7 @@ const GroupAdmin = () => {
 		if (currentGroupId && postId && commentId) {
 			try {
 				const response = await fetch(
-					`http://localhost:8000/group/${currentGroupId}/posts/${postId}/comments/${commentId}`,
+					`http://localhost:8000/group/${selectedGroupId}/posts/${postId}/comments/${commentId}`,
 					{
 						method: "DELETE",
 						credentials: "include",
