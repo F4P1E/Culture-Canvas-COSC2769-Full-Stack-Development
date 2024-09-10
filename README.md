@@ -101,15 +101,39 @@ Group-Assigment-Social-Network/
      npm run dev
      ```
 
+## Configuration
+
+- **Frontend**: Configuration is managed through `vite.config.js` and environment variables (if applicable).
+- **Backend**: Configuration is primarily handled via the `.env` file and `app.js`.
+
+### Environment variables
+
+- If not exist, create a `.env` in `/server` file with the following content:
+
+```js
+PORT="8000"
+MONGO_URI="mongodb+srv://Singani:singani1530@groupproject.m8wl1tq.mongodb.net/?retryWrites=true&w=majority&appName=GroupProject"
+SECRET="CrystalCrusherisbetterthanCodependenceeventhoughitisharderchangemymindlmaooo"
+```
+
 ## Usage
 
 - Access the frontend of the application via `http://localhost:5173` (default Vite port).
 - The backend API runs on `http://localhost:8000` (or as configured in the `.env` file).
 
-## Configuration
+### Site admin account credentials
 
-- **Frontend**: Configuration is managed through `vite.config.js` and environment variables (if applicable).
-- **Backend**: Configuration is primarily handled via the `.env` file and `app.js`.
+- **Username**:
+
+```
+MarkOppenheimer@admin
+```
+
+- **Password**:
+
+```
+Disassemble/*-+1239876
+```
 
 ## Dependencies
 
@@ -131,7 +155,7 @@ Group-Assigment-Social-Network/
 - **Mongoose**: MongoDB object modeling tool to interact with MongoDB.
 - **Bcrypt**: For password hashing to secure user passwords.
 - **Cors**: For enabling Cross-Origin Resource Sharing (CORS) to allow resource sharing between different origins.
-- **Dotenv**: For loading environment variables from a `.env` file into `process.env`.
+- **Dotenv**: For loading environment variables from a `.env` file into `process.env`. For secret keys, ports, etc.
 - **Express-Session**: For managing sessions, allowing server-side sessions to track user sessions.
 - **Nodemon**: For automatic server restarts during development, enabling live reloading.
 
