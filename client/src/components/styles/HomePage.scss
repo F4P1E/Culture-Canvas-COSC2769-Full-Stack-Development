@@ -1,0 +1,100 @@
+.homepage {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background-color: #f0f2f5;
+	padding: 20px;
+
+	h1 {
+		font-size: 28px;
+		font-weight: bold;
+		color: #1877f2;
+		margin-bottom: 20px;
+	}
+
+	section {
+		width: 100%;
+		max-width: 600px;
+		background-color: white;
+		border-radius: 8px;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+		margin-bottom: 20px;
+		padding: 15px;
+
+		h2 {
+			font-size: 18px;
+			font-weight: bold;
+			color: #333;
+			margin-bottom: 10px;
+		}
+
+		button {
+			background-color: #1877f2;
+			color: white;
+			border: none;
+			padding: 10px 15px;
+			font-size: 14px;
+			font-weight: bold;
+			border-radius: 5px;
+			cursor: pointer;
+			transition: background-color 0.3s;
+
+			&:hover {
+				background-color: #155dbb;
+			}
+		}
+	}
+
+	.logout-button {
+		background-color: red;
+		color: white;
+		padding: 15px;
+		font-size: 16px;
+		font-weight: bold;
+		border: none;
+		border-radius: 5px;
+		cursor: pointer;
+		transition: background-color 0.3s;
+
+		&:hover {
+			background-color: darkred;
+		}
+	}
+
+	.see-new-groups,
+	.see-your-groups {
+		background-color: #1877f2;
+		color: white;
+		border: none;
+		padding: 10px 15px;
+		font-size: 14px;
+		font-weight: bold;
+		border-radius: 5px;
+		cursor: pointer;
+		transition: background-color 0.3s;
+
+		&:hover {
+			background-color: #155dbb;
+		}
+	}
+
+	.spacing {
+		margin-bottom: 15px;
+	}
+}
+
+@media (max-width: 768px) {
+	.homepage section {
+		max-width: 100%;
+		padding: 10px;
+	}
+
+	.homepage h1 {
+		font-size: 24px;
+	}
+
+	.homepage section button {
+		width: 100%;
+		font-size: 16px;
+	}
+}

@@ -1,3 +1,6 @@
+// SCSS
+import "../styles/PostFeed.scss";
+
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts, setError, setLoading } from "../../slices/postSlice";
@@ -53,7 +56,7 @@ const PostFeed = (groupIdRaw) => {
 	}
 
 	return (
-		<div>
+		<div className="posts-feed-container">
 			<h1>{groupId ? "Group Posts" : "Post Feed"}</h1>
 
 			{posts.length ? (

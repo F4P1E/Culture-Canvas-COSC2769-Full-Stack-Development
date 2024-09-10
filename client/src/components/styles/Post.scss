@@ -1,0 +1,78 @@
+.post-container {
+	border: 1px solid #ddd;
+	padding: 16px;
+	margin-bottom: 20px;
+	background-color: #fff;
+	border-radius: 8px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+	h4 {
+		font-size: 1.5rem;
+		margin-bottom: 12px;
+	}
+
+	p {
+		font-size: 1rem;
+		color: #555;
+		line-height: 1.5;
+	}
+
+	button.toggle-details-btn {
+		background-color: #ff9800;
+		border: none;
+		color: white;
+		padding: 8px 16px;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 1rem;
+		margin-top: 10px;
+		transition: background-color 0.3s ease;
+
+		&:hover {
+			background-color: #e68900;
+		}
+	}
+
+	.reactions {
+		margin-top: 16px;
+		display: flex;
+		gap: 10px;
+
+		.reaction-icon {
+			display: inline-block;
+			width: 40px;
+			height: 40px;
+			background-color: #f0f0f0;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: background-color 0.3s, transform 0.3s;
+			cursor: pointer;
+
+			&:hover {
+				background-color: #ff9800;
+				transform: scale(1.1);
+
+				svg {
+					fill: #fff;
+				}
+			}
+
+			&.active {
+				background-color: #ff9800;
+
+				svg {
+					fill: #fff;
+				}
+			}
+
+			svg {
+				width: 24px;
+				height: 24px;
+				fill: #555;
+				transition: fill 0.3s;
+			}
+		}
+	}
+}

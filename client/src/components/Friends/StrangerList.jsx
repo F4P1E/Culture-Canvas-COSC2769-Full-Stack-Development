@@ -73,14 +73,14 @@ const StrangerList = () => {
 	};
 
 	return (
-		<div>
+		<div className="stranger-list-container">
 			{loading && <p>Loading...</p>}
 			{error && <p style={{ color: "red" }}>{error}</p>}
 			<ul>
 				{strangers.map((stranger) => (
-					<li key={stranger._id}>
-						{stranger.username}&nbsp;&nbsp;
-						<button onClick={() => handleAddFriend(stranger._id)}>
+					<li className="stranger-item" key={stranger._id}>
+						<p className="stranger-info">{stranger.username}&nbsp;&nbsp;</p>
+						<button className="stranger-buttons" onClick={() => handleAddFriend(stranger._id)}>
 							Add Friend
 						</button>
 					</li>

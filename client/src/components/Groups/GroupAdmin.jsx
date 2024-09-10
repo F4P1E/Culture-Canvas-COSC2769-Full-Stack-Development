@@ -1,3 +1,6 @@
+// SCSS
+import "../styles/GroupAdmin.scss";
+
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -245,7 +248,7 @@ const GroupAdmin = () => {
 	};
 
 	return (
-		<div>
+		<div className="group-admin-panel">
 			<h2>Group Admin Panel</h2>
 
 			{/* Group selection */}

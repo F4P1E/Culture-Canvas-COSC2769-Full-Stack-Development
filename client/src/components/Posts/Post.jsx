@@ -1,3 +1,6 @@
+// SCSS
+import "../styles/Post.scss";
+
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updatePost, addReaction } from "../../slices/postSlice";
@@ -83,7 +86,7 @@ const Post = ({ post }) => {
 
 	return (
 		<>
-			<div>
+			<div className="post-container">
 				<p>
 					<strong>By: {post?.username || "Anonymous"} &nbsp;|&nbsp; </strong>
 					<i>
@@ -106,15 +109,35 @@ const Post = ({ post }) => {
 							: getShortContent(post?.content),
 					}}
 				/>
-				<button onClick={handleToggleDetails}>
+				<button className="toggle-details-btn" onClick={handleToggleDetails}>
 					{showDetails ? "Hide Details" : "Show Details"}
 				</button>
 				{/* Handle reactions */}
-				<div>
-					<button onClick={() => handleReaction("like")}>Like</button>
-					<button onClick={() => handleReaction("love")}>Love</button>
-					<button onClick={() => handleReaction("haha")}>Haha</button>
-					<button onClick={() => handleReaction("angry")}>Angry</button>
+				<div className="reactions">
+					<button
+						className="reaction-icon"
+						onClick={() => handleReaction("like")}
+					>
+						Like
+					</button>
+					<button
+						className="reaction-icon"
+						onClick={() => handleReaction("love")}
+					>
+						Love
+					</button>
+					<button
+						className="reaction-icon"
+						onClick={() => handleReaction("haha")}
+					>
+						Haha
+					</button>
+					<button
+						className="reaction-icon"
+						onClick={() => handleReaction("angry")}
+					>
+						Angry
+					</button>
 				</div>
 				{/* Conditionally render the PostDetail component when showDetails is true */}
 				{showDetails && post?._id && <PostDetail postId={post._id} />}

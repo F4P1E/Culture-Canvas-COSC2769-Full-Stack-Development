@@ -1,3 +1,6 @@
+// SCSS
+import "../styles/GroupPage.scss";
+
 // Importing React hooks for state and effect, routing hook, and Redux hook for accessing state.
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -51,7 +54,7 @@ const GroupPage = () => {
 
 	// Render the group page with group details, admin actions, and posts.
 	return (
-		<div>
+		<div className="group-page">
 			<h1>{groupInfo.name || "Loading..."}</h1>
 			<h2>Members</h2>
 			<ul>

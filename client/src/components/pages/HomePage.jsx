@@ -1,3 +1,6 @@
+// SCSS
+import "../styles/HomePage.scss";
+
 import React from "react";
 import { useNavigate } from "react-router-dom"; // Correct import for useNavigate
 import { useDispatch } from "react-redux";
@@ -72,7 +75,7 @@ const HomePage = () => {
 	};
 
 	return (
-		<div>
+		<div className="homepage">
 			<h1>Home Page</h1>
 
 			<section>
@@ -104,16 +107,16 @@ const HomePage = () => {
 			</section>
 
 			<br />
-			<button onClick={handleRedirectToMoreGroups}>See new groups</button>
+			<button className="see-new-groups" onClick={handleRedirectToMoreGroups}>See new groups</button>
 			<br />
 			
 
 			<br />
-			<button onClick={handleRedirectToGroupsAdmin}>See your groups</button>
+			<button className="see-your-groups" onClick={handleRedirectToGroupsAdmin}>See your groups</button>
 			<br />
 			
 			<br />
-			<button style={{ height: "50px", width: "100px", fontSize: "15px", backgroundColor: "red", color: "white", fontWeight: "1000"}} onClick={handleLogout}>Logout</button>
+			<button className="logout-button" onClick={handleLogout}>Logout</button>
 		</div>
 	);
 };
