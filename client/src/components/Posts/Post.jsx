@@ -61,6 +61,7 @@ const Post = ({ post }) => {
 			if (response.ok) {
 				const data = await response.json();
 				dispatch(addReaction({ postId: post._id, userId, ...data }));
+				alert("Reacted successfully!");
 			}
 		} catch (error) {
 			console.error("Failed to update reaction:", error);

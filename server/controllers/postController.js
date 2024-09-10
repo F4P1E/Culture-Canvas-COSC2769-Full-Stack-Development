@@ -99,6 +99,7 @@ const getPosts = async (request, response) => {
 		const user = await userModel.findById(userId);
 		const userFriendIds = user.friends;
 		const groupId = request.headers["group-id"];
+		const printComments = Boolean(request.headers["comments"]);
 
 		if (groupId) {
 			const group = await groupModel.findById(groupId);
@@ -113,7 +114,23 @@ const getPosts = async (request, response) => {
 				options: { sort: { createdAt: -1 } },
 			});
 
-			response.status(200).json(posts);
+			if (printComments) {
+				// Add comments to each post
+				const postsWithComments = await Promise.all(
+					posts.map(async (post) => {
+						const comments = await commentModel
+							.find({ postId: post._id })
+							.sort({ createdAt: -1 })
+							.exec();
+						return { ...post._doc, comments };
+					})
+				);
+				return response.status(200).json(postsWithComments);
+			} else {
+				return response.status(200).json(posts);
+			}
+
+			// response.status(200).json(posts);
 		} else {
 			// Find public posts or friends-only posts where the user is a friend of the post's author
 			const posts = await postModel

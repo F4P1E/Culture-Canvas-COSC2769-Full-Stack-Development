@@ -15,6 +15,8 @@ const {
 	requestJoinGroup,
 	approveJoinGroup,
 	deleteMemberFromGroup,
+	removePostFromGroup,
+	removeCommentFromPost,
 } = require("../controllers/groupController");
 
 router.get("/", getGroups); // Get all groups that has not been joined
@@ -40,5 +42,9 @@ router.get("/create/requests", getCreateGroupRequests); // Get group create requ
 router.post("/create/approve/:id", approveCreateGroup); // Add user to specific group
 
 router.delete("/:id/:userId", deleteMemberFromGroup); // Delete user from specific group
+
+router.delete("/:id/post/:postId", removePostFromGroup); // Delete post from specific group
+
+router.delete("/:id/post/:postId/comment/:commentId", removeCommentFromPost); // Delete comment from specific post
 
 module.exports = router;

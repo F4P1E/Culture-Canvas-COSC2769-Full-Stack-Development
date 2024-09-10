@@ -89,6 +89,8 @@ const PostDetail = ({ postId }) => {
 				const data = await response.json();
 				dispatch(addComment({ postId, comment: data.comment }));
 				setComment(""); // Clear the input field
+
+				alert("Comment added successfully!");
 			}
 		} catch (err) {
 			dispatch(setCommentFailure(err.message));

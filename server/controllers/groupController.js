@@ -1,6 +1,8 @@
 const groupModel = require("../models/groupModel");
 const groupRequestModel = require("../models/groupRequestModel");
 const userModel = require("../models/userModel");
+const postModel = require("../models/postModel");
+const commentModel = require("../models/commentModel");
 
 const mongoose = require("mongoose");
 
@@ -249,10 +251,10 @@ const getCreateGroupRequests = async (req, res) => {
 		}
 
 		// Get group create requests with members
-		const group = await groupRequestModel.find({}).populate([
-			{ path: "members" },
-			{ path: "admins" },
-		]).exec();
+		const group = await groupRequestModel
+			.find({})
+			.populate([{ path: "members" }, { path: "admins" }])
+			.exec();
 		if (!group) {
 			return res.status(404).json({ error: "Group not found" });
 		}
@@ -402,6 +404,60 @@ const deleteMemberFromGroup = async (req, res) => {
 	}
 };
 
+const removePostFromGroup = async (req, res) => {
+	try {
+		const groupId = req.params.id;
+		const postId = req.params.postId;
+
+		// Step 1: Find the group by groupId
+		const group = await groupModel.findById(groupId);
+		if (!group) {
+			return res.status(404).json({ message: "Group not found" });
+		}
+
+		// Step 2: Remove the postId from the group's posts array
+		group.posts.pull(postId);
+
+		// Step 3: Optionally remove the post from the Post collection
+		await postModel.findByIdAndDelete(postId);
+
+		// Step 4: Save the updated group
+		await group.save();
+
+		// Step 5: Send a success response
+		res.status(200).json({ message: "Post removed successfully" });
+	} catch (error) {
+		console.error("Error removing post from group:", error);
+		res.status(500).json({ message: "Server error" });
+	}
+};
+
+const removeCommentFromPost = async (req, res) => {
+	try {
+		const groupId = req.params.id;
+		const postId = req.params.postId;
+		const commentId = req.params.commentId;
+
+		// Step 1: Delete the comment in the post
+		const post = await postModel.findById(postId);
+		if (!post) {
+			return res.status(404).json({ message: "Post not found" });
+		}
+
+		post.comments.pull(commentId);
+		await post.save();
+
+		// Step 2: Delete the comment itself
+		await commentModel.findByIdAndDelete(commentId);
+
+		// Step 3: Send a success response
+		res.status(200).json({ message: "Comment removed successfully" });
+	} catch (error) {
+		console.error("Error removing comment from post:", error);
+		res.status(500).json({ message: "Server error" });
+	}
+};
+
 module.exports = {
 	getGroups,
 	getOneGroup,
@@ -415,4 +471,6 @@ module.exports = {
 	requestJoinGroup,
 	approveJoinGroup,
 	deleteMemberFromGroup,
+	removePostFromGroup,
+	removeCommentFromPost,
 };
