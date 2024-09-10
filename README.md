@@ -1,4 +1,4 @@
-# Full-Stack Project
+# Culture Canvas
 
 ## Introduction
 
@@ -13,7 +13,7 @@ This project is a full-stack web application that integrates a React frontend wi
 - [Usage](#usage)
 - [Configuration](#configuration)
 - [Dependencies](#dependencies)
-- [Contributing](#contributing)
+- [Contribution](#contribution)
 
 ## Project Structure
 
@@ -120,6 +120,7 @@ Group-Assigment-Social-Network/
 - **Vite**: For fast build and hot-reload during development.
 - **Bootstrap**: For styling.
 - **Bootstrap Icons**: For icons.
+- **React Icons**: For icons.
 - **React Router DOM**: For routing.
 - **Redux Persist**: To persist Redux state across sessions.
 - **Sass**: For styling with SCSS.
@@ -134,6 +135,12 @@ Group-Assigment-Social-Network/
 - **Express-Session**: For managing sessions, allowing server-side sessions to track user sessions.
 - **Nodemon**: For automatic server restarts during development, enabling live reloading.
 
+## Demonstrations
+
+- **Presentation**: https://drive.google.com/file/d/1CXJrmmWQ-HztlJ4Aa1hSlDCCVWiFRB5B/view?usp=sharing
+
+- **Demo**: https://drive.google.com/file/d/1fCqYBCWyZMwsVJ7KYMb3gRKGIRdz4LVm/view?usp=sharing
+
 ## Contribution
 
-Contributions are welcome! Please fork the repository and submit a pull request.
+(Contribution here)
