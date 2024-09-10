@@ -20,7 +20,6 @@ import Login from "./components/Auth/Login";
 import HomePage from "./components/pages/HomePage";
 import PostFeed from "./components/Posts/PostFeed";
 import NotFound from "./components/pages/NotFound";
-import ProfilePage from "./components/pages/ProfilePage"; // Example ProfilePage import
 import GroupPage from "./components/pages/GroupPage"; // Example GroupPage import
 import PeoplePage from "./components/pages/PeoplePage";
 import AuthProvider from "./context/authContext";
@@ -59,10 +58,6 @@ const router = createBrowserRouter([
 			{
 				path: "/feed",
 				element: <PostFeed />,
-			},
-			{
-				path: "/profile",
-				element: <ProfilePage />,
 			},
 			{
 				path: "/group/:groupId",

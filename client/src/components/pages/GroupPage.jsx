@@ -57,7 +57,7 @@ const GroupPage = () => {
 		<div className="group-page">
 			<h1>{groupInfo.name || "Loading..."}</h1>
 			<h2>Members</h2>
-			<ul>
+			<ul className="members-list">
 				{groupInfo.members && groupInfo.members.length > 0 ? (
 					groupInfo.members.map((member) => (
 						<li key={member._id}>
@@ -70,9 +70,11 @@ const GroupPage = () => {
 			</ul>
 
 			<h2>Post something...</h2>
+			<div className="post-section">
 			<CreatePost groupId={groupId} />
 			<PostFeed groupId={groupId} />
 			{/* Render PostFeed with group's posts. */}
+		</div>
 		</div>
 	);
 };

@@ -37,10 +37,14 @@
 			font-weight: bold;
 			border-radius: 5px;
 			cursor: pointer;
-			transition: background-color 0.3s;
+			transition: background-color 0.3s ease;
 
 			&:hover {
 				background-color: #155dbb;
+			}
+
+			&:active {
+				background-color: #388e3c;
 			}
 		}
 	}

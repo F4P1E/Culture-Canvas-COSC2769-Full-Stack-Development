@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addPost } from "../../slices/postSlice";
+import "../styles/GroupPage.scss";
 
 const CreatePost = (groupIdRaw) => {
 	const groupId = groupIdRaw.groupId;
@@ -97,7 +98,7 @@ const CreatePost = (groupIdRaw) => {
 					</select>
 				</div>
 				<br />
-				<button type="submit">Create Post</button>
+				<button type="submit" className="create-post-button">Create Post</button>
 			</form>
 			<br />
 		</div>
