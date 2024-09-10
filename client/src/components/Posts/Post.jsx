@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updatePost, addReaction } from "../../slices/postSlice";
 import PostDetail from "./PostDetail";
+import { FaThumbsUp, FaHeart, FaLaugh, FaAngry } from "react-icons/fa";
 
 const Post = ({ post }) => {
 	const [showDetails, setShowDetails] = useState(false);
@@ -119,25 +120,25 @@ const Post = ({ post }) => {
 						className="reaction-icon"
 						onClick={() => handleReaction("like")}
 					>
-						Like
+						<FaThumbsUp />	Like
 					</button>
 					<button
 						className="reaction-icon"
 						onClick={() => handleReaction("love")}
 					>
-						Love
+						<FaHeart />	Love
 					</button>
 					<button
 						className="reaction-icon"
 						onClick={() => handleReaction("haha")}
 					>
-						Haha
+						<FaLaugh />	Haha
 					</button>
 					<button
 						className="reaction-icon"
 						onClick={() => handleReaction("angry")}
 					>
-						Angry
+						<FaAngry />	Angry
 					</button>
 				</div>
 				{/* Conditionally render the PostDetail component when showDetails is true */}

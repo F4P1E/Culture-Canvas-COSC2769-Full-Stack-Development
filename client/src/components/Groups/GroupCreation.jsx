@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addGroup } from '../../slices/groupSlice'; // Import relevant Redux actions
+import "../styles/GroupCreation.scss";
 
 const GroupCreation = () => {
   const [groupName, setGroupName] = useState(''); // Local state for group name input
