@@ -86,35 +86,6 @@ const groupSlice = createSlice({
 				);
 			}
 		},
-		deletePostFromGroup: (state, action) => {
-			const { groupId, postId } = action.payload;
-
-			// Find the group that contains the post
-			const group = state.groups.find((group) => group._id === groupId);
-
-			if (group) {
-				// Remove the post from the group's posts array
-				group.posts = group.posts.filter((post) => post._id !== postId);
-			}
-		},
-		removeCommentFromPost: (state, action) => {
-			const { groupId, postId, commentId } = action.payload;
-
-			// Find the group that contains the post
-			const group = state.groups.find((group) => group._id === groupId);
-
-			if (group) {
-				// Find the post within the group
-				const post = group.posts.find((post) => post._id === postId);
-
-				if (post) {
-					// Remove the comment from the post's comments array
-					post.comments = post.comments.filter(
-						(comment) => comment._id !== commentId
-					);
-				}
-			}
-		},
 	},
 });
 
@@ -130,8 +101,6 @@ export const {
 	requestJoinGroup,
 	approveJoinRequest,
 	deleteMemberFromGroup,
-	deletePostFromGroup,
-	removeCommentFromPost,
 } = groupSlice.actions;
 
 // Exporting the reducer to be used in the store.

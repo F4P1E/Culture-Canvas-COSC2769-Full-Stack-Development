@@ -8,8 +8,6 @@ import {
 	setMembers,
 	approveJoinRequest,
 	deleteMemberFromGroup,
-	deletePostFromGroup,
-	removeCommentFromPost,
 } from "../../slices/groupSlice";
 
 import { setPosts, setLoading, setError } from "../../slices/postSlice";
@@ -293,11 +291,11 @@ const GroupAdmin = () => {
 
 
 	// Handle removing a comment from a specific post
-	const handleRemoveComment = async (postId, commentId) => {
-		if (currentGroupId && postId && commentId) {
+	const handleRemoveComment = async () => {
+		if (selectedGroupId && selectedPostId && selectedCommentId) {
 			try {
 				const response = await fetch(
-					`http://localhost:8000/group/${selectedGroupId}/posts/${postId}/comments/${commentId}`,
+					`http://localhost:8000/group/${selectedGroupId}/posts/${selectedPostId}/comments/${selectedCommentId}`,
 					{
 						method: "DELETE",
 						credentials: "include",
