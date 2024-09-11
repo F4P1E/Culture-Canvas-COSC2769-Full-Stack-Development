@@ -15,35 +15,34 @@ const GroupCreation = () => {
 			return alert("Group name is required");
 		}
 
-		try {
-			const response = await fetch("http://localhost:8000/group/create", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					name: groupName,
-				}),
-				credentials: "include",
-			});
+		const response = await fetch("http://localhost:8000/group/create", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				name: groupName,
+			}),
+			credentials: "include",
+		});
 
-			const data = await response.json();
+		const data = await response.json();
 
-			if (!response.ok) {
-				throw new Error(data.error || "Failed to create group");
-			}
-
-			// Dispatch the addGroup action to add the new group to the Redux store
-			dispatch(addGroup({ group: data.group }));
-
-			// Reset the input fields
-			setGroupName("");
-
-			alert("Group creation request has been sent!");
-		} catch (err) {
-			console.error(err);
-			console.log(err.message || "Failed to create group");
+		if (data.error) {
+			throw new Error(data.error);
 		}
+
+		if (!response.ok) {
+			throw new Error(data.error || "Failed to create group");
+		}
+
+		// Dispatch the addGroup action to add the new group to the Redux store
+		dispatch(addGroup({ group: data.group }));
+
+		// Reset the input fields
+		setGroupName("");
+
+		alert("Group creation request has been sent!");
 	};
 
 	return (

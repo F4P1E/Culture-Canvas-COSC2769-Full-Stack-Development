@@ -88,7 +88,7 @@ const Post = ({ post }) => {
 		<div className="post-container">
 			<p>
 				<strong>By: {post?.username || "Anonymous"}&nbsp;&nbsp; </strong>
-				{console.log(post)}{" "}
+				{" "}
 				<i style={{ color: "#A0A0A0", fontWeight: "650" }}>
 					{post?.oldVersions.length > 0 ? "(Edited)" : ""}
 				</i>
