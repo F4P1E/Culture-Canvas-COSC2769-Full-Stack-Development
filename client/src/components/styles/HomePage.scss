@@ -106,6 +106,21 @@
 	.spacing {
 		margin-bottom: 15px;
 	}
+
+	.group-list-container {
+		.group-list {
+			display: flex;
+			flex-direction: column;
+			list-style-type: none;
+			gap: 1rem;
+
+			.group-name {
+				display: flex;
+				align-self: center;
+				margin-bottom: 0;
+			}
+		}
+	}
 }
 
 @media (max-width: 768px) {

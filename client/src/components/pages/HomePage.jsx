@@ -102,8 +102,8 @@ const HomePage = () => {
 				</button>
 			</section>
 
-			<section>
-				<h2>Your Groups:</h2>
+			<section className="group-list-container">
+				<h2 className="group-list-title">Your Groups:</h2>
 				<JoinedGroupList />
 				<button onClick={handleRedirectToGroupCreation}>
 					Create a new group

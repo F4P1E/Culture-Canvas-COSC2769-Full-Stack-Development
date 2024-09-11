@@ -42,10 +42,10 @@ const JoinedGroupList = () => {
 
 	return (
 		<div>
-			<ul>
+			<ul className="group-list">
 				{groups.map((group) => (
 					<li key={group._id}>
-						{group.name}
+						<p className="group-name">{group.name}</p>
 						&nbsp;&nbsp;
 						<button onClick={() => handleRedirectToViewGroup(group._id)}>
 							View Group
