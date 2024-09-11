@@ -88,11 +88,11 @@ const FriendList = () => {
 		<div>
 			{loading && <p>Loading...</p>}
 			{error && <p style={{ color: "red" }}>{error}</p>}
-			<ul>
+			<ul className="friend-list">
 				{/* Render the list of friends */}
 				{friends.map((friend) => (
 					<li key={friend._id}>
-						{friend.username}
+						<p className="friend-list-name">{friend.username}</p>
 						<br />
 						{/* Example buttons for adding, unfriending, accepting, and canceling friend requests */}
 						<button onClick={() => handleUnFriend(friend._id)}>Unfriend</button>

@@ -5,6 +5,7 @@ const router = express.Router();
 // Controller functions
 const {
 	getUsers,
+	suspendResumeUser,
 	loginUser,
 	signupUser,
 	viewFriendList,
@@ -19,6 +20,9 @@ const {
 
 // Get all users
 router.get("/user", getUsers);
+
+// Suspend user
+router.patch("/suspend/:id", suspendResumeUser);
 
 // Login
 router.post("/login", loginUser);

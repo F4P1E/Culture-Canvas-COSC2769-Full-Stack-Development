@@ -57,6 +57,8 @@ const FriendRequest = () => {
 		<div className="friend-request">
 			<h1>Friend Requests</h1>
 
+			{requests ? (requests.length > 0 ? null : <h2>No friend requests</h2>) : <p>No friend requests</p>}
+
 			<ul>
 				{requests.map(
 					(

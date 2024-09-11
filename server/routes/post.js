@@ -1,6 +1,7 @@
 const express = require("express");
 const {
 	createPost,
+	getAllPosts,
 	getPosts,
 	getGroupPosts,
 	getPostsFromSpecificUser,
@@ -21,6 +22,8 @@ const {
 const router = express.Router();
 
 router.get("/", getPosts);
+
+router.get("/all", getAllPosts);
 
 router.get("/group/:groupId", getGroupPosts);
 
@@ -50,6 +53,6 @@ router.get("/:id/comment", getPostComment);
 
 router.post("/:id/reaction", postReaction); //react to post
 
-router.post("/comment/:id/reaction", commentReaction); // react to comment
+router.post("/comment/:commentId/reaction", commentReaction); // react to comment
 
 module.exports = router;

@@ -32,6 +32,11 @@ const Login = () => {
 				body: JSON.stringify({ email, password }),
 				credentials: "include",
 			});
+
+			if (response.status === 403) {
+				throw new Error("Your account is suspended. Please contact support");
+			}
+
 			if (!response.ok) {
 				throw new Error("Login failed");
 			}

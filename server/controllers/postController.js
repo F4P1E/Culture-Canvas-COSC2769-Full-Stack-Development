@@ -86,7 +86,31 @@ const createPost = async (request, response) => {
 	}
 };
 
-// Get all posts
+// Get all available posts
+const getAllPosts = async (request, response) => {
+	const userId = request.user._id;
+
+	// Check if user is admin
+	const user = await userModel.findById(userId);
+	if (!user) {
+		return response.status(404).json({ error: "User not found" });
+	}
+
+	if (user.admin) {
+		// Get all posts, with a populated comment array
+		const posts = await postModel
+			.find()
+			.populate("comments")
+			.sort({ createdAt: -1 });
+
+		console.log(`Posts: ${posts}`);
+		return response.status(200).json(posts);
+	} else {
+		return response.status(403).json({ error: "User is not an admin" });
+	}
+};
+
+// Get all posts (output determined by some factors)
 const getPosts = async (request, response) => {
 	// // Shuffle posts array
 	// for (let i = posts.length - 1; i >= 0; i--) {
@@ -110,7 +134,7 @@ const getPosts = async (request, response) => {
 			// Find posts in the group
 			const { posts } = await groupModel.findById(groupId).populate({
 				path: "posts",
-				select: "-oldVersions",
+				// select: "-oldVersions",
 				options: { sort: { createdAt: -1 } },
 			});
 
@@ -122,15 +146,13 @@ const getPosts = async (request, response) => {
 							.find({ postId: post._id })
 							.sort({ createdAt: -1 })
 							.exec();
-						return { ...post._doc, comments };
+						return { ...post_doc, comments };
 					})
 				);
 				return response.status(200).json(postsWithComments);
 			} else {
 				return response.status(200).json(posts);
 			}
-
-			// response.status(200).json(posts);
 		} else {
 			// Find public posts or friends-only posts where the user is a friend of the post's author
 			const posts = await postModel
@@ -147,7 +169,7 @@ const getPosts = async (request, response) => {
 						},
 					],
 				})
-				.select("-oldVersions")
+				// .select("-oldVersions")
 				.sort({ createdAt: -1 })
 				.exec();
 
@@ -328,7 +350,7 @@ const createComment = async (request, response) => {
 
 // Delete comment
 const deleteComment = async (request, response) => {
-	const postId = request.params.postId;
+	const postId = request.params.id;
 	const commentId = request.params.commentId;
 
 	if (
@@ -480,8 +502,20 @@ const getCommentHistory = async (request, response) => {
 const postReaction = async (req, res) => {
 	try {
 		const postId = req.params.id;
-		const { reactionType } = req.body; // Reaction type (like, love, haha, angry)
+		const { reactionType } = req.body;
 		const userId = req.user._id;
+
+		// Log to check what is being sent in the request
+		console.log("Reaction type:", reactionType);
+		console.log("User ID:", userId);
+
+		// Validate reaction type
+		if (
+			reactionType &&
+			!["like", "love", "haha", "angry"].includes(reactionType)
+		) {
+			return res.status(400).json({ message: "Invalid reaction type" });
+		}
 
 		// Find the post
 		const post = await postModel.findById(postId);
@@ -489,55 +523,72 @@ const postReaction = async (req, res) => {
 			return res.status(404).json({ message: "Post not found" });
 		}
 
-		// Ensure the reactionType is valid based on the schema
-		if (!["like", "love", "haha", "angry"].includes(reactionType)) {
-			return res.status(400).json({ message: "Invalid reaction type" });
-		}
-
-		// Check if the user has already reacted with the given type
-		const hasReacted = post.reactions[reactionType].some(
-			(reaction) => reaction.user.toString() === userId.toString()
-		);
-
-		if (hasReacted) {
-			// Remove the user's reaction
-			post.reactions[reactionType] = post.reactions[reactionType].filter(
-				(reaction) => reaction.user.toString() !== userId.toString()
-			);
-		} else {
-			// Remove the user from any previous reactions
+		// Function to remove the user from any previous reactions
+		const removeUserReactions = () => {
 			Object.keys(post.reactions).forEach((key) => {
 				post.reactions[key] = post.reactions[key].filter(
 					(reaction) => reaction.user.toString() !== userId.toString()
 				);
 			});
+		};
 
-			// Add the user to the new reaction type
-			post.reactions[reactionType].push({ user: userId });
+		if (reactionType === null) {
+			// Remove the user's reaction
+			removeUserReactions();
+		} else {
+			// Check if the user has already reacted with the given type
+			const hasReacted = post.reactions[reactionType].some(
+				(reaction) => reaction.user.toString() === userId.toString()
+			);
+
+			if (hasReacted) {
+				// If the user has already reacted with this type, remove the reaction
+				post.reactions[reactionType] = post.reactions[reactionType].filter(
+					(reaction) => reaction.user.toString() !== userId.toString()
+				);
+			} else {
+				// Remove the user's previous reaction and add the new reaction
+				removeUserReactions();
+				post.reactions[reactionType].push({ user: userId });
+			}
 		}
 
 		// Update reactionCount by counting all reactions across types
-		const totalReactions = Object.values(post.reactions).reduce(
+		post.reactionCount = Object.values(post.reactions).reduce(
 			(acc, reactionArray) => acc + reactionArray.length,
 			0
 		);
-		post.reactionCount = totalReactions;
 
+		// Save the post with updated reactions
 		await post.save();
 
 		// Populate user details in reactions
-		const populatedPost = await postModel
-			.findById(postId)
-			.populate("reactions.like.user")
-			.populate("reactions.love.user")
-			.populate("reactions.haha.user")
-			.populate("reactions.angry.user");
+		const populatedPost = await postModel.findById(postId).populate({
+			path: "reactions.like.user reactions.love.user reactions.haha.user reactions.angry.user",
+		});
 
 		// Return the updated post with populated user details
 		res.json({
 			message: "Reaction updated",
 			reactionCount: populatedPost.reactionCount,
-			reactions: populatedPost.reactions,
+			reactions: {
+				like: populatedPost.reactions.like.map((reaction) => ({
+					user: reaction.user.username,
+					_id: reaction._id,
+				})),
+				love: populatedPost.reactions.love.map((reaction) => ({
+					user: reaction.user.username,
+					_id: reaction._id,
+				})),
+				haha: populatedPost.reactions.haha.map((reaction) => ({
+					user: reaction.user.username,
+					_id: reaction._id,
+				})),
+				angry: populatedPost.reactions.angry.map((reaction) => ({
+					user: reaction.user.username,
+					_id: reaction._id,
+				})),
+			},
 		});
 	} catch (error) {
 		console.error("Failed to update reaction:", error);
@@ -546,60 +597,102 @@ const postReaction = async (req, res) => {
 };
 
 // Add reaction to a comment
-const commentReaction = async (request, response) => {
-	const { postId, commentId } = request.params;
-	const { reactionType } = request.body;
-	const userId = request.user._id;
-
-	if (
-		!mongoose.isValidObjectId(postId) ||
-		!mongoose.isValidObjectId(commentId)
-	) {
-		return response.status(404).json({ error: "Incorrect ID" });
-	}
-
-	if (!reactionType) {
-		return response.status(400).json({ error: "Reaction type is required" });
-	}
-
+const commentReaction = async (req, res) => {
 	try {
-		const comment = await commentModel.findById(commentId);
+		const commentId = req.params.commentId;
+		const { reactionType } = req.body;
+		const userId = req.user._id;
 
-		if (!comment) {
-			return response.status(404).json({ error: "No such comment" });
+		// Validate reaction type
+		if (
+			reactionType &&
+			!["like", "love", "haha", "angry"].includes(reactionType)
+		) {
+			return res.status(400).json({ message: "Invalid reaction type" });
 		}
 
-		// Check if user already reacted
-		const existingReaction = comment.reactions.find(
-			(r) => r.userId.toString() === userId.toString()
+		// Find the comment
+		const comment = await commentModel.findById(commentId);
+		if (!comment) {
+			return res.status(404).json({ message: "Comment not found" });
+		}
+
+		// Function to remove the user from any previous reactions
+		const removeUserReactions = () => {
+			Object.keys(comment.reactions).forEach((key) => {
+				comment.reactions[key] = comment.reactions[key].filter(
+					(reaction) => reaction.user.toString() !== userId.toString()
+				);
+			});
+		};
+
+		if (reactionType === null) {
+			// Remove the user's reaction
+			removeUserReactions();
+		} else {
+			// Check if the user has already reacted with the given type
+			const hasReacted = comment.reactions[reactionType].some(
+				(reaction) => reaction.user.toString() === userId.toString()
+			);
+
+			if (hasReacted) {
+				// If the user has already reacted with this type, remove the reaction
+				comment.reactions[reactionType] = comment.reactions[
+					reactionType
+				].filter((reaction) => reaction.user.toString() !== userId.toString());
+			} else {
+				// Remove the user's previous reaction and add the new reaction
+				removeUserReactions();
+				comment.reactions[reactionType].push({ user: userId });
+			}
+		}
+
+		// Update reactionCount by counting all reactions across types
+		comment.reactionCount = Object.values(comment.reactions).reduce(
+			(acc, reactionArray) => acc + reactionArray.length,
+			0
 		);
 
-		if (existingReaction) {
-			// Update existing reaction
-			existingReaction.reactionType = reactionType;
-		} else {
-			// Add new reaction
-			comment.reactions.push({ userId, reactionType });
-		}
-
-		comment.reactionCount = comment.reactions.length;
+		// Save the comment with updated reactions
 		await comment.save();
 
-		// Optionally update the post's comment reactions count
-		await postModel.findByIdAndUpdate(
-			postId,
-			{ $inc: { commentReactionCount: 1 } },
-			{ new: true }
-		);
+		// Populate user details in reactions
+		const populatedComment = await commentModel.findById(commentId).populate({
+			path: "reactions.like.user reactions.love.user reactions.haha.user reactions.angry.user",
+		});
 
-		response.status(200).json(comment);
+		// Return the updated comment with populated user details
+		res.json({
+			message: "Reaction updated",
+			reactionCount: populatedComment.reactionCount,
+			reactions: {
+				like: populatedComment.reactions.like.map((reaction) => ({
+					user: reaction.user.username,
+					_id: reaction._id,
+				})),
+				love: populatedComment.reactions.love.map((reaction) => ({
+					user: reaction.user.username,
+					_id: reaction._id,
+				})),
+				haha: populatedComment.reactions.haha.map((reaction) => ({
+					user: reaction.user.username,
+					_id: reaction._id,
+				})),
+				angry: populatedComment.reactions.angry.map((reaction) => ({
+					user: reaction.user.username,
+					_id: reaction._id,
+				})),
+			},
+		});
 	} catch (error) {
-		response.status(500).json({ error: "Internal server error" });
+		console.error("Failed to update reaction:", error);
+		res.status(500).json({ message: "Server error" });
 	}
 };
 
 module.exports = {
 	createPost,
+	getAllPosts,
 	getPosts,
 	getGroupPosts,
 	getPostsFromSpecificUser,

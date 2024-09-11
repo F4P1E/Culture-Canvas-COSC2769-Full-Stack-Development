@@ -263,9 +263,6 @@ const GroupAdmin = () => {
 
   // Handle removing a comment from a specific post
   const handleRemoveComment = async (postId, commentId) => {
-    console.log(`Selected group ID: ${selectedGroupId}`);
-    console.log(`Selected post ID: ${postId}`);
-    console.log(`Selected comment ID: ${commentId}`);
     if (selectedGroupId && postId && commentId) {
       try {
         const response = await fetch(

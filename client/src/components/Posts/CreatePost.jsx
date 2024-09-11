@@ -1,3 +1,6 @@
+// SCSS
+import "../styles/CreatePost.scss";
+
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addPost } from "../../slices/postSlice";
@@ -63,10 +66,8 @@ const CreatePost = (groupIdRaw) => {
 	return (
 		<div className="create-post">
 			{error && <p className="error">{error}</p>}
-			<form onSubmit={handleSubmit}>
+			<form className="create-post-form" onSubmit={handleSubmit}>
 				<div>
-					<label htmlFor="content">Content:</label>
-					<br />
 					<textarea
 						rows="4"
 						cols="50"
@@ -77,7 +78,7 @@ const CreatePost = (groupIdRaw) => {
 						required
 					/>
 				</div>
-				<div>
+				<div className="visibility-select">
 					<label htmlFor="visibility">Visibility: </label>
 					<select
 						id="visibility"

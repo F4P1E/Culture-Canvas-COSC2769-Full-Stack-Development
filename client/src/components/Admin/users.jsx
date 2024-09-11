@@ -17,19 +17,29 @@ function Users() {
 	}, []);
 
 	// Function to handle user deletion
-	const deleteUser = (userId) => {
-		fetch(`http://localhost:8000/user/${userId}`, {
-			method: "DELETE",
+	const toggleSuspendUser = async (userId) => {
+		const response = await fetch(`http://localhost:8000/suspend/${userId}`, {
+			method: "PATCH",
 			credentials: "include",
-		})
-			.then((response) => {
-				if (response.ok) {
-					setUsers(users.filter((user) => user._id !== userId));
-				} else {
-					alert("Failed to delete the user.");
-				}
-			})
-			.catch((error) => console.error("Failed to delete user:", error));
+		});
+
+		if (!response.ok) {
+			throw new Error("Failed to suspend user. Please try again later.");
+		}
+
+		try {
+			const data = await response.json();
+
+			if (data.message == "User suspended successfully") {
+				alert("User suspended successfully");
+				window.location.reload();
+			} else {
+				alert("User resumed successfully");
+				window.location.reload();
+			}
+		} catch (error) {
+			console.error("Failed to suspend user:", error);
+		}
 	};
 
 	return (
@@ -38,11 +48,14 @@ function Users() {
 			{users.map((user, index) => (
 				<div key={user._id}>
 					<span>{user.username}</span>
-					<button onClick={() => deleteUser(user._id)}>Delete</button>
+					{user.suspended ? (
+						<button onClick={() => toggleSuspendUser(user._id)}>Resume</button>
+					) : (
+						<button onClick={() => toggleSuspendUser(user._id)}>Suspend</button>
+					)}
 				</div>
 			))}
 		</div>
 	);
 }
-
 export default Users;

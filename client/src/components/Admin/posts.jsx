@@ -1,49 +1,125 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setPosts, getComments, deleteComment } from "../../slices/postSlice";
 
 function Posts() {
-    const [posts, setPosts] = useState([]); 
+	const dispatch = useDispatch();
+	const { posts } = useSelector((state) => state.posts);
+	const comments = useSelector((state) => state.posts.comments);
 
-    // Fetch posts from the backend
-    useEffect(() => {
-        fetch('http://localhost:8000/post', {
-            credentials: 'include',
-        })
-            .then(response => response.json())
-            .then(data => {
-                const postsArray = Array.isArray(data) ? data : [data];
-                setPosts(postsArray);
-            })
-            .catch(error => console.error('Failed to fetch posts:', error));
-    }, []);
+    const [selectedPostId, setPostId] = useState(null);
+    const [selectedCommentId, setCommentId] = useState(null);
 
-    // Function to handle post deletion
-    const deletePost = (postId) => {
-        fetch(`http://localhost:8000/post/${postId}`, {
-            method: 'DELETE',
-            credentials: 'include',
-        })
-            .then(response => {
-                if (response.ok) {
-                    setPosts(posts.filter(post => post._id !== postId));
-                } else {
-                    alert('Failed to delete the post.');
-                }
-            })
-            .catch(error => console.error('Failed to delete post:', error));
-    };
+	// Fetch posts from the backend
+	useEffect(() => {
+		const fetchPosts = async () => {
+			try {
+				const response = await fetch("http://localhost:8000/post/all", {
+					method: "GET",
+					credentials: "include",
+				});
 
-    return (
-        <div>
-            <h1>Posts Management</h1>
-            {posts.map((post, index) => (
-                <div key={post._id}>
-                    <h4>{post.title}</h4>
-                    <p>{post.content.length > 100 ? `${post.content.substring(0, 100)}...` : post.content}</p>
-                    <button onClick={() => deletePost(post._id)}>Delete</button>
-                </div>
-            ))}
-        </div>
-    );
+				if (!response.ok) {
+					throw new Error("Failed to fetch posts. Please try again later.");
+				}
+
+				const data = await response.json();
+
+				dispatch(setPosts(data));
+				dispatch(getComments(data));
+
+                console.log("comments fetched:", data);
+			} catch (err) {
+				console.error("Failed to fetch posts:", err);
+				// dispatch(setError({ error: err.message })); // Dispatch error to Redux store.
+			}
+		};
+
+		fetchPosts(); // Call the fetch function on component mount.
+	}, [dispatch]);
+
+	// Function to handle post deletion
+	const handleDeletePost = (postId) => {
+		fetch(`http://localhost:8000/post/${postId}`, {
+			method: "DELETE",
+			credentials: "include",
+		})
+			.then((response) => {
+				if (response.ok) {
+					setPosts(posts.filter((post) => post._id !== postId));
+					alert("Post deleted successfully");
+					window.location.reload();
+				} else {
+					alert("Failed to delete the post.");
+				}
+			})
+			.catch((error) => console.error("Failed to delete post:", error));
+	};
+
+	const handleRemoveComment = async (postId, commentId) => {
+		console.log(postId, commentId);
+
+		try {
+			const response = await fetch(
+				`http://localhost:8000/post/${postId}/comment/${commentId}`,
+				{
+					method: "DELETE",
+					credentials: "include",
+				}
+			);
+
+			if (!response.ok) {
+				throw new Error("Failed to delete comment");
+			}
+
+            setPostId(postId);
+            setCommentId(commentId);
+
+            setPosts(comments.filter((comment) => comment._id !== selectedCommentId));
+
+			console.log(comments);
+
+			alert("Comment deleted successfully");
+			window.location.reload();
+		} catch (error) {
+			console.error("Error deleting comment:", error);
+		}
+	};
+
+	return (
+		<div>
+			<h1>Posts Management</h1>
+
+			<ul>
+				{posts.map((post) => (
+					<li key={post._id}>
+						<div>
+							<div>{post.content}</div>
+
+							<button onClick={() => handleDeletePost(post._id)}>
+								Delete Post
+							</button>
+						</div>
+						<br />
+						<ul>
+							{post.comments.map((comment) => (
+								<li key={comment._id}>
+									{comment.content}
+
+									<button
+										onClick={() => handleRemoveComment(post._id, comment._id)}
+									>
+										Delete Comment
+									</button>
+									<br />
+								</li>
+							))}
+						</ul>
+					</li>
+				))}
+			</ul>
+		</div>
+	);
 }
 
 export default Posts;

@@ -35,8 +35,9 @@ function Groups() {
             <h1>Group List</h1>
             {groups.map((group, index) => (
                 <div key={index}>
+                    <br />
                     <span>{group.name} - Admin: {group.admin}</span>
-                    <button onClick={() => deleteGroup(group._id)}>Delete</button>
+                    <br />
                 </div>
             ))}
         </div>

@@ -5,13 +5,64 @@ const mongoose = require("mongoose");
 const getUsers = async (request, response) => {
 	try {
 		const users = await userModel.find({}).exec();
-		console.log(`Users: ${users}`);
 
 		response.status(200).json(users);
 	} catch (error) {
 		response
 			.status(500)
 			.json({ status: "error", message: "Failed to retrieve posts" });
+	}
+};
+
+const suspendResumeUser = async (request, response) => {
+	const suspendId = request.params.id;
+	const userId = request.user._id;
+
+	try {
+		const suspendUser = await userModel.findById(suspendId);
+		if (!suspendUser) {
+			return response.status(404).json({ error: "User not found" });
+		}
+
+		const user = await userModel.findById(userId);
+
+		// Check if user is an admin
+		if (!user.admin) {
+			return response
+				.status(403)
+				.json({ error: "Only admins can suspend users" });
+		}
+
+		// Check if the suspendId is yourself
+		if (suspendUser === user) {
+			return response
+				.status(403)
+				.json({ error: "You cannot suspend yourself" });
+		}
+
+		// Check if the suspendId is of an admin
+		if (suspendUser.admin) {
+			return response
+				.status(403)
+				.json({ error: "You cannot suspend an admin" });
+		}
+
+		// Check if the suspendId is suspended
+		if (suspendUser.suspended) {
+			// Unsuspend the user
+			suspendUser.suspended = false;
+			await suspendUser.save();
+
+			response.status(200).json({ message: "User resumed successfully" });
+		} else {
+			// Suspend the user
+			suspendUser.suspended = true;
+			await suspendUser.save();
+
+			response.status(200).json({ message: "User suspended successfully" });
+		}
+	} catch (error) {
+		response.status(500).json({ error: "Internal server error" });
 	}
 };
 
@@ -22,6 +73,12 @@ const loginUser = async (request, response) => {
 	console.log(
 		`- id: ${user._id}\n- username: ${user.username}\n- email: ${email}\n`
 	);
+
+	// Check if user is suspended
+	if (user.suspended) {
+		response.status(403).json({ error: "User is suspended" });
+		return;
+	}
 
 	try {
 		const user = await userModel.login(email, password);
@@ -251,6 +308,7 @@ const getStrangers = async (request, response) => {
 
 module.exports = {
 	getUsers,
+	suspendResumeUser,
 	loginUser,
 	signupUser,
 	viewFriendList,

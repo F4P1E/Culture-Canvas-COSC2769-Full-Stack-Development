@@ -1,3 +1,6 @@
+// SCSS
+import "../styles/PostHistory.scss";
+
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setPostHistory } from "../../slices/postSlice";
@@ -36,17 +39,20 @@ const PostHistory = () => {
 	}, [dispatch, postId]);
 
 	return (
-		<div>
+		<div className="post-history">
 			<h1>Post History</h1>
-			<ul>
-				{postHistory.map((post) => (
-					<li key={post._id}>
-						<p>Version: {post.version}</p>
-						<p>Post: {post.content}</p>
-                        <br />
-					</li>
-				))}
-			</ul>
+			<div className="post-history-container">
+				<ul>
+					{postHistory.map((post) => (
+						<li className="post-history-item" key={post._id}>
+							<span className="post-history-info">
+								<p>● Version: {post.version}</p>
+								<p>&nbsp; ◽ Post: {post.content}</p>
+							</span>
+						</li>
+					))}
+				</ul>
+			</div>
 		</div>
 	);
 };
