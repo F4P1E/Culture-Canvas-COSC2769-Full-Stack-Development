@@ -79,7 +79,8 @@ const CreatePost = (groupIdRaw) => {
 					/>
 				</div>
 				<div className="visibility-select">
-					<label htmlFor="visibility">Visibility: </label>
+					<label htmlFor="visibility"><strong>Visibility: </strong></label>
+					&nbsp;&nbsp;
 					<select
 						id="visibility"
 						value={visibility}
