@@ -63,19 +63,6 @@ const commentSchema = new Schema(
 	{ timestamps: true }
 );
 
-// Ensure that reactions can be an empty array
-// commentSchema.path("reactions").validate(function (value) {
-// 	return (
-// 		typeof value === "object" &&
-// 		["like", "love", "haha", "angry"].every((reactionType) => {
-// 			return (
-// 				Array.isArray(value[reactionType]) &&
-// 				value[reactionType].every((reaction) => reaction.userId)
-// 			);
-// 		})
-// 	);
-// }, "Invalid reaction format");
-
 commentSchema.pre(["updateOne", "findOneAndUpdate"], async function (next) {
 	const update = this.getUpdate();
 	const filter = this.getFilter();

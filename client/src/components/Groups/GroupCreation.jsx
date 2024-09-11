@@ -16,7 +16,6 @@ const GroupCreation = () => {
 		}
 
 		try {
-			// Make the API request to create a group
 			const response = await fetch("http://localhost:8000/group/create", {
 				method: "POST",
 				headers: {

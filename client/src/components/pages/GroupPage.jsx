@@ -15,7 +15,6 @@ const GroupPage = () => {
 	const { groupId } = useParams();
 	const { groupInfo, memberInfo } = useSelector((state) => state.groups);
 	const userId = useSelector((state) => state.auth.user._id);
-	// const memberInfo = useSelector((state) => state.groups.memberInfo);
 
 	// useEffect to fetch group data when the component mounts or ID/token changes.
 	useEffect(() => {
@@ -36,7 +35,6 @@ const GroupPage = () => {
 
 				const data = await response.json();
 
-				// Check if data has the expected structure
 				if (data && data.members && Array.isArray(data.members)) {
 					dispatch(fetchOneGroupInfo(data));
 				} else {

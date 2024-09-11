@@ -29,11 +29,10 @@ function Posts() {
 				dispatch(getComments(data));
 			} catch (err) {
 				console.error("Failed to fetch posts:", err);
-				// dispatch(setError({ error: err.message })); // Dispatch error to Redux store.
 			}
 		};
 
-		fetchPosts(); // Call the fetch function on component mount.
+		fetchPosts();
 	}, [dispatch]);
 
 	// Function to handle post deletion

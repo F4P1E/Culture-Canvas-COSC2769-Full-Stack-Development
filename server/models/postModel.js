@@ -22,7 +22,7 @@ const postModel = new Schema(
 			required: true,
 		},
 		content: {
-			type: Schema.Types.Mixed, // Allows String or Buffer
+			type: Schema.Types.Mixed,
 			required: true,
 		},
 		reactionCount: {

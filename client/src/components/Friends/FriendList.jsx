@@ -1,9 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-	viewFriendList,
-	unFriend,
-} from "../../slices/friendSlice";
+import { viewFriendList, unFriend } from "../../slices/friendSlice";
 
 const FriendList = () => {
 	const dispatch = useDispatch();
@@ -29,18 +26,14 @@ const FriendList = () => {
 					}
 				);
 
-				// Check if the response is ok (status in the range 200-299)
 				if (!response.ok) {
 					throw new Error("Network response was not ok");
 				}
 
-				// Parse the response JSON
 				const data = await response.json();
 
-				// Update the state with the fetched friends data
 				dispatch(viewFriendList(data));
 			} catch (error) {
-				// Handle errors (e.g., network issues, invalid responses)
 				console.error("Failed to fetch friends:", error);
 			}
 		};
@@ -49,14 +42,12 @@ const FriendList = () => {
 		if (userId) {
 			fetchFriends();
 		}
-	}, [userId]); // Dependencies array: runs the effect if userId changes
+	}, [userId]);
 
-	// Function to handle unfriending a friend
 	// Function to handle unfriending a friend
 	const handleUnFriend = (friendId) => {
 		const deleteFriend = async () => {
 			try {
-				// Send DELETE request to the server to unfriend the user
 				const response = await fetch(
 					`http://localhost:8000/friend/${friendId}`,
 					{
@@ -65,12 +56,10 @@ const FriendList = () => {
 					}
 				);
 
-				// Check if the response is ok
 				if (!response.ok) {
 					throw new Error("Failed to unfriend");
 				}
 
-				// Dispatch the unFriend action to update the Redux store
 				dispatch(unFriend(friendId));
 			} catch (error) {
 				// Handle any errors

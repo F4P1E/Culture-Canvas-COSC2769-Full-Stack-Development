@@ -16,7 +16,7 @@ const GroupCreationRequest = () => {
         const response = await fetch("http://localhost:8000/group/create/requests", {
             method: "GET",
             credentials: 'include',
-        }); // Fetch group creation requests (assuming your API endpoint is set up this way)
+        }); // Fetch group creation requests
         const data = await response.json();
         if (response.ok) {
           dispatch(setRequests(data)); // Update Redux state with the fetched requests

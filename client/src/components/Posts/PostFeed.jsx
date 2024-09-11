@@ -36,23 +36,23 @@ const PostFeed = (groupIdRaw) => {
 
 				const data = await response.json();
 
-				dispatch(setPosts(data)); // Dispatch action to set posts in Redux store.
+				dispatch(setPosts(data));
 			} catch (err) {
-				dispatch(setError({ error: err.message })); // Dispatch error to Redux store.
+				dispatch(setError({ error: err.message }));
 			} finally {
-				dispatch(setLoading({ isLoading: false })); // Turn off loading state.
+				dispatch(setLoading({ isLoading: false }));
 			}
 		};
 
-		fetchPosts(); // Call the fetch function on component mount.
+		fetchPosts();
 	}, [dispatch]);
 
 	if (isLoading) {
-		return <div>Loading posts...</div>; // Show loading indicator.
+		return <div>Loading posts...</div>;
 	}
 
 	if (error) {
-		return <div>Error: {error}</div>; // Show error message.
+		return <div>Error: {error}</div>;
 	}
 
 	return (

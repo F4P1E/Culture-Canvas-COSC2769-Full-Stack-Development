@@ -24,8 +24,8 @@ const UnjoinedGroupList = () => {
 					throw new Error("Network response was not ok");
 				}
 
-				const data = await response.json(); // Parse the response data
-				dispatch(setGroups(data)); // Update Redux store with fetched groups
+				const data = await response.json();
+				dispatch(setGroups(data));
 			} catch (err) {
 				console.error("Failed to fetch groups:", err);
 			}
@@ -51,9 +51,9 @@ const UnjoinedGroupList = () => {
 				throw new Error("Network response was not ok");
 			}
 
-			const data = await response.json(); // Parse the response data
-			dispatch(requestJoinGroup(data)); // Update Redux store with fetched groups
-
+			const data = await response.json();
+			dispatch(requestJoinGroup(data));
+ 
 			alert("Join request sent!"); // Show confirmation
 		} catch (err) {
 			console.error("Failed to send join request:", err);

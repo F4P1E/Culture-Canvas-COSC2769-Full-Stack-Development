@@ -30,8 +30,6 @@ const GroupAdmin = () => {
 
 	const { posts, isLoading, error } = useSelector((state) => state.posts);
 
-	const currentGroupId = useSelector((state) => state.groups.currentGroupId);
-
 	// Fetch groups when the component mounts
 	useEffect(() => {
 		const fetchGroups = async () => {
@@ -156,11 +154,10 @@ const GroupAdmin = () => {
 				}
 			} catch (err) {
 				console.error("Failed to fetch posts:", err);
-				// dispatch(setError({ error: err.message })); // Dispatch error to Redux store.
 			}
 		};
 
-		fetchPosts(); // Call the fetch function on component mount.
+		fetchPosts();
 	}, [selectedGroupId, dispatch]);
 
 	const handleApproveJoinRequest = (requestId) => {
@@ -185,7 +182,6 @@ const GroupAdmin = () => {
 				alert("Request approved successfully");
 				window.location.reload();
 			} catch (error) {
-				// Handle any errors
 				console.error("Network error:", error);
 			}
 		};
@@ -209,7 +205,6 @@ const GroupAdmin = () => {
 					}
 				);
 
-				// Check if the response is ok
 				if (!response.ok) {
 					throw new Error("Failed to remove this member");
 				}
