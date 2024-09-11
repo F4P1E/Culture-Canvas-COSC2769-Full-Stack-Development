@@ -2,7 +2,16 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 // Importing Redux library for persisting state.
-import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
+import {
+	persistStore,
+	persistReducer,
+	FLUSH,
+	REHYDRATE,
+	PAUSE,
+	PERSIST,
+	PURGE,
+	REGISTER,
+} from "redux-persist";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
 import { combineReducers } from "redux";
 
@@ -35,7 +44,7 @@ const store = configureStore({
 		getDefaultMiddleware({
 			serializableCheck: {
 				// Ignore actions with these action types
-				ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
+				ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
 			},
 		}),
 });

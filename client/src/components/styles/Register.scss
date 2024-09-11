@@ -6,59 +6,59 @@ $button-text-color: #fff;
 $error-text-color: #f44336;
 
 .register-form {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 2rem;
-    background-color: $form-bg-color;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	max-width: 400px;
+	margin: 0 auto;
+	padding: 2rem;
+	background-color: $form-bg-color;
+	border-radius: 8px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-    h1 {
-        font-size: 28px;
+	h1 {
+		font-size: 28px;
 		font-weight: bold;
 		color: #1877f2;
 		margin-bottom: 20px;
-        text-align: center;
-    }
+		text-align: center;
+	}
 
-    input {
-        width: 100%;
-        padding: 0.75rem;
-        margin-bottom: 1rem;
-        border: 1px solid $input-border-color;
-        border-radius: 4px;
-        font-size: 1rem;
+	input {
+		width: 100%;
+		padding: 0.75rem;
+		margin-bottom: 1rem;
+		border: 1px solid $input-border-color;
+		border-radius: 4px;
+		font-size: 1rem;
 
-        &:focus {
-            border-color: $button-bg-color;
-            outline: none;
-        }
-    }
+		&:focus {
+			border-color: $button-bg-color;
+			outline: none;
+		}
+	}
 
-    button {
-        width: 100%;
-        padding: 0.75rem;
-        border: none;
-        border-radius: 4px;
-        background-color: $button-bg-color;
-        color: $button-text-color;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
+	button {
+		width: 100%;
+		padding: 0.75rem;
+		border: none;
+		border-radius: 4px;
+		background-color: $button-bg-color;
+		color: $button-text-color;
+		font-size: 1rem;
+		cursor: pointer;
+		transition: background-color 0.3s ease;
 
-        &:hover {
-            background-color: darken($button-bg-color, 10%);
-        }
+		&:hover {
+			background-color: darken($button-bg-color, 10%);
+		}
 
-        &:disabled {
-            background-color: #ddd;
-            cursor: not-allowed;
-        }
-    }
+		&:disabled {
+			background-color: #ddd;
+			cursor: not-allowed;
+		}
+	}
 
-    p {
-        color: $error-text-color;
-        text-align: center;
-        margin: 1rem 0;
-    }
+	p {
+		color: $error-text-color;
+		text-align: center;
+		margin: 1rem 0;
+	}
 }

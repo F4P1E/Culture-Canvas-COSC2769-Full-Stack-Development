@@ -99,7 +99,9 @@ const CreatePost = (groupIdRaw) => {
 					</select>
 				</div>
 				<br />
-				<button type="submit" className="create-post-button">Create Post</button>
+				<button type="submit" className="create-post-button">
+					Create Post
+				</button>
 			</form>
 			<br />
 		</div>

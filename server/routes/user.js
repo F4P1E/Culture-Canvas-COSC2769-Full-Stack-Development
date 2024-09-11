@@ -17,7 +17,6 @@ const {
 	unFriend,
 } = require("../controllers/userController");
 
-
 // Get all users
 router.get("/user", getUsers);
 

@@ -1,48 +1,48 @@
 .unjoined-group-list {
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rbga(0, 0, 0, 0.1);
+	padding: 20px;
+	background-color: #f9f9f9;
+	border-radius: 8px;
+	box-shadow: 0 4px 8px rbga(0, 0, 0, 0.1);
 
-    h2 {
-        font-size: 1.8rem;
-        color: #333;
-        margin-bottom: 15px;
-    }
+	h2 {
+		font-size: 1.8rem;
+		color: #333;
+		margin-bottom: 15px;
+	}
 
-    ul {
-        list-style-type: none;
-        padding: 0;
+	ul {
+		list-style-type: none;
+		padding: 0;
 
-        li {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+		li {
+			background-color: #fff;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			padding: 10px;
+			margin-bottom: 10px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
 
-            p {
-                margin: 0;
-                font-size: 1rem;
-                color: #555;
-            }
+			p {
+				margin: 0;
+				font-size: 1rem;
+				color: #555;
+			}
 
-            button {
-                background-color: #ff6600;
-                color: #fff;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 0.9rem;
+			button {
+				background-color: #ff6600;
+				color: #fff;
+				border: none;
+				padding: 8px 16px;
+				border-radius: 4px;
+				cursor: pointer;
+				font-size: 0.9rem;
 
-                &:hover {
-                    background-color: #cc5200;
-                }
-            }
-        }
-    }
+				&:hover {
+					background-color: #cc5200;
+				}
+			}
+		}
+	}
 }

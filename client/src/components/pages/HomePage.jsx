@@ -30,7 +30,7 @@ const HomePage = () => {
 	const handleRedirectToPostFeed = (e) => {
 		e.preventDefault();
 		navigate("/feed");
-	}
+	};
 
 	const handleRedirectToFriendRequests = (e) => {
 		e.preventDefault();
@@ -49,8 +49,8 @@ const HomePage = () => {
 
 	const handleRedirectToGroupCreation = (e) => {
 		e.preventDefault();
-		navigate("/groupcreation")
-	}
+		navigate("/groupcreation");
+	};
 
 	const handleLogout = async (e) => {
 		try {
@@ -64,7 +64,7 @@ const HomePage = () => {
 			if (!response.ok) {
 				throw new Error("Logout failed");
 			}
-      
+
 			dispatch(setLogout());
 			setUser(null);
 
@@ -93,30 +93,39 @@ const HomePage = () => {
 			</section>
 
 			<section>
-			<button onClick={handleRedirect}>See more people</button>
+				<button onClick={handleRedirect}>See more people</button>
 			</section>
 			<br />
 			<section>
-			<button onClick={handleRedirectToFriendRequests}>View Friend Request</button>
+				<button onClick={handleRedirectToFriendRequests}>
+					View Friend Request
+				</button>
 			</section>
 
 			<section>
 				<h2>Your Groups:</h2>
 				<JoinedGroupList />
-				<button onClick={handleRedirectToGroupCreation}>Create a new group</button>
+				<button onClick={handleRedirectToGroupCreation}>
+					Create a new group
+				</button>
 			</section>
 
 			<br />
-			<button className="see-new-groups" onClick={handleRedirectToMoreGroups}>See new groups</button>
+			<button className="see-new-groups" onClick={handleRedirectToMoreGroups}>
+				See new groups
+			</button>
 			<br />
-			
 
 			<br />
-			<button className="see-your-groups" onClick={handleRedirectToGroupsAdmin}>See your groups</button>
+			<button className="see-your-groups" onClick={handleRedirectToGroupsAdmin}>
+				See your groups
+			</button>
 			<br />
-			
+
 			<br />
-			<button className="logout-button" onClick={handleLogout}>Logout</button>
+			<button className="logout-button" onClick={handleLogout}>
+				Logout
+			</button>
 		</div>
 	);
 };

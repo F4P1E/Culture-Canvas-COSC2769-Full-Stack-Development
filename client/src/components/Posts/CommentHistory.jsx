@@ -43,7 +43,7 @@ const CommentHistory = () => {
 					<li key={comment._id}>
 						<p>Version: {comment.version}</p>
 						<p>Comment: {comment.content}</p>
-                        <br />
+						<br />
 					</li>
 				))}
 			</ul>

@@ -71,10 +71,10 @@ const GroupPage = () => {
 
 			<h2>Post something...</h2>
 			<div className="post-section">
-			<CreatePost groupId={groupId} />
-			<PostFeed groupId={groupId} />
-			{/* Render PostFeed with group's posts. */}
-		</div>
+				<CreatePost groupId={groupId} />
+				<PostFeed groupId={groupId} />
+				{/* Render PostFeed with group's posts. */}
+			</div>
 		</div>
 	);
 };

@@ -1,9 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-	viewStrangersList,
-	addFriend,
-} from "../../slices/friendSlice";
+import { viewStrangersList, addFriend } from "../../slices/friendSlice";
 
 const StrangerList = () => {
 	const dispatch = useDispatch();
@@ -43,7 +40,7 @@ const StrangerList = () => {
 
 	const handleAddFriend = (strangerId) => {
 		console.log(`Stranger ID: ${strangerId}`);
-		
+
 		const makeFriend = async () => {
 			try {
 				const response = await fetch(
@@ -53,7 +50,7 @@ const StrangerList = () => {
 						credentials: "include",
 					}
 				);
-				
+
 				if (!response.ok) {
 					alert("Already sent a friend request!");
 					throw new Error("Failed to send friend request");
@@ -80,7 +77,10 @@ const StrangerList = () => {
 				{strangers.map((stranger) => (
 					<li className="stranger-item" key={stranger._id}>
 						<p className="stranger-info">{stranger.username}&nbsp;&nbsp;</p>
-						<button className="stranger-buttons" onClick={() => handleAddFriend(stranger._id)}>
+						<button
+							className="stranger-buttons"
+							onClick={() => handleAddFriend(stranger._id)}
+						>
 							Add Friend
 						</button>
 					</li>
