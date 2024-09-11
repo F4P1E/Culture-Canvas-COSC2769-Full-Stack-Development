@@ -111,9 +111,11 @@ Group-Assigment-Social-Network/
 - If not exist, create a `.env` in `/server` file with the following content:
 
 ```js
-PORT="8000"
-MONGO_URI="mongodb+srv://Singani:singani1530@groupproject.m8wl1tq.mongodb.net/?retryWrites=true&w=majority&appName=GroupProject"
-SECRET="CrystalCrusherisbetterthanCodependenceeventhoughitisharderchangemymindlmaooo"
+PORT = "8000";
+MONGO_URI =
+	"mongodb+srv://Singani:singani1530@groupproject.m8wl1tq.mongodb.net/?retryWrites=true&w=majority&appName=GroupProject";
+SECRET =
+	"CrystalCrusherisbetterthanCodependenceeventhoughitisharderchangemymindlmaooo";
 ```
 
 ## Usage
@@ -167,4 +169,12 @@ Disassemble/*-+1239876
 
 ## Contribution
 
-(Contribution here)
+<!-- Make a markdown table -->
+
+| Name             | Contribution Score |
+| ---------------- | ------------------ |
+| Nguyen Bao Thinh | 5                  |
+| Duong Phu Dong   | 5                  |
+| Ly Minh Phuc     | 5                  |
+| Nguyen Hai Lam   | 5                  |
+| Du Tuan Vu       | 5                  |
