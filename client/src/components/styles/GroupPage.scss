@@ -42,6 +42,23 @@
 				border-bottom: none;
 			}
 		}
+
+		li.request {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		button {
+			background-color: #1877f2;
+			color: #fff;
+			border: none;
+			border-radius: 5px;
+			padding: 10px 20px;
+			font-size: 16px;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+		}
 	}
 
 	.post-section {
@@ -52,30 +69,6 @@
 		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 		padding: 15px;
 		margin-bottom: 20px;
-	}
-
-	.create-post-button {
-		background-color: #add8e6;
-		color: #fff;
-		border: none;
-		border-radius: 5px;
-		padding: 10px 20px;
-		font-size: 16px;
-		cursor: pointer;
-		transition: background-color 0.3s ease;
-
-		&:hover {
-			background-color: #87ceeb;
-		}
-
-		&:active {
-			background-color: #6495ed;
-		}
-
-		&:disabled {
-			background-color: #d3d3d3;
-			cursor: not-allowed;
-		}
 	}
 
 	@media (max-width: 768px) {
