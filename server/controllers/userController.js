@@ -70,6 +70,10 @@ const loginUser = async (request, response) => {
 	const { email, password } = request.body;
 
 	const user = await userModel.findOne({ email: email });
+	if (!user) {
+		response.status(404).json({ error: "User not found" });
+		return;
+	}
 	console.log(
 		`- id: ${user._id}\n- username: ${user.username}\n- email: ${email}\n`
 	);

@@ -1,10 +1,15 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import "../admin/admin.css";
+
 import { useAuth } from "../../context/authContext";
+import { setLogout } from "../../slices/authSlice";
 
 function Sidebar({ selectPage }) {
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
+	const { setUser } = useAuth();
 	const [activeItem, setActiveItem] = useState("Dashboard");
 
 	const handleLogout = async () => {
@@ -15,6 +20,8 @@ function Sidebar({ selectPage }) {
 			});
 
 			if (response.ok) {
+				dispatch(setLogout());
+				setUser(null);
 				navigate("/login");
 			} else {
 				console.error("Logout failed");
