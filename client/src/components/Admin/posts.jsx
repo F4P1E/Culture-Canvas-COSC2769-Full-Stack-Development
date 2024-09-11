@@ -7,8 +7,8 @@ function Posts() {
 	const { posts } = useSelector((state) => state.posts);
 	const comments = useSelector((state) => state.posts.comments);
 
-    const [selectedPostId, setPostId] = useState(null);
-    const [selectedCommentId, setCommentId] = useState(null);
+	const [selectedPostId, setPostId] = useState(null);
+	const [selectedCommentId, setCommentId] = useState(null);
 
 	// Fetch posts from the backend
 	useEffect(() => {
@@ -27,8 +27,6 @@ function Posts() {
 
 				dispatch(setPosts(data));
 				dispatch(getComments(data));
-
-                console.log("comments fetched:", data);
 			} catch (err) {
 				console.error("Failed to fetch posts:", err);
 				// dispatch(setError({ error: err.message })); // Dispatch error to Redux store.
@@ -57,8 +55,6 @@ function Posts() {
 	};
 
 	const handleRemoveComment = async (postId, commentId) => {
-		console.log(postId, commentId);
-
 		try {
 			const response = await fetch(
 				`http://localhost:8000/post/${postId}/comment/${commentId}`,
@@ -72,12 +68,10 @@ function Posts() {
 				throw new Error("Failed to delete comment");
 			}
 
-            setPostId(postId);
-            setCommentId(commentId);
+			setPostId(postId);
+			setCommentId(commentId);
 
-            setPosts(comments.filter((comment) => comment._id !== selectedCommentId));
-
-			console.log(comments);
+			setPosts(comments.filter((comment) => comment._id !== selectedCommentId));
 
 			alert("Comment deleted successfully");
 			window.location.reload();

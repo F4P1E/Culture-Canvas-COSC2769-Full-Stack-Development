@@ -32,8 +32,6 @@ const GroupAdmin = () => {
 
 	const currentGroupId = useSelector((state) => state.groups.currentGroupId);
 
-	console.log(`selectedGroupId: ${selectedGroupId}`);
-
 	// Fetch groups when the component mounts
 	useEffect(() => {
 		const fetchGroups = async () => {
@@ -200,8 +198,6 @@ const GroupAdmin = () => {
 
 	// Handle deleting a member from a group
 	const handleDeleteMember = (memberId) => {
-		console.log(`Selected group ID: ${selectedGroupId}`);
-		console.log(`Selected member ID: ${memberId}`);
 		const deleteMember = async () => {
 			try {
 				// Send DELETE request to the server to unfriend the user

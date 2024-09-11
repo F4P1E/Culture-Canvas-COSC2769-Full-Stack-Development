@@ -103,7 +103,6 @@ const getAllPosts = async (request, response) => {
 			.populate("comments")
 			.sort({ createdAt: -1 });
 
-		console.log(`Posts: ${posts}`);
 		return response.status(200).json(posts);
 	} else {
 		return response.status(403).json({ error: "User is not an admin" });
@@ -417,7 +416,6 @@ const updateComment = async (request, response) => {
 		}
 
 		// Check if the user is the author
-		console.log(`userId: ${userId}, comment.userId: ${comment.userId}`);
 		if (JSON.stringify(userId) !== JSON.stringify(comment.userId)) {
 			return response
 				.status(400)
@@ -504,10 +502,6 @@ const postReaction = async (req, res) => {
 		const postId = req.params.id;
 		const { reactionType } = req.body;
 		const userId = req.user._id;
-
-		// Log to check what is being sent in the request
-		console.log("Reaction type:", reactionType);
-		console.log("User ID:", userId);
 
 		// Validate reaction type
 		if (

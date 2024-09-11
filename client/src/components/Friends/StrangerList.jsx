@@ -39,8 +39,6 @@ const StrangerList = () => {
 	}, [userId]); // Added dispatch to the dependencies array
 
 	const handleAddFriend = (strangerId) => {
-		console.log(`Stranger ID: ${strangerId}`);
-
 		const makeFriend = async () => {
 			try {
 				const response = await fetch(

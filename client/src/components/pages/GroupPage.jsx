@@ -17,8 +17,6 @@ const GroupPage = () => {
 	const userId = useSelector((state) => state.auth.user._id);
 	// const memberInfo = useSelector((state) => state.groups.memberInfo);
 
-	console.log(`Group ID: ${groupId}`);
-
 	// useEffect to fetch group data when the component mounts or ID/token changes.
 	useEffect(() => {
 		const fetchOneGroup = async () => {

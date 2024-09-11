@@ -71,7 +71,6 @@ const getUserGroups = async (req, res) => {
 		const user = await userModel.findById(userId).populate("groups").exec();
 		if (user && Array.isArray(user.groups)) {
 			const groupIdWithUser = user.groups.map((group) => group._id);
-			console.log("- groupIdWithUser:", groupIdWithUser);
 
 			const groups = await groupModel.find({
 				_id: { $in: groupIdWithUser },
@@ -98,7 +97,6 @@ const getAdminGroups = async (req, res) => {
 			const groupIdWithUserAsAdmin = user.groups
 				.filter((group) => group.admins.includes(userId))
 				.map((group) => group._id);
-			console.log("- groupIdWithUserAsAdmin:", groupIdWithUserAsAdmin);
 
 			const groups = await groupModel.find({
 				_id: { $in: groupIdWithUserAsAdmin },
@@ -185,9 +183,6 @@ const approveCreateGroup = async (req, res) => {
 
 		// Find the group request by ID
 		const groupRequest = await groupRequestModel.findById(groupRequestId);
-		console.log(
-			`- groupRequest: ${await groupRequestModel.findById(groupRequestId)}`
-		);
 
 		if (!groupRequest) {
 			return res.status(404).json({ message: "Group request not found" });

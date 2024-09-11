@@ -42,7 +42,6 @@ const Login = () => {
 			}
 
 			const data = await response.json();
-			console.log(`${data}`);
 
 			function removePassFromUser(user) {
 				const { password, ...userWithoutPassword } = user;
