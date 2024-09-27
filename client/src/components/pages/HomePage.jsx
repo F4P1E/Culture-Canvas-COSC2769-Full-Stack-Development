@@ -1,3 +1,6 @@
+// SCSS
+import "../styles/HomePage.scss";
+
 import React from "react";
 import { useNavigate } from "react-router-dom"; // Correct import for useNavigate
 import { useDispatch } from "react-redux";
